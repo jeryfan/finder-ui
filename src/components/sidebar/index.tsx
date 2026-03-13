@@ -11,7 +11,12 @@ const cn = (...classes: Array<string | false | null | undefined>) =>
   classes.filter(Boolean).join(" ");
 
 export function Sidebar({ tabs, className }: SidebarProps) {
-  const { activeTab, setActiveTab, onContextMenu } = useStore();
+  const { activeTab, setActiveTab, openContextMenu } = useStore();
+
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    openContextMenu(event.clientX, event.clientY, null, "empty");
+  };
 
   return (
     <aside
@@ -20,11 +25,7 @@ export function Sidebar({ tabs, className }: SidebarProps) {
         "h-full flex flex-col",
         className
       )}
-      onContextMenu={(event) => {
-        const target = event.target as HTMLElement;
-        if (target.closest('[data-sidebar-tab="true"]')) return;
-        onContextMenu(event, null);
-      }}
+      onContextMenu={handleContextMenu}
     >
       <div className="p-2">
         <div className="mb-2 px-2 text-xs font-medium tracking-[0.6px] text-[#A1A1AA]">
@@ -43,7 +44,6 @@ export function Sidebar({ tabs, className }: SidebarProps) {
                   key={tab.key}
                   data-sidebar-tab="true"
                   onClick={() => setActiveTab(tab.key)}
-                  onContextMenu={(event) => onContextMenu(event, null)}
                   className={cn(
                     "w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors text-[#2E2929]",
                     activeTab === tab.key
