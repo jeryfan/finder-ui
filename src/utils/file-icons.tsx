@@ -3,6 +3,7 @@ import {
   FolderIcon,
   FileIcon,
   FileCodeIcon,
+  FileBracesIcon,
   FileSpreadsheetIcon,
   PresentationIcon,
   ImageIcon,
@@ -72,7 +73,7 @@ export const getFileIcon = (
   if (CODE_ICON_EXTENSIONS.has(ext))
     return <FileCodeIcon className={cn(className, 'text-emerald-500')} />
   if (BRACES_EXTENSIONS.has(ext))
-    return <FileCodeIcon className={cn(className, 'text-yellow-600')} />
+    return <FileBracesIcon className={cn(className, 'text-yellow-600')} />
   if (TEXT_EXTENSIONS.has(ext) || MARKDOWN_EXTENSIONS.has(ext))
     return <FileIcon className={cn(className, 'text-black')} />
   if (ARCHIVE_EXTENSIONS.has(ext))

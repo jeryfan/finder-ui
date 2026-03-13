@@ -6,6 +6,7 @@ import { useStore } from '@/store'
 import {
   FileIcon,
   FileCodeIcon,
+  FileBracesIcon,
   FileSpreadsheetIcon,
   PresentationIcon,
   ImageIcon,
@@ -16,6 +17,7 @@ import {
   SaveIcon,
   RefreshIcon,
   EditIcon,
+  EyeIcon,
   CloseIcon,
   MaximizeIcon,
   MinimizeIcon,
@@ -80,7 +82,7 @@ const getPreviewFileIcon = (preview: PreviewWindow, className = 'w-3.5 h-3.5') =
   if (IMAGE_EXTENSIONS.has(ext)) return <ImageIcon className={cn(className, 'text-green-500')} />
   if (VIDEO_EXTENSIONS.has(ext)) return <FilmIcon className={cn(className, 'text-purple-500')} />
   if (CODE_ICON_EXTENSIONS.has(ext)) return <FileCodeIcon className={cn(className, 'text-emerald-500')} />
-  if (BRACES_EXTENSIONS.has(ext)) return <FileCodeIcon className={cn(className, 'text-yellow-600')} />
+  if (BRACES_EXTENSIONS.has(ext)) return <FileBracesIcon className={cn(className, 'text-yellow-600')} />
   if (SPREADSHEET_EXTENSIONS.has(ext)) return <FileSpreadsheetIcon className={cn(className, 'text-green-600')} />
   if (TEXT_EXTENSIONS.has(ext) || MARKDOWN_EXTENSIONS.has(ext)) return <FileIcon className={cn(className, 'text-black')} />
   if (ARCHIVE_EXTENSIONS.has(ext)) return <FileArchiveIcon className={cn(className, 'text-yellow-600')} />
@@ -197,7 +199,7 @@ export function PreviewPanel({
 
     if (shouldUseCodeEditor) {
       return (
-        <div className="h-full bg-[#282C34] text-[13px] leading-[18.2px]">
+        <div className="h-full overflow-auto bg-[#282C34] text-[13px] leading-[18.2px]">
           <CodeMirror
             value={preview.draftContent}
             height="100%"
@@ -247,7 +249,8 @@ export function PreviewPanel({
         >
           {previews.map((preview) => {
             const isMarkdown = isMarkdownFile(preview.name)
-            const secondaryActionIsEdit = updateEnabled && isMarkdown && !preview.isEditing
+            const isMarkdownPreviewMode = isMarkdown && !preview.isEditing
+            const isMarkdownEditMode = isMarkdown && preview.isEditing
             const canSave = updateEnabled && preview.draftContent !== preview.content && !preview.isSaving
 
             return (
@@ -258,6 +261,7 @@ export function PreviewPanel({
                 {/* Title Bar */}
                 <div className="flex h-10 cursor-default items-center gap-2 border-b border-[#EAE9E6] bg-white px-3">
                   <div className="flex min-w-0 flex-1 items-center gap-2">
+                    {getPreviewFileIcon(preview, 'h-3.5 w-3.5 shrink-0')}
                     <span className="truncate text-sm font-medium text-[#2E2929]">{preview.name}</span>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
@@ -270,24 +274,34 @@ export function PreviewPanel({
                         <DownloadIcon className="h-3.5 w-3.5" />
                       </button>
                     )}
-                    {updateEnabled && (
+                    {updateEnabled && isMarkdownPreviewMode && (
                       <button
-                        onClick={() => {
-                          if (secondaryActionIsEdit) {
-                            setPreviewEditing(preview.path, true)
-                            return
-                          }
-                          void handleSave(preview)
-                        }}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929] disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={secondaryActionIsEdit ? false : !canSave}
-                        title={secondaryActionIsEdit ? 'Edit' : 'Save'}
+                        onClick={() => setPreviewEditing(preview.path, true)}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+                        title="Edit"
                       >
-                        {secondaryActionIsEdit
-                          ? <EditIcon className="h-3.5 w-3.5" />
-                          : preview.isSaving
-                            ? <LoaderIcon className="h-3.5 w-3.5" />
-                            : <SaveIcon className="h-3.5 w-3.5" />}
+                        <EditIcon className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    {updateEnabled && isMarkdownEditMode && (
+                      <button
+                        onClick={() => setPreviewEditing(preview.path, false)}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+                        title="Preview"
+                      >
+                        <EyeIcon className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    {updateEnabled && (isMarkdownEditMode || !isMarkdown) && (
+                      <button
+                        onClick={() => void handleSave(preview)}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929] disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={!canSave}
+                        title="Save"
+                      >
+                        {preview.isSaving
+                          ? <LoaderIcon className="h-3.5 w-3.5" />
+                          : <SaveIcon className="h-3.5 w-3.5" />}
                       </button>
                     )}
                     <button
@@ -347,7 +361,8 @@ export function PreviewPanel({
               {previews.map((preview) => {
                 const isActiveTab = activePreview.path === preview.path
                 const isMarkdownTab = isMarkdownFile(preview.name)
-                const tabActionIsEdit = updateEnabled && isMarkdownTab && !preview.isEditing
+                const isMarkdownPreviewTab = isMarkdownTab && !preview.isEditing
+                const isMarkdownEditTab = isMarkdownTab && preview.isEditing
                 const canSaveTab = updateEnabled && preview.draftContent !== preview.content && !preview.isSaving && !preview.isLoading
 
                 return (
@@ -369,29 +384,45 @@ export function PreviewPanel({
                       {getPreviewFileIcon(preview, 'h-3.5 w-3.5 shrink-0')}
                       <span className="max-w-[100px] truncate">{preview.name}</span>
                     </button>
-                    {isActiveTab && updateEnabled && (
-                      <div className="flex shrink-0 items-center gap-0.5">
+                    {isActiveTab && updateEnabled && isMarkdownPreviewTab && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setActivePreviewPath(preview.path)
+                          setPreviewEditing(preview.path, true)
+                        }}
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors hover:text-[#2E2929]"
+                        title="Edit"
+                      >
+                        <EditIcon className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    {isActiveTab && updateEnabled && isMarkdownEditTab && (
+                      <>
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
-                            if (tabActionIsEdit) {
-                              setActivePreviewPath(preview.path)
-                              setPreviewEditing(preview.path, true)
-                              return
-                            }
+                            setPreviewEditing(preview.path, false)
+                          }}
+                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors hover:text-[#2E2929]"
+                          title="Preview"
+                        >
+                          <EyeIcon className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
                             void handleSave(preview)
                           }}
-                          disabled={tabActionIsEdit ? false : !canSaveTab}
-                          className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929] disabled:cursor-not-allowed disabled:opacity-50"
-                          title={tabActionIsEdit ? 'Edit' : 'Save'}
+                          disabled={!canSaveTab}
+                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors hover:text-[#2E2929] disabled:cursor-not-allowed disabled:opacity-50"
+                          title="Save"
                         >
-                          {tabActionIsEdit
-                            ? <EditIcon className="h-3.5 w-3.5" />
-                            : preview.isSaving
-                              ? <LoaderIcon className="h-3.5 w-3.5" />
-                              : <SaveIcon className="h-3.5 w-3.5" />}
+                          {preview.isSaving
+                            ? <LoaderIcon className="h-3.5 w-3.5" />
+                            : <SaveIcon className="h-3.5 w-3.5" />}
                         </button>
-                      </div>
+                      </>
                     )}
                     <button
                       onClick={(e) => {
@@ -411,7 +442,25 @@ export function PreviewPanel({
               })}
             </div>
             <div className="flex shrink-0 items-center gap-1">
-              {updateEnabled && (
+              {updateEnabled && isMarkdownFile(activePreview.name) && !activePreview.isEditing && (
+                <button
+                  onClick={() => setPreviewEditing(activePreview.path, true)}
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+                  title="Edit"
+                >
+                  <EditIcon className="h-3.5 w-3.5" />
+                </button>
+              )}
+              {updateEnabled && isMarkdownFile(activePreview.name) && activePreview.isEditing && (
+                <button
+                  onClick={() => setPreviewEditing(activePreview.path, false)}
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+                  title="Preview"
+                >
+                  <EyeIcon className="h-3.5 w-3.5" />
+                </button>
+              )}
+              {updateEnabled && (!isMarkdownFile(activePreview.name) || activePreview.isEditing) && (
                 <button
                   onClick={() => void handleSave(activePreview)}
                   disabled={activePreview.draftContent === activePreview.content || activePreview.isSaving}

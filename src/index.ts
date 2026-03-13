@@ -32,6 +32,7 @@ export {
   FolderOpenIcon,
   FileIcon,
   FileCodeIcon,
+  FileBracesIcon,
   FileSpreadsheetIcon,
   PresentationIcon,
   ImageIcon,
