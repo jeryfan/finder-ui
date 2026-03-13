@@ -1,10 +1,10 @@
 import { File } from "lucide-react";
 import "./App.css";
 import { Sidebar } from "@/components/sidebar";
-import type { FinderSidebarTab } from "./types";
+import type { SidebarTab } from "./types";
 
 function App() {
-  const tabs: Array<FinderSidebarTab> = [
+  const tabs: Array<SidebarTab> = [
     {
       key: "tab1",
       label: "Tab 1",
