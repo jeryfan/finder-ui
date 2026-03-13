@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom'
+import { useEffect } from 'react'
 import { useStore } from '@/store'
 import {
   FolderOpenIcon,
@@ -23,6 +24,28 @@ export function ContextMenu() {
   } = useStore()
 
   const { isOpen, x, y, targetFile, targetType } = contextMenu
+
+  // 点击外部关闭菜单
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (!target.closest('[data-context-menu="true"]')) {
+        closeContextMenu()
+      }
+    }
+
+    // 使用 capture 阶段确保在事件冒泡前处理
+    document.addEventListener('click', handleClickOutside, true)
+    // 也监听 contextmenu 事件（右键点击其他地方时关闭）
+    document.addEventListener('contextmenu', handleClickOutside, true)
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true)
+      document.removeEventListener('contextmenu', handleClickOutside, true)
+    }
+  }, [isOpen, closeContextMenu])
 
   if (!isOpen) return null
 
