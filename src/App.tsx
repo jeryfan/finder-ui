@@ -1,16 +1,7 @@
-import { useEffect, useMemo } from 'react'
-import {
-  Sidebar,
-  FileList,
-  ContextMenu,
-  useStore,
-  type SidebarTab,
-  type FileEntry,
-} from './'
-import { Toolbar } from '@/components/toolbar'
-import { PreviewPanel, getPreviewLeftPaneWidth } from '@/components/preview-panel'
+import { Finder, type SidebarTab, type FileEntry } from './'
 
-// 示例：自定义图标组件
+// --- Demo icon components ---
+
 const HomeIcon = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -30,7 +21,14 @@ const SkillsIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
-// 模拟文件数据
+// --- Demo data ---
+
+const TABS: SidebarTab[] = [
+  { key: 'home', label: 'Home', rootPath: '/root', icon: HomeIcon },
+  { key: 'workspace', label: 'Workspace', rootPath: '/root/workspace', icon: WorkspaceIcon },
+  { key: 'skills', label: 'Skills', rootPath: '/root/.claude/skills', icon: SkillsIcon },
+]
+
 const seedEntries: Record<string, FileEntry[]> = {
   '/root': [
     { name: '.cache', path: '/root/.cache', size: 0, type: 'directory', lastModified: new Date().toISOString() },
@@ -67,193 +65,42 @@ const seedFileContents: Record<string, string> = {
   '/root/styles.css': '.container {\n  max-width: 1200px;\n  margin: 0 auto;\n  padding: 20px;\n}\n\n.header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  border-bottom: 1px solid #eae9e6;\n}\n',
 }
 
-const TABS: SidebarTab[] = [
-  { key: 'home', label: 'Home', rootPath: '/root', icon: HomeIcon },
-  { key: 'workspace', label: 'Workspace', rootPath: '/root/workspace', icon: WorkspaceIcon },
-  { key: 'skills', label: 'Skills', rootPath: '/root/.claude/skills', icon: SkillsIcon },
-]
-
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
+// --- Demo handlers ---
+
+const handleFetchFiles = async (path: string): Promise<FileEntry[]> => {
+  await wait(120)
+  return seedEntries[path] || []
+}
+
+const handleOpenFile = async (file: FileEntry): Promise<string | void> => {
+  if (file.type !== 'file') return
+  return seedFileContents[file.path] || `File: ${file.name}\nSize: ${file.size} bytes\n`
+}
+
+const handleSave = async (path: string, content: string) => {
+  console.log('Saving file:', path, 'Content length:', content.length)
+  await wait(800)
+}
+
+// --- App ---
+
 function App() {
-  const {
-    currentPath,
-    historyStack,
-    historyIndex,
-    activeTab,
-    viewMode,
-    searchQuery,
-    previews,
-    setTabs,
-    setActiveTab,
-    setFiles,
-    setLoading,
-    setUpdateEnabled,
-    setOpenHandler,
-    setDownloadHandler,
-    setBatchDownloadHandler,
-    setUploadHandler,
-    setRefreshHandler,
-    setSavePreviewHandler,
-    setNavigateToPathHandler,
-    setCurrentPath,
-    navigateTo,
-    goBack,
-    goForward,
-    setViewMode,
-    setSearchQuery,
-    openPreview,
-  } = useStore()
-
-  const leftPaneWidth = getPreviewLeftPaneWidth(previews.length)
-
-  const loadFiles = async (path: string) => {
-    setLoading(true)
-    await wait(120)
-    const entries = seedEntries[path] || []
-    setFiles(entries)
-    setCurrentPath(path)
-    setLoading(false)
-  }
-
-  const breadcrumbs = useMemo(() => {
-    const tab = TABS.find(t => t.key === activeTab)
-    const tabLabel = tab?.label ?? 'Files'
-    const rootPath = tab?.rootPath ?? '/root'
-    const items: Array<{ label: string; path: string }> = [{ label: tabLabel, path: rootPath }]
-    if (currentPath === rootPath) return items
-    const relativePath = currentPath.startsWith(`${rootPath}/`) ? currentPath.slice(rootPath.length + 1) : currentPath.slice(1)
-    const segments = relativePath.split('/').filter(Boolean)
-    let cursor = rootPath
-    segments.forEach((segment) => {
-      cursor = `${cursor}/${segment}`
-      items.push({ label: segment, path: cursor })
-    })
-    return items
-  }, [activeTab, currentPath])
-
-  useEffect(() => {
-    setTabs(TABS)
-    setActiveTab('home')
-    setUpdateEnabled(true)
-
-    setNavigateToPathHandler((path: string) => {
-      loadFiles(path)
-    })
-
-    setOpenHandler((file: FileEntry) => {
-      if (file.type === 'file') {
-        const content = seedFileContents[file.path] || `File: ${file.name}\nSize: ${file.size} bytes\n`
-        openPreview(file, content)
-      }
-    })
-
-    setDownloadHandler((file: FileEntry) => {
-      console.log('Downloading file:', file)
-    })
-
-    setBatchDownloadHandler((downloadFiles: FileEntry[]) => {
-      console.log('Batch downloading files:', downloadFiles)
-    })
-
-    setUploadHandler((isFolder: boolean, targetPath?: string) => {
-      console.log('Upload:', isFolder ? 'folder' : 'files', 'to:', targetPath)
-    })
-
-    setRefreshHandler(() => {
-      loadFiles(useStore.getState().currentPath)
-    })
-
-    setSavePreviewHandler(async (path: string, content: string) => {
-      console.log('Saving file:', path, 'Content length:', content.length)
-      await wait(800)
-    })
-
-    loadFiles('/root')
-  }, [])
-
-  const handleTabChange = (tabKey: string) => {
-    const tab = TABS.find(t => t.key === tabKey)
-    if (!tab) return
-    setActiveTab(tabKey)
-    const rootPath = tab.rootPath
-    navigateTo(rootPath)
-    loadFiles(rootPath)
-  }
-
-  const handleNavigate = (path: string) => {
-    navigateTo(path)
-    loadFiles(path)
-  }
-
-  const handleDownloadPreview = async (path: string) => {
-    const preview = previews.find(p => p.path === path)
-    if (!preview) return
-    const blob = new Blob([preview.content], { type: 'text/plain;charset=utf-8' })
-    const href = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = href
-    anchor.download = preview.name
-    document.body.appendChild(anchor)
-    anchor.click()
-    document.body.removeChild(anchor)
-    URL.revokeObjectURL(href)
-  }
-
   return (
     <main className="finder-ui-playground">
       <section className="finder-ui-canvas">
-        <div
-          className="h-full w-full relative overflow-hidden select-none finder-ui-root bg-[#F9F6F1] [&_*]:[scrollbar-width:none] [&_*::-webkit-scrollbar]:hidden"
-          data-finder-theme="target"
-          style={{
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-            WebkitFontSmoothing: 'antialiased',
-          }}
-        >
-          <div className="relative h-full flex">
-            {/* Main content area - both left pane and preview stack live here */}
-            <div className="flex-1 min-w-0 h-full p-4 pl-0 relative z-10 overflow-hidden">
-              {/* Left pane - file list area, with dynamic width when previews are open */}
-              <div
-                className="overflow-hidden transition-all duration-300 ease-out absolute inset-0"
-                style={previews.length > 0 ? { width: `${leftPaneWidth}px` } : undefined}
-              >
-                <div className="relative overflow-hidden bg-white rounded-2xl transition-all duration-300 ease-out flex-1 h-full">
-                  <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                    <div className="h-full flex bg-white text-[#2E2929] overflow-hidden select-none" data-finder-window="true">
-                      <Sidebar tabs={TABS} />
-
-                      <section className="flex-1 flex flex-col min-w-0">
-                        <Toolbar
-                          historyIndex={historyIndex}
-                          historyStackLength={historyStack.length}
-                          breadcrumbs={breadcrumbs}
-                          viewMode={viewMode}
-                          searchQuery={searchQuery}
-                          onGoBack={goBack}
-                          onGoForward={goForward}
-                          onNavigate={handleNavigate}
-                          onViewModeChange={setViewMode}
-                          onSearchChange={setSearchQuery}
-                        />
-                        <FileList />
-                      </section>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Preview stack - positioned to the right of the left pane */}
-              <PreviewPanel
-                leftPaneWidth={leftPaneWidth}
-                onDownloadPreview={handleDownloadPreview}
-              />
-            </div>
-          </div>
-
-          <ContextMenu />
-        </div>
+        <Finder
+          tabs={TABS}
+          defaultTab="home"
+          onFetchFiles={handleFetchFiles}
+          onOpenFile={handleOpenFile}
+          onDownload={(file) => console.log('Downloading file:', file)}
+          onBatchDownload={(files) => console.log('Batch downloading files:', files)}
+          onUpload={(isFolder, targetPath) => console.log('Upload:', isFolder ? 'folder' : 'files', 'to:', targetPath)}
+          onSave={handleSave}
+          editable
+        />
       </section>
     </main>
   )

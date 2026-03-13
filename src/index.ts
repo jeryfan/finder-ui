@@ -14,6 +14,8 @@ export type {
 } from '@/types'
 
 // Components
+export { Finder } from '@/components/finder'
+export type { FinderProps } from '@/components/finder'
 export { Sidebar } from '@/components/sidebar'
 export { FileList } from '@/components/file-list'
 export { ContextMenu } from '@/components/context-menu'
