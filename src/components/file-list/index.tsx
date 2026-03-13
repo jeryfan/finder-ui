@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useStore } from '@/store'
 import { FolderIcon, LoaderIcon, ChevronDownIcon } from '@/icons'
 import { cn, formatDateTimeEN, formatFileSize } from '@/utils'
@@ -16,39 +17,78 @@ export function FileList() {
     searchQuery,
     fileLoadingStates,
     setSort,
+    setSelectedPaths,
     toggleSelection,
+    selectRange,
     clearSelection,
     openContextMenu,
-    setOpenHandler,
-    setLoading,
+    onOpen,
+    navigateTo,
+    onNavigateToPath,
+    previews,
+    setActivePreviewPath,
   } = useStore()
 
   const dateColumnClass = 'w-32'
   const sizeColumnClass = 'w-20'
 
+  const filteredFiles = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+    if (!query) return files
+    return files.filter(item => item.name.toLowerCase().includes(query))
+  }, [files, searchQuery])
+
+  const sortedFiles = useMemo(() => {
+    const direction = sortOrder === 'asc' ? 1 : -1
+    return [...filteredFiles].sort((left, right) => {
+      if (left.type !== right.type) return left.type === 'directory' ? -1 : 1
+      if (sortField === 'modified_at') {
+        const leftTime = Date.parse(left.lastModified || left.modified_at || '')
+        const rightTime = Date.parse(right.lastModified || right.modified_at || '')
+        return (leftTime - rightTime) * direction
+      }
+      if (sortField === 'size') return (left.size - right.size) * direction
+      return left.name.localeCompare(right.name) * direction
+    })
+  }, [filteredFiles, sortField, sortOrder])
+
   const handleEntryClick = (entry: FileEntry, event: React.MouseEvent) => {
-    if (event.metaKey || event.ctrlKey) {
+    event.preventDefault()
+    event.stopPropagation()
+    const isMetaSelect = event.metaKey || event.ctrlKey
+    const isShiftSelect = event.shiftKey
+
+    if (isMetaSelect) {
       toggleSelection(entry.path)
+    } else if (isShiftSelect && selectedPaths.size > 0) {
+      selectRange(entry.path)
     } else {
-      setLoading(true)
-      clearSelection()
-      toggleSelection(entry.path)
-      setLoading(false)
+      setSelectedPaths(new Set([entry.path]))
+    }
+
+    if (previews.some(item => item.path === entry.path)) {
+      setActivePreviewPath(entry.path)
     }
   }
 
-  const handleEntryDoubleClick = (entry: FileEntry) => {
+  const handleEntryDoubleClick = (entry: FileEntry, event: React.MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
     if (entry.type === 'directory') {
-      // Navigate into folder
-    } else {
-      const { onOpen } = useStore.getState()
-      onOpen(entry)
+      clearSelection()
+      navigateTo(entry.path)
+      onNavigateToPath(entry.path)
+      return
     }
+    onOpen(entry)
   }
 
   const handleContextMenu = (event: React.MouseEvent, entry: FileEntry | null) => {
     event.preventDefault()
     const targetType = entry?.type === 'directory' ? 'folder' : entry ? 'file' : 'empty'
+    if (entry && !selectedPaths.has(entry.path)) {
+      setSelectedPaths(new Set([entry.path]))
+    }
     openContextMenu(event.clientX, event.clientY, entry, targetType)
   }
 
@@ -67,7 +107,7 @@ export function FileList() {
           handleContextMenu(event, null)
         }}
       >
-        {viewMode === 'list' && (files.length > 0 || loading) && (
+        {viewMode === 'list' && (sortedFiles.length > 0 || loading) && (
           <div className="flex items-center gap-2 px-2 py-1 text-[10px] leading-4 font-semibold text-[#666666] uppercase tracking-wider border-b border-[#EAE9E6]">
             <button
               onClick={() => setSort('name')}
@@ -107,7 +147,7 @@ export function FileList() {
           </div>
         )}
 
-        {viewMode === 'grouped' && loading && files.length === 0 && (
+        {viewMode === 'grouped' && loading && sortedFiles.length === 0 && (
           <div className="grid grid-cols-8 gap-4 p-4">
             {Array.from({ length: 16 }).map((_, index) => (
               <div key={`grid-skeleton-${index}`} className="flex flex-col items-center gap-2 animate-pulse">
@@ -118,7 +158,7 @@ export function FileList() {
           </div>
         )}
 
-        {viewMode === 'list' && loading && files.length === 0 && (
+        {viewMode === 'list' && loading && sortedFiles.length === 0 && (
           <div className="p-4 space-y-1">
             {Array.from({ length: 8 }).map((_, index) => (
               <div key={`list-skeleton-${index}`} className="flex items-center gap-3 py-2 animate-pulse">
@@ -131,7 +171,7 @@ export function FileList() {
           </div>
         )}
 
-        {files.length === 0 && !loading && !loadError && (
+        {sortedFiles.length === 0 && !loading && !loadError && (
           <div className="h-full flex items-center justify-center text-[#666666]">
             <div className="text-center">
               <FolderIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -141,15 +181,15 @@ export function FileList() {
           </div>
         )}
 
-        {viewMode === 'grouped' && files.length > 0 && (
+        {viewMode === 'grouped' && sortedFiles.length > 0 && (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-3">
-            {files.map(entry => (
+            {sortedFiles.map(entry => (
               <button
                 key={entry.path}
                 data-file-row="true"
                 data-file-path={entry.path}
                 onClick={event => handleEntryClick(entry, event)}
-                onDoubleClick={() => handleEntryDoubleClick(entry)}
+                onDoubleClick={event => handleEntryDoubleClick(entry, event)}
                 onContextMenu={event => handleContextMenu(event, entry)}
                 className={cn(
                   'flex flex-col items-center p-2 rounded-lg transition-colors text-center group',
@@ -167,15 +207,15 @@ export function FileList() {
           </div>
         )}
 
-        {viewMode === 'list' && files.length > 0 && (
+        {viewMode === 'list' && sortedFiles.length > 0 && (
           <div className="mt-0.5 space-y-0.5">
-            {files.map(entry => (
+            {sortedFiles.map(entry => (
               <button
                 key={entry.path}
                 data-file-row="true"
                 data-file-path={entry.path}
                 onClick={event => handleEntryClick(entry, event)}
-                onDoubleClick={() => handleEntryDoubleClick(entry)}
+                onDoubleClick={event => handleEntryDoubleClick(entry, event)}
                 onContextMenu={event => handleContextMenu(event, entry)}
                 className={cn(
                   'w-full flex items-center gap-2 px-2 py-1 rounded-md transition-colors text-left leading-[25.6px] group',
@@ -201,7 +241,7 @@ export function FileList() {
       </div>
 
       <div className="flex h-6 shrink-0 items-center border-t border-[#EAE9E6] bg-[#F6F5F433] px-3 text-[10px] leading-4 text-[#666666]">
-        <span>{files.length} items</span>
+        <span>{sortedFiles.length} items</span>
         {selectedPaths.size > 0 && (
           <span className="ml-2">{selectedPaths.size} selected</span>
         )}

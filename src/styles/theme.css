@@ -1,0 +1,67 @@
+.finder-ui-root {
+  --color-background: #fcfbf8;
+  --color-foreground: #2e2929;
+  --color-border: #eae9e6;
+  --color-muted: #efeeeb;
+  --color-muted-foreground: #666666;
+  --color-card: #ffffff;
+  --color-popover: #ffffff;
+  --color-primary: #f59e0b;
+  color: var(--color-foreground);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.finder-ui-root[data-finder-theme='target'] {
+  --color-background: #fcfbf8;
+  --color-foreground: #2e2929;
+  --color-border: #eae9e6;
+  --color-muted: #efeeeb;
+  --color-muted-foreground: #666666;
+  --color-card: #ffffff;
+  --color-popover: #ffffff;
+  --color-primary: #f59e0b;
+}
+
+.finder-ui-root[data-finder-theme='graphite'] {
+  --color-background: #f5f6f7;
+  --color-foreground: #222629;
+  --color-border: #d9dde1;
+  --color-muted: #eceff2;
+  --color-muted-foreground: #5f676f;
+  --color-card: #ffffff;
+  --color-popover: #ffffff;
+  --color-primary: #3b82f6;
+}
+
+.finder-ui-root[data-finder-theme='clean'] {
+  --color-background: #fdfdfd;
+  --color-foreground: #1f2937;
+  --color-border: #e5e7eb;
+  --color-muted: #f3f4f6;
+  --color-muted-foreground: #6b7280;
+  --color-card: #ffffff;
+  --color-popover: #ffffff;
+  --color-primary: #16a34a;
+}
+
+.finder-ui-root ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.finder-ui-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.finder-ui-root ::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-muted-foreground) 36%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.finder-ui-root ::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--color-muted-foreground) 56%, transparent);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}

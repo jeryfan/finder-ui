@@ -9,12 +9,16 @@ export type {
   SidebarTab,
   FileEntry,
   ContextMenuTargetType,
+  PreviewMode,
+  PreviewWindow,
 } from '@/types'
 
 // Components
 export { Sidebar } from '@/components/sidebar'
 export { FileList } from '@/components/file-list'
 export { ContextMenu } from '@/components/context-menu'
+export { PreviewPanel, getPreviewLeftPaneWidth } from '@/components/preview-panel'
+export { Toolbar } from '@/components/toolbar'
 
 // Store
 export { useStore } from '@/store'
@@ -37,7 +41,15 @@ export {
   DownloadIcon,
   RefreshIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  SaveIcon,
+  EditIcon,
+  MaximizeIcon,
+  MinimizeIcon,
+  CloseIcon,
 } from '@/icons'
 export type { IconProps } from '@/icons'
 
+// File icon utilities
 export { getFileIcon, getFilePreviewType } from '@/utils/file-icons'

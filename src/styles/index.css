@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@source "../**/*.{ts,tsx}";
+
+@theme {
+  --color-foreground: #2e2929;
+  --color-muted-foreground: #666666;
+  --color-border: #eae9e6;
+  --color-muted: #f6f5f4;
+  --color-card: #ffffff;
+  --color-popover: #ffffff;
+  --color-primary: #f59e0b;
+}
+
+@import "./theme.css";

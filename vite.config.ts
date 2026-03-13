@@ -10,8 +10,9 @@ export default defineConfig({
     tailwindcss(),
     dts({
       insertTypesEntry: true,
-      rollupTypes: true,
-      include: ['src/**/*']
+      rollupTypes: false,
+      include: ['src/**/*'],
+      exclude: ['src/App.tsx', 'src/main.tsx'],
     })
   ],
   build: {
@@ -22,12 +23,24 @@ export default defineConfig({
       fileName: (format) => `finder-ui.${format}.js`
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        '@codemirror/lang-json',
+        '@codemirror/theme-one-dark',
+        '@uiw/react-codemirror',
+        '@codemirror/state',
+        '@codemirror/view',
+      ],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
-          'react/jsx-runtime': 'jsxRuntime'
+          'react/jsx-runtime': 'jsxRuntime',
+          '@codemirror/lang-json': 'codemirrorLangJson',
+          '@codemirror/theme-one-dark': 'codemirrorThemeOneDark',
+          '@uiw/react-codemirror': 'ReactCodeMirror',
         }
       }
     },

@@ -22,3 +22,19 @@ export type FileEntry = {
 }
 
 export type ContextMenuTargetType = 'file' | 'folder' | 'empty'
+
+export type PreviewMode = 'split' | 'grouped'
+
+export type PreviewWindow = {
+  path: string
+  name: string
+  size: number
+  content: string
+  draftContent: string
+  isLoading: boolean
+  isSaving: boolean
+  isEditing: boolean
+  error?: string
+  mimeType?: string
+  mimetype?: string
+}
