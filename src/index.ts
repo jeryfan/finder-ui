@@ -11,6 +11,8 @@ export type {
   ContextMenuTargetType,
   PreviewMode,
   PreviewWindow,
+  FilePreviewType,
+  MimeResolvable,
 } from '@/types'
 
 // Components
@@ -56,3 +58,6 @@ export type { IconProps } from '@/icons'
 
 // File icon utilities
 export { getFileIcon, getFilePreviewType } from '@/utils/file-icons'
+
+// File utilities
+export { readEntryFiles } from '@/utils/read-entry-files'
