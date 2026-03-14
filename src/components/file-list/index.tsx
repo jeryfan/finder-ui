@@ -1,44 +1,10 @@
-import { useMemo, useState, useRef, useCallback } from 'react'
+import { useMemo } from 'react'
 import { useStore } from '@/store'
 import { FolderIcon, LoaderIcon, ChevronDownIcon, UploadIcon } from '@/icons'
 import { cn, formatDateTimeEN, formatFileSize } from '@/utils'
 import { getFileIcon } from '@/utils/file-icons'
 import type { FileEntry } from '@/types'
-
-/** Recursively read all files from a FileSystemEntry tree */
-const readEntryFiles = async (entry: FileSystemEntry): Promise<File[]> => {
-  if (entry.isFile) {
-    return new Promise((resolve) => {
-      (entry as FileSystemFileEntry).file(
-        (file) => resolve([file]),
-        () => resolve([]),
-      )
-    })
-  }
-  if (entry.isDirectory) {
-    const reader = (entry as FileSystemDirectoryEntry).createReader()
-    const entries = await new Promise<FileSystemEntry[]>((resolve) => {
-      const allEntries: FileSystemEntry[] = []
-      const readBatch = () => {
-        reader.readEntries(
-          (batch) => {
-            if (batch.length === 0) {
-              resolve(allEntries)
-            } else {
-              allEntries.push(...batch)
-              readBatch()
-            }
-          },
-          () => resolve(allEntries),
-        )
-      }
-      readBatch()
-    })
-    const nested = await Promise.all(entries.map(readEntryFiles))
-    return nested.flat()
-  }
-  return []
-}
+import { useFileDrop } from './use-file-drop'
 
 export function FileList() {
   const {
@@ -66,8 +32,13 @@ export function FileList() {
     onDropFiles,
   } = useStore()
 
-  const [isDragOver, setIsDragOver] = useState(false)
-  const dragCounterRef = useRef(0)
+  const {
+    isDragOver,
+    handleDragEnter,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+  } = useFileDrop(currentPath, onDropFiles)
 
   const dateColumnClass = 'w-32'
   const sizeColumnClass = 'w-20'
@@ -131,57 +102,6 @@ export function FileList() {
     }
     openContextMenu(event.clientX, event.clientY, entry, targetType)
   }
-
-  const handleDragEnter = useCallback((event: React.DragEvent) => {
-    event.preventDefault()
-    dragCounterRef.current += 1
-    if (event.dataTransfer.types.includes('Files')) {
-      setIsDragOver(true)
-    }
-  }, [])
-
-  const handleDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault()
-    event.dataTransfer.dropEffect = 'copy'
-  }, [])
-
-  const handleDragLeave = useCallback((event: React.DragEvent) => {
-    event.preventDefault()
-    dragCounterRef.current -= 1
-    if (dragCounterRef.current <= 0) {
-      dragCounterRef.current = 0
-      setIsDragOver(false)
-    }
-  }, [])
-
-  const handleDrop = useCallback(async (event: React.DragEvent) => {
-    event.preventDefault()
-    dragCounterRef.current = 0
-    setIsDragOver(false)
-
-    const items = event.dataTransfer.items
-    if (!items || items.length === 0) return
-
-    // Try to use webkitGetAsEntry for folder support
-    const entries = Array.from(items)
-      .map((item) => item.webkitGetAsEntry?.())
-      .filter((entry): entry is FileSystemEntry => entry != null)
-
-    if (entries.length > 0) {
-      const nestedFiles = await Promise.all(entries.map(readEntryFiles))
-      const allFiles = nestedFiles.flat()
-      if (allFiles.length > 0) {
-        onDropFiles(allFiles, currentPath)
-      }
-      return
-    }
-
-    // Fallback: plain file list (no folder recursion)
-    const droppedFiles = Array.from(event.dataTransfer.files)
-    if (droppedFiles.length > 0) {
-      onDropFiles(droppedFiles, currentPath)
-    }
-  }, [currentPath, onDropFiles])
 
   return (
     <>
