@@ -70,6 +70,7 @@ export function Finder({
     setRefreshHandler,
     setSavePreviewHandler,
     setNavigateToPathHandler,
+    setDropFilesHandler,
     setCurrentPath,
     navigateTo,
     goBack,
@@ -162,6 +163,9 @@ export function Finder({
     })
     setSavePreviewHandler(async (path, content) => {
       await saveRef.current?.(path, content)
+    })
+    setDropFilesHandler((files, targetPath) => {
+      uploadRef.current?.(files, targetPath)
     })
 
     setRefreshHandler(() => {

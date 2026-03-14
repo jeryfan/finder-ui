@@ -91,6 +91,8 @@ interface State {
   setSavePreviewHandler: (handler: (path: string, content: string) => Promise<void> | void) => void
   onNavigateToPath: (path: string) => void
   setNavigateToPathHandler: (handler: (path: string) => void) => void
+  onDropFiles: (files: File[], targetPath?: string) => void
+  setDropFilesHandler: (handler: (files: File[], targetPath?: string) => void) => void
 }
 
 export const useStore = create<State>((set, get) => ({
@@ -301,4 +303,6 @@ export const useStore = create<State>((set, get) => ({
   setSavePreviewHandler: (handler) => set({ onSavePreview: handler }),
   onNavigateToPath: () => {},
   setNavigateToPathHandler: (handler) => set({ onNavigateToPath: handler }),
+  onDropFiles: () => {},
+  setDropFilesHandler: (handler) => set({ onDropFiles: handler }),
 }))

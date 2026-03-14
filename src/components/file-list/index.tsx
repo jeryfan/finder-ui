@@ -1,9 +1,44 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useRef, useCallback } from 'react'
 import { useStore } from '@/store'
-import { FolderIcon, LoaderIcon, ChevronDownIcon } from '@/icons'
+import { FolderIcon, LoaderIcon, ChevronDownIcon, UploadIcon } from '@/icons'
 import { cn, formatDateTimeEN, formatFileSize } from '@/utils'
 import { getFileIcon } from '@/utils/file-icons'
 import type { FileEntry } from '@/types'
+
+/** Recursively read all files from a FileSystemEntry tree */
+const readEntryFiles = async (entry: FileSystemEntry): Promise<File[]> => {
+  if (entry.isFile) {
+    return new Promise((resolve) => {
+      (entry as FileSystemFileEntry).file(
+        (file) => resolve([file]),
+        () => resolve([]),
+      )
+    })
+  }
+  if (entry.isDirectory) {
+    const reader = (entry as FileSystemDirectoryEntry).createReader()
+    const entries = await new Promise<FileSystemEntry[]>((resolve) => {
+      const allEntries: FileSystemEntry[] = []
+      const readBatch = () => {
+        reader.readEntries(
+          (batch) => {
+            if (batch.length === 0) {
+              resolve(allEntries)
+            } else {
+              allEntries.push(...batch)
+              readBatch()
+            }
+          },
+          () => resolve(allEntries),
+        )
+      }
+      readBatch()
+    })
+    const nested = await Promise.all(entries.map(readEntryFiles))
+    return nested.flat()
+  }
+  return []
+}
 
 export function FileList() {
   const {
@@ -16,6 +51,7 @@ export function FileList() {
     sortOrder,
     searchQuery,
     fileLoadingStates,
+    currentPath,
     setSort,
     setSelectedPaths,
     toggleSelection,
@@ -27,7 +63,11 @@ export function FileList() {
     onNavigateToPath,
     previews,
     setActivePreviewPath,
+    onDropFiles,
   } = useStore()
+
+  const [isDragOver, setIsDragOver] = useState(false)
+  const dragCounterRef = useRef(0)
 
   const dateColumnClass = 'w-32'
   const sizeColumnClass = 'w-20'
@@ -92,6 +132,57 @@ export function FileList() {
     openContextMenu(event.clientX, event.clientY, entry, targetType)
   }
 
+  const handleDragEnter = useCallback((event: React.DragEvent) => {
+    event.preventDefault()
+    dragCounterRef.current += 1
+    if (event.dataTransfer.types.includes('Files')) {
+      setIsDragOver(true)
+    }
+  }, [])
+
+  const handleDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'copy'
+  }, [])
+
+  const handleDragLeave = useCallback((event: React.DragEvent) => {
+    event.preventDefault()
+    dragCounterRef.current -= 1
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0
+      setIsDragOver(false)
+    }
+  }, [])
+
+  const handleDrop = useCallback(async (event: React.DragEvent) => {
+    event.preventDefault()
+    dragCounterRef.current = 0
+    setIsDragOver(false)
+
+    const items = event.dataTransfer.items
+    if (!items || items.length === 0) return
+
+    // Try to use webkitGetAsEntry for folder support
+    const entries = Array.from(items)
+      .map((item) => item.webkitGetAsEntry?.())
+      .filter((entry): entry is FileSystemEntry => entry != null)
+
+    if (entries.length > 0) {
+      const nestedFiles = await Promise.all(entries.map(readEntryFiles))
+      const allFiles = nestedFiles.flat()
+      if (allFiles.length > 0) {
+        onDropFiles(allFiles, currentPath)
+      }
+      return
+    }
+
+    // Fallback: plain file list (no folder recursion)
+    const droppedFiles = Array.from(event.dataTransfer.files)
+    if (droppedFiles.length > 0) {
+      onDropFiles(droppedFiles, currentPath)
+    }
+  }, [currentPath, onDropFiles])
+
   return (
     <>
       <div
@@ -106,7 +197,20 @@ export function FileList() {
           if (target.closest('[data-file-row="true"]')) return
           handleContextMenu(event, null)
         }}
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       >
+        {/* Drop overlay */}
+        {isDragOver && (
+          <div className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center rounded-xl border-2 border-dashed border-[#F59E0B] bg-[#F59E0B]/5">
+            <div className="flex flex-col items-center gap-2 text-[#F59E0B]">
+              <UploadIcon className="h-8 w-8" />
+              <span className="text-sm font-medium">Drop files here to upload</span>
+            </div>
+          </div>
+        )}
         {viewMode === 'list' && (sortedFiles.length > 0 || loading) && (
           <div className="flex items-center gap-2 px-2 py-1 text-[10px] leading-4 font-semibold text-[#666666] uppercase tracking-wider border-b border-[#EAE9E6]">
             <button
