@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { json as jsonLanguage } from '@codemirror/lang-json'
 import { oneDark } from '@codemirror/theme-one-dark'
+import { marked } from 'marked'
 import CodeMirror from '@uiw/react-codemirror'
 import { useStore } from '@/store'
 import {
@@ -40,6 +41,19 @@ const PREVIEW_TOP_INSET = 0
 const PREVIEW_BOTTOM_INSET = 0
 const PREVIEW_GAP = 9
 const GROUPED_PREVIEW_GAP = 9
+
+marked.setOptions({ breaks: true, gfm: true })
+
+const defaultRenderMarkdown = (content: string) => {
+  const html = marked.parse(content)
+  if (typeof html !== 'string') return null
+  return (
+    <div
+      className="prose prose-sm max-w-none prose-headings:text-[#2E2929] prose-p:text-[#2E2929] prose-strong:text-[#2E2929] prose-code:text-[#2E2929] prose-pre:bg-[#F6F5F4] prose-pre:text-[#2E2929]"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
+}
 
 export function getPreviewLeftPaneWidth(previewCount: number) {
   if (previewCount <= 1) return 515
@@ -188,11 +202,10 @@ export function PreviewPanel({
     }
 
     if (isMarkdown && !preview.isEditing) {
+      const renderer = renderMarkdown ?? defaultRenderMarkdown
       return (
-        <div className="h-full overflow-auto p-4 text-sm leading-6 text-[#2E2929]">
-          {renderMarkdown
-            ? renderMarkdown(preview.draftContent)
-            : <pre className="m-0 whitespace-pre-wrap break-words font-mono text-xs">{preview.draftContent}</pre>}
+        <div className="h-full overflow-auto bg-white p-6 text-sm leading-6 text-[#2E2929]">
+          {renderer(preview.draftContent)}
         </div>
       )
     }
