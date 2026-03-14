@@ -1,14 +1,12 @@
 import type { SidebarTab } from '@/types'
 import { useStore } from '@/store'
 import { HardDriveIcon } from '@/icons'
+import { cn } from '@/utils'
 
 export type SidebarProps = {
   tabs: SidebarTab[]
   className?: string
 }
-
-const cn = (...classes: Array<string | false | null | undefined>) =>
-  classes.filter(Boolean).join(' ')
 
 export function Sidebar({ tabs, className }: SidebarProps) {
   const { activeTab, setActiveTab, openContextMenu } = useStore()

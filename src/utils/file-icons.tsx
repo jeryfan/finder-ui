@@ -1,4 +1,4 @@
-import type { FileEntry } from '@/types'
+import type { MimeResolvable, FilePreviewType } from '@/types'
 import {
   FolderIcon,
   FileIcon,
@@ -23,9 +23,9 @@ import {
 } from '@/constants'
 import { extractExtension, resolveEntryMimeType } from './index'
 
-export type FilePreviewType = 'sheet' | 'doc' | 'presentation' | 'markdown' | null
+export type { FilePreviewType } from '@/types'
 
-export const getFilePreviewType = (entry: FileEntry): FilePreviewType => {
+export const getFilePreviewType = (entry: MimeResolvable & { type?: string }): FilePreviewType => {
   const ext = extractExtension(entry.name)
   const mimeType = resolveEntryMimeType(entry).toLowerCase()
 
@@ -41,7 +41,7 @@ export const getFilePreviewType = (entry: FileEntry): FilePreviewType => {
 }
 
 export const getFileIcon = (
-  entry: FileEntry,
+  entry: MimeResolvable & { type?: string },
   className = 'h-4 w-4',
 ) => {
   if (entry.type === 'directory')

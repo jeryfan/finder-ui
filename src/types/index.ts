@@ -1,4 +1,4 @@
-import type { ComponentType, ReactNode } from 'react'
+import type { ComponentType } from 'react'
 import type { IconProps } from '@/icons'
 
 export type TabKey = string
@@ -22,6 +22,10 @@ export type FileEntry = {
 }
 
 export type ContextMenuTargetType = 'file' | 'folder' | 'empty'
+
+export type FilePreviewType = 'sheet' | 'doc' | 'presentation' | 'markdown' | null
+
+export type MimeResolvable = { name: string; mimeType?: string; mimetype?: string }
 
 export type PreviewMode = 'split' | 'grouped'
 

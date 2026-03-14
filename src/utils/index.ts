@@ -1,14 +1,7 @@
-import type { FileEntry } from '@/types'
+import type { FileEntry, MimeResolvable } from '@/types'
 import {
   MARKDOWN_EXTENSIONS,
   CODE_EXTENSIONS,
-  IMAGE_EXTENSIONS,
-  VIDEO_EXTENSIONS,
-  CODE_ICON_EXTENSIONS,
-  BRACES_EXTENSIONS,
-  SPREADSHEET_EXTENSIONS,
-  TEXT_EXTENSIONS,
-  ARCHIVE_EXTENSIONS,
 } from '@/constants'
 
 export const cn = (...classes: Array<string | false | null | undefined>) =>
@@ -24,7 +17,7 @@ export const extractExtension = (name: string) => {
 export const isMarkdownFile = (name: string) => MARKDOWN_EXTENSIONS.has(extractExtension(name))
 export const isCodeFile = (name: string) => CODE_EXTENSIONS.has(extractExtension(name))
 
-export const resolveEntryMimeType = (entry: FileEntry) =>
+export const resolveEntryMimeType = (entry: MimeResolvable) =>
   (entry.mimeType || entry.mimetype || '')
 
 export const formatDateTimeEN = (isoString: string) => {
