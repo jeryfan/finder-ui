@@ -32,6 +32,8 @@ export default defineConfig({
         '@uiw/react-codemirror',
         '@codemirror/state',
         '@codemirror/view',
+        'zustand',
+        'marked',
       ],
       output: {
         globals: {
@@ -41,6 +43,8 @@ export default defineConfig({
           '@codemirror/lang-json': 'codemirrorLangJson',
           '@codemirror/theme-one-dark': 'codemirrorThemeOneDark',
           '@uiw/react-codemirror': 'ReactCodeMirror',
+          zustand: 'zustand',
+          marked: 'marked',
         }
       }
     },
