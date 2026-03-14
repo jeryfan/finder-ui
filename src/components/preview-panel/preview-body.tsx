@@ -1,0 +1,110 @@
+import { json as jsonLanguage } from '@codemirror/lang-json'
+import { oneDark } from '@codemirror/theme-one-dark'
+import { marked } from 'marked'
+import CodeMirror from '@uiw/react-codemirror'
+import { LoaderIcon } from '@/icons'
+import { extractExtension, isMarkdownFile, isCodeFile } from '@/utils'
+import type { PreviewWindow } from '@/types'
+
+marked.setOptions({ breaks: true, gfm: true })
+
+const defaultRenderMarkdown = (content: string) => {
+  const html = marked.parse(content)
+  if (typeof html !== 'string') return null
+  return (
+    <div
+      className="prose prose-sm max-w-none prose-headings:text-[#2E2929] prose-p:text-[#2E2929] prose-strong:text-[#2E2929] prose-code:text-[#2E2929] prose-pre:bg-[#F6F5F4] prose-pre:text-[#2E2929]"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
+}
+
+export type PreviewBodyProps = {
+  preview: PreviewWindow
+  updateEnabled: boolean
+  renderMarkdown?: (content: string) => React.ReactNode
+  onDraftChange: (path: string, content: string) => void
+  onRefresh: (path: string) => void
+}
+
+export function PreviewBody({
+  preview,
+  updateEnabled,
+  renderMarkdown,
+  onDraftChange,
+  onRefresh,
+}: PreviewBodyProps) {
+  const isMarkdown = isMarkdownFile(preview.name)
+  const isCode = isCodeFile(preview.name)
+  const isMarkdownEditing = isMarkdown && preview.isEditing
+  const shouldUseCodeEditor = isCode || isMarkdownEditing
+  const codeExtension = extractExtension(preview.name)
+  const codeMirrorExtensions = codeExtension === 'json' ? [jsonLanguage()] : []
+
+  if (preview.isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center text-[#666666]">
+        <div className="flex items-center gap-2">
+          <LoaderIcon className="h-4 w-4" />
+          <span className="text-xs">Loading file...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (preview.error) {
+    return (
+      <div className="flex h-full items-center justify-center p-4 text-center">
+        <div>
+          <p className="text-sm text-red-600">{preview.error}</p>
+          <button
+            className="mt-2 text-xs text-[#F59E0B] hover:underline"
+            onClick={() => onRefresh(preview.path)}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (isMarkdown && !preview.isEditing) {
+    const renderer = renderMarkdown ?? defaultRenderMarkdown
+    return (
+      <div className="h-full overflow-auto bg-white p-6 text-sm leading-6 text-[#2E2929]">
+        {renderer(preview.draftContent)}
+      </div>
+    )
+  }
+
+  if (shouldUseCodeEditor) {
+    return (
+      <div className="h-full overflow-auto bg-[#282C34] text-[13px] leading-[18.2px]">
+        <CodeMirror
+          value={preview.draftContent}
+          height="100%"
+          theme={oneDark}
+          extensions={codeMirrorExtensions}
+          editable={updateEnabled}
+          basicSetup={{
+            lineNumbers: true,
+            foldGutter: true,
+            highlightActiveLine: true,
+            highlightActiveLineGutter: true,
+          }}
+          onChange={value => onDraftChange(preview.path, value)}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <textarea
+      className="h-full w-full resize-none border-0 bg-transparent p-4 font-mono text-[13px] leading-5 text-[#2E2929] focus:outline-none"
+      value={preview.draftContent}
+      onChange={event => onDraftChange(preview.path, event.target.value)}
+      spellCheck={false}
+      readOnly={!updateEnabled}
+    />
+  )
+}
