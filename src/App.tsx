@@ -97,7 +97,7 @@ function App() {
           onOpenFile={handleOpenFile}
           onDownload={(file) => console.log('Downloading file:', file)}
           onBatchDownload={(files) => console.log('Batch downloading files:', files)}
-          onUpload={(isFolder, targetPath) => console.log('Upload:', isFolder ? 'folder' : 'files', 'to:', targetPath)}
+          onUpload={(files, targetPath) => console.log('Upload:', files.length, 'files to:', targetPath)}
           onSave={handleSave}
           editable
         />

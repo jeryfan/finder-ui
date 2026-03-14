@@ -21,8 +21,8 @@ export type FinderProps = {
   onDownload?: (file: FileEntry) => void
   /** Handle batch file download */
   onBatchDownload?: (files: FileEntry[]) => void
-  /** Handle file/folder upload */
-  onUpload?: (isFolder: boolean, targetPath?: string) => void
+  /** Handle file upload. Receives the selected files and the target directory path. */
+  onUpload?: (files: File[], targetPath?: string) => void
   /** Handle save of edited file content in preview */
   onSave?: (path: string, content: string) => Promise<void> | void
   /** Whether files can be edited in the preview panel. Default: false */
@@ -92,6 +92,10 @@ export function Finder({
   uploadRef.current = onUpload
   saveRef.current = onSave
 
+  // Hidden file input for triggering native file picker
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const uploadTargetPathRef = useRef<string | undefined>(undefined)
+
   // Track previous tab to detect sidebar-initiated changes
   const prevTabRef = useRef<string | undefined>(undefined)
 
@@ -142,7 +146,20 @@ export function Finder({
     // Delegate to latest callback refs so prop changes are respected
     setDownloadHandler((file) => downloadRef.current?.(file))
     setBatchDownloadHandler((files) => batchDownloadRef.current?.(files))
-    setUploadHandler((isFolder, targetPath) => uploadRef.current?.(isFolder, targetPath))
+    setUploadHandler((isFolder, targetPath) => {
+      uploadTargetPathRef.current = targetPath
+      const input = fileInputRef.current
+      if (!input) return
+      // Reset so the same file can be re-selected
+      input.value = ''
+      // webkitdirectory for folder selection
+      if (isFolder) {
+        input.setAttribute('webkitdirectory', '')
+      } else {
+        input.removeAttribute('webkitdirectory')
+      }
+      input.click()
+    })
     setSavePreviewHandler(async (path, content) => {
       await saveRef.current?.(path, content)
     })
@@ -204,6 +221,12 @@ export function Finder({
   const handleNavigate = (path: string) => {
     navigateTo(path)
     loadFiles(path)
+  }
+
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = event.target.files
+    if (!selectedFiles || selectedFiles.length === 0) return
+    uploadRef.current?.(Array.from(selectedFiles), uploadTargetPathRef.current)
   }
 
   const handleDownloadPreview = async (path: string) => {
@@ -275,6 +298,15 @@ export function Finder({
       </div>
 
       <ContextMenu />
+
+      {/* Hidden file input for native file picker */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
     </div>
   )
 }
