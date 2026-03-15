@@ -26,6 +26,8 @@ export type FinderProps = {
   renderMarkdown?: (content: string) => React.ReactNode
   /** Additional CSS class name for the root element */
   className?: string
+  /** Inline styles for the root element. Use to set dimensions, e.g. `{ height: '100vh' }` */
+  style?: React.CSSProperties
   /** Theme variant. Default: 'target' */
   theme?: 'target' | 'graphite' | 'clean'
 }

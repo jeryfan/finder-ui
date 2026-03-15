@@ -122,21 +122,18 @@ function App() {
   }
 
   return (
-    <main className="finder-ui-playground">
-      <section className="finder-ui-canvas">
-        <Finder
-          tabs={TABS}
-          defaultTab="projects"
-          onFetchFiles={handleFetchFiles}
-          onOpenFile={handleOpenFile}
-          onSave={handleSave}
-          onUpload={handleUpload}
-          onDownload={handleDownload}
-          onBatchDownload={handleBatchDownload}
-          editable
-        />
-      </section>
-    </main>
+    <Finder
+      tabs={TABS}
+      defaultTab="projects"
+      style={{ height: '100vh' }}
+      onFetchFiles={handleFetchFiles}
+      onOpenFile={handleOpenFile}
+      onSave={handleSave}
+      onUpload={handleUpload}
+      onDownload={handleDownload}
+      onBatchDownload={handleBatchDownload}
+      editable
+    />
   )
 }
 

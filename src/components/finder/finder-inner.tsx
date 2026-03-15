@@ -21,6 +21,7 @@ export function FinderInner({
   editable = false,
   renderMarkdown,
   className,
+  style,
   theme = 'target',
 }: FinderProps) {
   const {
@@ -286,6 +287,7 @@ export function FinderInner({
       style={{
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
         WebkitFontSmoothing: 'antialiased',
+        ...style,
       }}
     >
       <div className="relative h-full flex">
