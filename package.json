@@ -11,7 +11,7 @@
   "main": "./dist/finder-ui.umd.js",
   "module": "./dist/finder-ui.es.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": ["dist", "LICENSE", "README.md"],
   "sideEffects": ["*.css"],
   "exports": {
     ".": {
