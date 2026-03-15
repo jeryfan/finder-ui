@@ -54,9 +54,9 @@ export function FileList() {
     const direction = sortOrder === 'asc' ? 1 : -1
     return [...filteredFiles].sort((left, right) => {
       if (left.type !== right.type) return left.type === 'directory' ? -1 : 1
-      if (sortField === 'modified_at') {
-        const leftTime = Date.parse(left.lastModified || left.modified_at || '')
-        const rightTime = Date.parse(right.lastModified || right.modified_at || '')
+      if (sortField === 'lastModified') {
+        const leftTime = Date.parse(left.lastModified || '')
+        const rightTime = Date.parse(right.lastModified || '')
         return (leftTime - rightTime) * direction
       }
       if (sortField === 'size') return (left.size - right.size) * direction
@@ -142,11 +142,11 @@ export function FileList() {
               {sortField === 'name' && <ChevronDownIcon className={cn('w-3 h-3', sortOrder === 'desc' && 'rotate-180')} />}
             </button>
             <button
-              onClick={() => setSort('modified_at')}
+              onClick={() => setSort('lastModified')}
               className={`${dateColumnClass} text-left flex items-center gap-1 hover:text-[#2E2929]`}
             >
               Date Modified
-              {sortField === 'modified_at' && <ChevronDownIcon className={cn('w-3 h-3', sortOrder === 'desc' && 'rotate-180')} />}
+              {sortField === 'lastModified' && <ChevronDownIcon className={cn('w-3 h-3', sortOrder === 'desc' && 'rotate-180')} />}
             </button>
             <button
               onClick={() => setSort('size')}
@@ -267,7 +267,7 @@ export function FileList() {
                 </div>
                 <span className="flex-1 text-sm truncate">{entry.name}</span>
                 <span className={`${dateColumnClass} text-xs text-[#666666] truncate`}>
-                  {(entry.lastModified || entry.modified_at) ? formatDateTimeEN(entry.lastModified || entry.modified_at || '') : '--'}
+                  {entry.lastModified ? formatDateTimeEN(entry.lastModified) : '--'}
                 </span>
                 <span className={`${sizeColumnClass} text-xs text-[#666666] text-right`}>
                   {formatFileSize(entry.size || 0, entry.type)}

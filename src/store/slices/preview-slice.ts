@@ -9,8 +9,6 @@ export const createPreviewSlice: StateCreator<StoreState, [], [], PreviewSlice> 
   updateEnabled: false,
 
   openPreview: (file, content) => set((state) => {
-    const existingIndex = state.previews.findIndex(p => p.path === file.path)
-
     const newPreview: PreviewWindow = {
       path: file.path,
       name: file.name,
@@ -20,16 +18,13 @@ export const createPreviewSlice: StateCreator<StoreState, [], [], PreviewSlice> 
       isLoading: false,
       isSaving: false,
       isEditing: false,
-      mimeType: file.mimeType || file.mimetype,
+      mimeType: file.mimeType,
     }
 
-    let newPreviews: PreviewWindow[]
-    if (existingIndex >= 0) {
-      newPreviews = [...state.previews]
-      newPreviews[existingIndex] = { ...newPreviews[existingIndex], ...newPreview }
-    } else {
-      newPreviews = [...state.previews, newPreview]
-    }
+    const exists = state.previews.some(p => p.path === file.path)
+    const newPreviews = exists
+      ? state.previews.map(p => p.path === file.path ? { ...p, ...newPreview } : p)
+      : [...state.previews, newPreview]
 
     return {
       previews: newPreviews,
@@ -38,8 +33,6 @@ export const createPreviewSlice: StateCreator<StoreState, [], [], PreviewSlice> 
   }),
 
   openPreviewLoading: (file) => set((state) => {
-    const existingIndex = state.previews.findIndex(p => p.path === file.path)
-
     const loadingPreview: PreviewWindow = {
       path: file.path,
       name: file.name,
@@ -49,16 +42,13 @@ export const createPreviewSlice: StateCreator<StoreState, [], [], PreviewSlice> 
       isLoading: true,
       isSaving: false,
       isEditing: false,
-      mimeType: file.mimeType || file.mimetype,
+      mimeType: file.mimeType,
     }
 
-    let newPreviews: PreviewWindow[]
-    if (existingIndex >= 0) {
-      newPreviews = [...state.previews]
-      newPreviews[existingIndex] = { ...newPreviews[existingIndex], isLoading: true }
-    } else {
-      newPreviews = [...state.previews, loadingPreview]
-    }
+    const exists = state.previews.some(p => p.path === file.path)
+    const newPreviews = exists
+      ? state.previews.map(p => p.path === file.path ? { ...p, isLoading: true } : p)
+      : [...state.previews, loadingPreview]
 
     return {
       previews: newPreviews,

@@ -39,7 +39,7 @@ export interface FileListSlice {
   loading: boolean
   loadError: string | null
   viewMode: 'list' | 'grouped'
-  sortField: 'name' | 'modified_at' | 'size'
+  sortField: 'name' | 'lastModified' | 'size'
   sortOrder: 'asc' | 'desc'
   searchQuery: string
   fileLoadingStates: Record<string, boolean>
@@ -52,7 +52,7 @@ export interface FileListSlice {
   setLoading: (loading: boolean) => void
   setLoadError: (error: string | null) => void
   setViewMode: (mode: 'list' | 'grouped') => void
-  setSort: (field: 'name' | 'modified_at' | 'size') => void
+  setSort: (field: 'name' | 'lastModified' | 'size') => void
   setSearchQuery: (query: string) => void
   setFileLoading: (path: string, loading: boolean) => void
   setUploadingFiles: (files: Array<{ name: string; type: 'file' | 'directory' }>) => void

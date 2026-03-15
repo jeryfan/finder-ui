@@ -16,16 +16,14 @@ export type FileEntry = {
   size: number
   type: 'file' | 'directory'
   lastModified?: string
-  modified_at?: string
   mimeType?: string
-  mimetype?: string
 }
 
 export type ContextMenuTargetType = 'file' | 'folder' | 'empty'
 
 export type FilePreviewType = 'sheet' | 'doc' | 'presentation' | 'markdown' | null
 
-export type MimeResolvable = { name: string; mimeType?: string; mimetype?: string }
+export type MimeResolvable = { name: string; mimeType?: string }
 
 export type PreviewMode = 'split' | 'grouped'
 
@@ -40,5 +38,4 @@ export type PreviewWindow = {
   isEditing: boolean
   error?: string
   mimeType?: string
-  mimetype?: string
 }

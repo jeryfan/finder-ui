@@ -43,6 +43,8 @@ export default defineConfig({
           '@codemirror/lang-json': 'codemirrorLangJson',
           '@codemirror/theme-one-dark': 'codemirrorThemeOneDark',
           '@uiw/react-codemirror': 'ReactCodeMirror',
+          '@codemirror/state': 'codemirrorState',
+          '@codemirror/view': 'codemirrorView',
           zustand: 'zustand',
           marked: 'marked',
         }

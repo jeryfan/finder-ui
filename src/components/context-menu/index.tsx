@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useStore } from '@/store'
 import {
   FolderOpenIcon,
@@ -25,7 +25,7 @@ export function ContextMenu() {
 
   const { isOpen, x, y, targetFile, targetType } = contextMenu
 
-  // 点击外部关闭菜单
+  // Close menu on outside click
   useEffect(() => {
     if (!isOpen) return
 
@@ -36,9 +36,8 @@ export function ContextMenu() {
       }
     }
 
-    // 使用 capture 阶段确保在事件冒泡前处理
+    // Use capture phase to handle before event bubbles
     document.addEventListener('click', handleClickOutside, true)
-    // 也监听 contextmenu 事件（右键点击其他地方时关闭）
     document.addEventListener('contextmenu', handleClickOutside, true)
 
     return () => {
@@ -47,6 +46,19 @@ export function ContextMenu() {
     }
   }, [isOpen, closeContextMenu])
 
+  // Adjust position to keep menu within viewport
+  const menuRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    if (!isOpen || !menuRef.current) return
+    const rect = menuRef.current.getBoundingClientRect()
+    const adjustedX = x + rect.width > window.innerWidth ? window.innerWidth - rect.width - 4 : x
+    const adjustedY = y + rect.height > window.innerHeight ? window.innerHeight - rect.height - 4 : y
+    if (adjustedX !== x || adjustedY !== y) {
+      menuRef.current.style.left = `${Math.max(0, adjustedX)}px`
+      menuRef.current.style.top = `${Math.max(0, adjustedY)}px`
+    }
+  }, [isOpen, x, y])
+
   if (!isOpen) return null
 
   const selectedFiles = files.filter((f) => selectedPaths.has(f.path))
@@ -54,6 +66,7 @@ export function ContextMenu() {
 
   return createPortal(
     <div
+      ref={menuRef}
       className="fixed z-[9999] min-w-[180px] bg-white border border-[#EAE9E6] rounded-lg py-1 text-sm shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)]"
       style={{ left: x, top: y }}
       onClick={(event) => event.stopPropagation()}

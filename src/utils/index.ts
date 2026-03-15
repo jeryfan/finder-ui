@@ -18,7 +18,7 @@ export const isMarkdownFile = (name: string) => MARKDOWN_EXTENSIONS.has(extractE
 export const isCodeFile = (name: string) => CODE_EXTENSIONS.has(extractExtension(name))
 
 export const resolveEntryMimeType = (entry: MimeResolvable) =>
-  (entry.mimeType || entry.mimetype || '')
+  (entry.mimeType || '')
 
 export const formatDateTimeEN = (isoString: string) => {
   const date = new Date(isoString)
