@@ -100,23 +100,35 @@ export function Finder({
 
   // Track previous tab to detect sidebar-initiated changes
   const prevTabRef = useRef<string | undefined>(undefined)
+  // AbortController to cancel stale fetch requests on rapid navigation
+  const fetchAbortRef = useRef<AbortController | null>(null)
 
   const leftPaneWidth = getPreviewLeftPaneWidth(previews.length)
 
   // Stable loadFiles — zustand setters are referentially stable
   const loadFiles = useCallback(async (path: string) => {
+    // Cancel any in-flight request
+    fetchAbortRef.current?.abort()
+    const controller = new AbortController()
+    fetchAbortRef.current = controller
+
+    // Immediately show loading in the new directory
+    setFiles([])
+    setCurrentPath(path)
     setLoading(true)
     setLoadError(null)
     try {
       const entries = await fetchFilesRef.current(path)
+      if (controller.signal.aborted) return
       setFiles(entries)
-      setCurrentPath(path)
     } catch (err) {
+      if (controller.signal.aborted) return
       setLoadError(err instanceof Error ? err.message : 'Failed to load files')
       setFiles([])
-      setCurrentPath(path)
     } finally {
-      setLoading(false)
+      if (!controller.signal.aborted) {
+        setLoading(false)
+      }
     }
   }, [setLoading, setLoadError, setFiles, setCurrentPath])
 
