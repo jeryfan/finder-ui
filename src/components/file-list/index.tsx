@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useStore } from '@/store'
+import { useFinderStore, useFinderStoreApi } from '@/store'
 import { FolderIcon, LoaderIcon, ChevronDownIcon, UploadIcon } from '@/icons'
 import { cn, formatDateTimeEN, formatFileSize } from '@/utils'
 import { getFileIcon } from '@/utils/file-icons'
@@ -31,7 +31,9 @@ export function FileList() {
     previews,
     setActivePreviewPath,
     onDropFiles,
-  } = useStore()
+  } = useFinderStore()
+
+  const storeApi = useFinderStoreApi()
 
   const {
     isDragOver,
@@ -163,7 +165,7 @@ export function FileList() {
             <div>
               <p className="text-sm text-red-600">Failed to load files</p>
               <button
-                onClick={() => useStore.getState().onRefresh()}
+                onClick={() => storeApi.getState().onRefresh()}
                 className="mt-2 px-3 py-1 text-xs rounded-md bg-[#2E2929] text-white hover:opacity-90"
               >
                 Retry

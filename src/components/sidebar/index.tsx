@@ -1,5 +1,5 @@
 import type { SidebarTab } from '@/types'
-import { useStore } from '@/store'
+import { useFinderStore } from '@/store'
 import { HardDriveIcon } from '@/icons'
 import { cn } from '@/utils'
 
@@ -9,7 +9,7 @@ export type SidebarProps = {
 }
 
 export function Sidebar({ tabs, className }: SidebarProps) {
-  const { activeTab, setActiveTab, openContextMenu } = useStore()
+  const { activeTab, setActiveTab, openContextMenu } = useFinderStore()
 
   const handleContextMenu = (event: React.MouseEvent) => {
     const target = event.target as HTMLElement

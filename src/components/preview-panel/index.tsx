@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useStore } from '@/store'
+import { useFinderStore, useFinderStoreApi } from '@/store'
 import type { PreviewWindow } from '@/types'
 import { PREVIEW_GAP, GROUPED_PREVIEW_GAP } from './constants'
 import { SplitMode } from './split-mode'
@@ -31,7 +31,9 @@ export function PreviewPanel({
     setPreviewSaving,
     refreshPreview,
     onSavePreview,
-  } = useStore()
+  } = useFinderStore()
+
+  const storeApi = useFinderStoreApi()
 
   const activePreview = useMemo(
     () => previews.find(item => item.path === activePreviewPath) ?? previews[previews.length - 1] ?? null,
@@ -47,14 +49,18 @@ export function PreviewPanel({
     try {
       await onSavePreview(preview.path, preview.draftContent)
       refreshPreview(preview.path, preview.draftContent)
+    } catch (err) {
+      storeApi.getState().setPreviewError(
+        preview.path,
+        err instanceof Error ? err.message : 'Failed to save file',
+      )
     } finally {
       setPreviewSaving(preview.path, false)
     }
   }
 
   const handleRefresh = (_path: string) => {
-    const { onRefresh } = useStore.getState()
-    onRefresh()
+    storeApi.getState().onRefresh()
   }
 
   const handleMaximize = (path: string) => {

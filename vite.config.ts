@@ -9,8 +9,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
     dts({
-      insertTypesEntry: true,
-      rollupTypes: false,
+      tsconfigPath: './tsconfig.app.json',
+      entryRoot: 'src',
       include: ['src/**/*'],
       exclude: ['src/App.tsx', 'src/main.tsx'],
     })
@@ -33,6 +33,8 @@ export default defineConfig({
         '@codemirror/state',
         '@codemirror/view',
         'zustand',
+        'zustand/vanilla',
+        'zustand/react',
         'marked',
       ],
       output: {
@@ -46,6 +48,8 @@ export default defineConfig({
           '@codemirror/state': 'codemirrorState',
           '@codemirror/view': 'codemirrorView',
           zustand: 'zustand',
+          'zustand/vanilla': 'zustandVanilla',
+          'zustand/react': 'zustandReact',
           marked: 'marked',
         }
       }

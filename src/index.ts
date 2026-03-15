@@ -19,13 +19,17 @@ export type {
 export { Finder } from '@/components/finder'
 export type { FinderProps } from '@/components/finder'
 export { Sidebar } from '@/components/sidebar'
+export type { SidebarProps } from '@/components/sidebar'
 export { FileList } from '@/components/file-list'
 export { ContextMenu } from '@/components/context-menu'
 export { PreviewPanel, getPreviewLeftPaneWidth } from '@/components/preview-panel'
+export type { PreviewPanelProps } from '@/components/preview-panel'
 export { Toolbar } from '@/components/toolbar'
+export type { ToolbarProps } from '@/components/toolbar'
 
 // Store
-export { useStore } from '@/store'
+export { useFinderStore, useFinderStoreApi, createFinderStore, FinderStoreContext } from '@/store'
+export type { FinderStore } from '@/store'
 
 // Icons
 export {

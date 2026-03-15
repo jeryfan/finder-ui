@@ -1,5 +1,4 @@
 import { Finder, type SidebarTab, type FileEntry } from './'
-import { useStore } from './store'
 
 // ── Icons ──────────────────────────────────────────────────────
 
@@ -77,8 +76,8 @@ function App() {
     await fetch('/api/files/upload', { method: 'POST', body: form })
   }
 
-  const handleUpload = async (files: File[], targetPath?: string) => {
-    const dir = targetPath ?? useStore.getState().currentPath
+  const handleUpload = async (files: File[], targetPath = '/') => {
+    const dir = targetPath
     const hasRelativePaths = files.some((f) => f.webkitRelativePath?.includes('/'))
 
     if (!hasRelativePaths) {

@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom'
 import { useEffect, useRef } from 'react'
-import { useStore } from '@/store'
+import { useFinderStore } from '@/store'
 import {
   FolderOpenIcon,
   FolderIcon,
@@ -21,7 +21,7 @@ export function ContextMenu() {
     onRefresh,
     files,
     selectedPaths,
-  } = useStore()
+  } = useFinderStore()
 
   const { isOpen, x, y, targetFile, targetType } = contextMenu
 
