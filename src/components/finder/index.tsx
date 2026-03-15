@@ -22,7 +22,7 @@ export type FinderProps = {
   /** Handle batch file download */
   onBatchDownload?: (files: FileEntry[]) => void
   /** Handle file upload. Receives the selected files and the target directory path. */
-  onUpload?: (files: File[], targetPath?: string) => void
+  onUpload?: (files: File[], targetPath?: string) => Promise<void> | void
   /** Handle save of edited file content in preview */
   onSave?: (path: string, content: string) => Promise<void> | void
   /** Whether files can be edited in the preview panel. Default: false */
@@ -77,6 +77,7 @@ export function Finder({
     goForward,
     setViewMode,
     setSearchQuery,
+    setUploadingFiles,
   } = useStore()
 
   // Stable refs for callback props so handlers always use the latest version
@@ -119,6 +120,33 @@ export function Finder({
     }
   }, [setLoading, setLoadError, setFiles, setCurrentPath])
 
+  // Upload wrapper — manages uploadingFiles state and auto-refreshes
+  const performUpload = useCallback(async (files: File[], targetPath?: string) => {
+    // Detect folder upload via webkitRelativePath
+    const hasRelativePaths = files.some(f => f.webkitRelativePath?.includes('/'))
+    let uploadingItems: Array<{ name: string; type: 'file' | 'directory' }>
+
+    if (hasRelativePaths) {
+      // Extract unique top-level folder names
+      const folderNames = new Set<string>()
+      for (const f of files) {
+        const topDir = f.webkitRelativePath.split('/')[0]
+        if (topDir) folderNames.add(topDir)
+      }
+      uploadingItems = Array.from(folderNames).map(name => ({ name, type: 'directory' }))
+    } else {
+      uploadingItems = files.map(f => ({ name: f.name, type: 'file' as const }))
+    }
+
+    setUploadingFiles(uploadingItems)
+    try {
+      await uploadRef.current?.(files, targetPath)
+    } finally {
+      setUploadingFiles([])
+      loadFiles(useStore.getState().currentPath)
+    }
+  }, [setUploadingFiles, loadFiles])
+
   // --- Initialization ---
   useEffect(() => {
     setTabs(tabs)
@@ -134,13 +162,21 @@ export function Finder({
       loadFiles(path)
     })
 
-    // Open handler — if user's callback returns a string, open preview
+    // Open handler — show loading preview first, then fill content
     setOpenHandler(async (file: FileEntry) => {
       const handler = openFileRef.current
       if (!handler) return
-      const result = await handler(file)
-      if (typeof result === 'string') {
-        useStore.getState().openPreview(file, result)
+      useStore.getState().openPreviewLoading(file)
+      try {
+        const result = await handler(file)
+        if (typeof result === 'string') {
+          useStore.getState().openPreview(file, result)
+        } else {
+          // Handler didn't return content — close the loading preview
+          useStore.getState().closePreview(file.path)
+        }
+      } catch {
+        useStore.getState().setPreviewError(file.path, 'Failed to load file')
       }
     })
 
@@ -165,7 +201,7 @@ export function Finder({
       await saveRef.current?.(path, content)
     })
     setDropFilesHandler((files, targetPath) => {
-      uploadRef.current?.(files, targetPath)
+      performUpload(files, targetPath)
     })
 
     setRefreshHandler(() => {
@@ -230,7 +266,7 @@ export function Finder({
   const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files
     if (!selectedFiles || selectedFiles.length === 0) return
-    uploadRef.current?.(Array.from(selectedFiles), uploadTargetPathRef.current)
+    performUpload(Array.from(selectedFiles), uploadTargetPathRef.current)
   }
 
   const handleDownloadPreview = async (path: string) => {

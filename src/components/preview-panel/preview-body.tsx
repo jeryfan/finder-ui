@@ -43,11 +43,8 @@ export function PreviewBody({
 
   if (preview.isLoading) {
     return (
-      <div className="flex h-full items-center justify-center text-[#666666]">
-        <div className="flex items-center gap-2">
-          <LoaderIcon className="h-4 w-4" />
-          <span className="text-xs">Loading file...</span>
-        </div>
+      <div className="flex h-full items-center justify-center">
+        <LoaderIcon className="h-8 w-8 text-[#666666]" />
       </div>
     )
   }

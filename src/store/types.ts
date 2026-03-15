@@ -43,6 +43,7 @@ export interface FileListSlice {
   sortOrder: 'asc' | 'desc'
   searchQuery: string
   fileLoadingStates: Record<string, boolean>
+  uploadingFiles: Array<{ name: string; type: 'file' | 'directory' }>
   setFiles: (files: FileEntry[]) => void
   setSelectedPaths: (paths: Set<string>) => void
   toggleSelection: (path: string) => void
@@ -54,6 +55,7 @@ export interface FileListSlice {
   setSort: (field: 'name' | 'modified_at' | 'size') => void
   setSearchQuery: (query: string) => void
   setFileLoading: (path: string, loading: boolean) => void
+  setUploadingFiles: (files: Array<{ name: string; type: 'file' | 'directory' }>) => void
 }
 
 export interface PreviewSlice {
@@ -62,6 +64,7 @@ export interface PreviewSlice {
   previewMode: PreviewMode
   updateEnabled: boolean
   openPreview: (file: FileEntry, content: string) => void
+  openPreviewLoading: (file: FileEntry) => void
   closePreview: (path: string) => void
   setActivePreviewPath: (path: string | null) => void
   setPreviewMode: (mode: PreviewMode) => void

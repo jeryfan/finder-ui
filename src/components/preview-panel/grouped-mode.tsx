@@ -133,8 +133,15 @@ export function GroupedMode({
                         e.stopPropagation()
                         handleSave(preview)
                       }}
-                      disabled={!canSaveTab}
-                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors hover:text-[#2E2929] disabled:cursor-not-allowed disabled:opacity-50"
+                      disabled={!canSaveTab && !preview.isSaving}
+                      className={cn(
+                        'flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors',
+                        preview.isSaving
+                          ? 'pointer-events-none'
+                          : canSaveTab
+                            ? 'hover:text-[#2E2929]'
+                            : 'cursor-not-allowed opacity-50',
+                      )}
                       title="Save"
                     >
                       {preview.isSaving
@@ -182,8 +189,15 @@ export function GroupedMode({
           {updateEnabled && (!isMarkdownFile(activePreview.name) || activePreview.isEditing) && (
             <button
               onClick={() => handleSave(activePreview)}
-              disabled={activePreview.draftContent === activePreview.content || activePreview.isSaving}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929] disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={activePreview.draftContent === activePreview.content && !activePreview.isSaving}
+              className={cn(
+                'flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors',
+                activePreview.isSaving
+                  ? 'pointer-events-none'
+                  : activePreview.draftContent !== activePreview.content
+                    ? 'hover:bg-[#F6F5F4] hover:text-[#2E2929]'
+                    : 'cursor-not-allowed opacity-50',
+              )}
               title="Save"
             >
               {activePreview.isSaving ? <LoaderIcon className="h-3.5 w-3.5" /> : <SaveIcon className="h-3.5 w-3.5" />}

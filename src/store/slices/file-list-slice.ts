@@ -11,6 +11,7 @@ export const createFileListSlice: StateCreator<StoreState, [], [], FileListSlice
   sortOrder: 'asc',
   searchQuery: '',
   fileLoadingStates: {},
+  uploadingFiles: [],
 
   setFiles: (files) => set({ files }),
   setSelectedPaths: (paths) => set({ selectedPaths: paths }),
@@ -54,4 +55,6 @@ export const createFileListSlice: StateCreator<StoreState, [], [], FileListSlice
   setFileLoading: (path, loading) => set((state) => ({
     fileLoadingStates: { ...state.fileLoadingStates, [path]: loading },
   })),
+
+  setUploadingFiles: (files) => set({ uploadingFiles: files }),
 })

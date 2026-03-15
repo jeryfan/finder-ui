@@ -29,6 +29,7 @@ export function PreviewPanel({
     updatePreviewDraft,
     setPreviewEditing,
     setPreviewSaving,
+    refreshPreview,
     onSavePreview,
   } = useStore()
 
@@ -45,6 +46,7 @@ export function PreviewPanel({
     setPreviewSaving(preview.path, true)
     try {
       await onSavePreview(preview.path, preview.draftContent)
+      refreshPreview(preview.path, preview.draftContent)
     } finally {
       setPreviewSaving(preview.path, false)
     }

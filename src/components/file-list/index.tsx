@@ -17,6 +17,7 @@ export function FileList() {
     sortOrder,
     searchQuery,
     fileLoadingStates,
+    uploadingFiles,
     currentPath,
     setSort,
     setSelectedPaths,
@@ -195,7 +196,7 @@ export function FileList() {
           </div>
         )}
 
-        {sortedFiles.length === 0 && !loading && !loadError && (
+        {sortedFiles.length === 0 && uploadingFiles.length === 0 && !loading && !loadError && (
           <div className="h-full flex items-center justify-center text-[#666666]">
             <div className="text-center">
               <FolderIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -205,7 +206,7 @@ export function FileList() {
           </div>
         )}
 
-        {viewMode === 'grouped' && sortedFiles.length > 0 && (
+        {viewMode === 'grouped' && (sortedFiles.length > 0 || uploadingFiles.length > 0) && (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-3">
             {sortedFiles.map(entry => (
               <button
@@ -228,10 +229,23 @@ export function FileList() {
                 <span className="text-[11px] leading-tight line-clamp-2 w-full break-all">{entry.name}</span>
               </button>
             ))}
+            {uploadingFiles.map((item, index) => (
+              <div
+                key={`uploading-${index}`}
+                className="flex flex-col items-center p-2 rounded-lg bg-[#F1EFEB]/50 animate-pulse"
+              >
+                <div className="w-14 h-14 mb-1 flex items-center justify-center">
+                  {item.type === 'directory'
+                    ? <FolderIcon className="w-8 h-8 text-[#666666]/40" />
+                    : <div className="w-10 h-10 rounded bg-[#666666]/10" />}
+                </div>
+                <span className="text-[11px] leading-tight line-clamp-2 w-full break-all text-[#666666] text-center">{item.name}</span>
+              </div>
+            ))}
           </div>
         )}
 
-        {viewMode === 'list' && sortedFiles.length > 0 && (
+        {viewMode === 'list' && (sortedFiles.length > 0 || uploadingFiles.length > 0) && (
           <div className="mt-0.5 space-y-0.5">
             {sortedFiles.map(entry => (
               <button
@@ -260,6 +274,19 @@ export function FileList() {
                 </span>
               </button>
             ))}
+            {uploadingFiles.map((item, index) => (
+              <div
+                key={`uploading-${index}`}
+                className="w-full flex items-center gap-2 px-2 py-1 rounded-md bg-[#F1EFEB]/50 animate-pulse leading-[25.6px]"
+              >
+                {item.type === 'directory'
+                  ? <FolderIcon className="w-4 h-4 flex-shrink-0 text-[#666666]/40" />
+                  : <div className="w-4 h-4 flex-shrink-0 rounded bg-[#666666]/10" />}
+                <span className="flex-1 text-sm truncate text-[#666666]">{item.name}</span>
+                <span className={`${dateColumnClass} text-xs text-[#666666]`}>--</span>
+                <span className={`${sizeColumnClass} text-xs text-[#666666] text-right`}>--</span>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -269,7 +296,10 @@ export function FileList() {
         {selectedPaths.size > 0 && (
           <span className="ml-2">{selectedPaths.size} selected</span>
         )}
-        {loading && <span className="ml-auto">refreshing</span>}
+        {uploadingFiles.length > 0 && (
+          <span className="ml-auto">uploading {uploadingFiles.length} file(s)...</span>
+        )}
+        {uploadingFiles.length === 0 && loading && <span className="ml-auto">refreshing</span>}
       </div>
     </>
   )

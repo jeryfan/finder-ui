@@ -37,6 +37,35 @@ export const createPreviewSlice: StateCreator<StoreState, [], [], PreviewSlice> 
     }
   }),
 
+  openPreviewLoading: (file) => set((state) => {
+    const existingIndex = state.previews.findIndex(p => p.path === file.path)
+
+    const loadingPreview: PreviewWindow = {
+      path: file.path,
+      name: file.name,
+      size: file.size,
+      content: '',
+      draftContent: '',
+      isLoading: true,
+      isSaving: false,
+      isEditing: false,
+      mimeType: file.mimeType || file.mimetype,
+    }
+
+    let newPreviews: PreviewWindow[]
+    if (existingIndex >= 0) {
+      newPreviews = [...state.previews]
+      newPreviews[existingIndex] = { ...newPreviews[existingIndex], isLoading: true }
+    } else {
+      newPreviews = [...state.previews, loadingPreview]
+    }
+
+    return {
+      previews: newPreviews,
+      activePreviewPath: file.path,
+    }
+  }),
+
   closePreview: (path) => set((state) => {
     const newPreviews = state.previews.filter(p => p.path !== path)
     let newActivePath = state.activePreviewPath

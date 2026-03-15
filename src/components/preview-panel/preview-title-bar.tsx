@@ -36,7 +36,8 @@ export function PreviewTitleBar({
   const isMarkdown = isMarkdownFile(preview.name)
   const isMarkdownPreviewMode = isMarkdown && !preview.isEditing
   const isMarkdownEditMode = isMarkdown && preview.isEditing
-  const canSave = updateEnabled && preview.draftContent !== preview.content && !preview.isSaving
+  const hasChanges = preview.draftContent !== preview.content
+  const canSave = updateEnabled && hasChanges && !preview.isSaving
 
   return (
     <div className="flex h-10 cursor-default items-center gap-2 border-b border-[#EAE9E6] bg-white px-3">
@@ -75,8 +76,14 @@ export function PreviewTitleBar({
         {updateEnabled && (isMarkdownEditMode || !isMarkdown) && (
           <button
             onClick={() => onSave(preview)}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929] disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={!canSave}
+            className={`flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors ${
+              preview.isSaving
+                ? 'pointer-events-none'
+                : canSave
+                  ? 'hover:bg-[#F6F5F4] hover:text-[#2E2929]'
+                  : 'cursor-not-allowed opacity-50'
+            }`}
+            disabled={!canSave && !preview.isSaving}
             title="Save"
           >
             {preview.isSaving
