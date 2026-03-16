@@ -61,8 +61,10 @@ export function PreviewPanel({
     }
   }
 
-  const handleRefresh = (_path: string) => {
-    storeApi.getState().onRefresh()
+  const handleRefresh = (path: string) => {
+    const preview = previews.find(p => p.path === path)
+    if (!preview) return
+    onOpen({ path: preview.path, name: preview.name, size: preview.size, type: 'file', mimeType: preview.mimeType })
   }
 
   const handleMaximize = (path: string) => {
