@@ -1,33 +1,39 @@
-import { json as jsonLanguage } from '@codemirror/lang-json'
-import { oneDark } from '@codemirror/theme-one-dark'
-import { marked } from 'marked'
-import CodeMirror from '@uiw/react-codemirror'
-import { LoaderIcon } from '@/icons'
-import { extractExtension, isMarkdownFile, isCodeFile, isImageFile, isVideoFile } from '@/utils'
-import { ImagePreview } from './image-preview'
-import { VideoPreview } from './video-preview'
-import type { PreviewWindow } from '@/types'
+import { json as jsonLanguage } from "@codemirror/lang-json";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { marked } from "marked";
+import CodeMirror from "@uiw/react-codemirror";
+import {
+  extractExtension,
+  isMarkdownFile,
+  isCodeFile,
+  isImageFile,
+  isVideoFile,
+} from "@/utils";
+import { ImagePreview } from "./image-preview";
+import { VideoPreview } from "./video-preview";
+import type { PreviewWindow } from "@/types";
+import { Loader2 } from "lucide-react";
 
-marked.setOptions({ breaks: true, gfm: true })
+marked.setOptions({ breaks: true, gfm: true });
 
 const defaultRenderMarkdown = (content: string) => {
-  const html = marked.parse(content)
-  if (typeof html !== 'string') return null
+  const html = marked.parse(content);
+  if (typeof html !== "string") return null;
   return (
     <div
       className="prose prose-sm max-w-none prose-headings:text-[#2E2929] prose-p:text-[#2E2929] prose-strong:text-[#2E2929] prose-code:text-[#2E2929] prose-pre:bg-[#F6F5F4] prose-pre:text-[#2E2929]"
       dangerouslySetInnerHTML={{ __html: html }}
     />
-  )
-}
+  );
+};
 
 export type PreviewBodyProps = {
-  preview: PreviewWindow
-  updateEnabled: boolean
-  renderMarkdown?: (content: string) => React.ReactNode
-  onDraftChange: (path: string, content: string) => void
-  onRefresh: (path: string) => void
-}
+  preview: PreviewWindow;
+  updateEnabled: boolean;
+  renderMarkdown?: (content: string) => React.ReactNode;
+  onDraftChange: (path: string, content: string) => void;
+  onRefresh: (path: string) => void;
+};
 
 export function PreviewBody({
   preview,
@@ -36,21 +42,21 @@ export function PreviewBody({
   onDraftChange,
   onRefresh,
 }: PreviewBodyProps) {
-  const isMarkdown = isMarkdownFile(preview.name)
-  const isImage = isImageFile(preview.name)
-  const isVideo = isVideoFile(preview.name)
-  const isCode = isCodeFile(preview.name)
-  const isMarkdownEditing = isMarkdown && preview.isEditing
-  const shouldUseCodeEditor = isCode || isMarkdownEditing
-  const codeExtension = extractExtension(preview.name)
-  const codeMirrorExtensions = codeExtension === 'json' ? [jsonLanguage()] : []
+  const isMarkdown = isMarkdownFile(preview.name);
+  const isImage = isImageFile(preview.name);
+  const isVideo = isVideoFile(preview.name);
+  const isCode = isCodeFile(preview.name);
+  const isMarkdownEditing = isMarkdown && preview.isEditing;
+  const shouldUseCodeEditor = isCode || isMarkdownEditing;
+  const codeExtension = extractExtension(preview.name);
+  const codeMirrorExtensions = codeExtension === "json" ? [jsonLanguage()] : [];
 
   if (preview.isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <LoaderIcon className="h-8 w-8 text-[#666666]" />
+        <Loader2 className="h-8 w-8 text-[#666666]" />
       </div>
-    )
+    );
   }
 
   if (preview.error) {
@@ -66,24 +72,24 @@ export function PreviewBody({
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   if (isImage) {
-    return <ImagePreview src={preview.content} alt={preview.name} />
+    return <ImagePreview src={preview.content} alt={preview.name} />;
   }
 
   if (isVideo) {
-    return <VideoPreview src={preview.content} />
+    return <VideoPreview src={preview.content} />;
   }
 
   if (isMarkdown && !preview.isEditing) {
-    const renderer = renderMarkdown ?? defaultRenderMarkdown
+    const renderer = renderMarkdown ?? defaultRenderMarkdown;
     return (
       <div className="h-full overflow-auto bg-white p-6 text-sm leading-6 text-[#2E2929]">
         {renderer(preview.draftContent)}
       </div>
-    )
+    );
   }
 
   if (shouldUseCodeEditor) {
@@ -101,19 +107,19 @@ export function PreviewBody({
             highlightActiveLine: true,
             highlightActiveLineGutter: true,
           }}
-          onChange={value => onDraftChange(preview.path, value)}
+          onChange={(value) => onDraftChange(preview.path, value)}
         />
       </div>
-    )
+    );
   }
 
   return (
     <textarea
       className="h-full w-full resize-none border-0 bg-transparent p-4 font-mono text-[13px] leading-5 text-[#2E2929] focus:outline-none"
       value={preview.draftContent}
-      onChange={event => onDraftChange(preview.path, event.target.value)}
+      onChange={(event) => onDraftChange(preview.path, event.target.value)}
       spellCheck={false}
       readOnly={!updateEnabled}
     />
-  )
+  );
 }

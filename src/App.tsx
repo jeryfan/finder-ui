@@ -96,7 +96,6 @@ function App() {
       return
     }
 
-    // Directory upload: group by parent directory, parallel requests
     const groups = new Map<string, File[]>()
     for (const file of files) {
       const parts = (file.webkitRelativePath || file.name).split('/')
@@ -130,18 +129,36 @@ function App() {
   }
 
   return (
-    <Finder
-      tabs={TABS}
-      defaultTab="projects"
-      style={{ height: '100vh' }}
-      onFetchFiles={handleFetchFiles}
-      onOpenFile={handleOpenFile}
-      onSave={handleSave}
-      onUpload={handleUpload}
-      onDownload={handleDownload}
-      onBatchDownload={handleBatchDownload}
-      editable
-    />
+    <div
+      className="h-screen w-screen flex bg-[#F9F6F1]"
+      style={{
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        WebkitFontSmoothing: 'antialiased',
+      }}
+    >
+      {/* ── Outer App Sidebar (w-64 = 256px, matching target) ── */}
+      <aside className="h-full w-64 flex-shrink-0 flex flex-col px-4">
+        <div className="flex-shrink-0 pt-4 pb-1" />
+        <div className="flex-1 min-h-0" />
+        <div className="pt-1 pb-4 flex-shrink-0" />
+      </aside>
+
+      {/* ── Content: Finder ── */}
+      <div className="flex-1 min-w-0 h-full pt-4 pr-4 pb-4">
+        <Finder
+          tabs={TABS}
+          defaultTab="projects"
+          style={{ height: '100%', width: '100%' }}
+          onFetchFiles={handleFetchFiles}
+          onOpenFile={handleOpenFile}
+          onSave={handleSave}
+          onUpload={handleUpload}
+          onDownload={handleDownload}
+          onBatchDownload={handleBatchDownload}
+          editable
+        />
+      </div>
+    </div>
   )
 }
 

@@ -291,13 +291,13 @@ export function FinderInner({
       }}
     >
       <div className="relative h-full flex">
-        <div className="flex-1 min-w-0 h-full p-4 pl-0 relative z-10 overflow-hidden">
+        <div className="flex-1 min-w-0 h-full relative z-10 overflow-hidden">
           {/* Left pane — file list area */}
           <div
             className="overflow-hidden transition-all duration-300 ease-out absolute inset-0"
             style={previews.length > 0 ? { width: `${leftPaneWidth}px` } : undefined}
           >
-            <div className="relative overflow-hidden bg-white rounded-2xl transition-all duration-300 ease-out flex-1 h-full">
+            <div className="relative overflow-hidden bg-white rounded-2xl border border-[#EAE9E6] transition-all duration-300 ease-out flex-1 h-full">
               <div className="absolute inset-0 overflow-hidden rounded-2xl">
                 <div className="h-full flex bg-white text-[#2E2929] overflow-hidden select-none" data-finder-window="true">
                   <Sidebar tabs={tabs} />
