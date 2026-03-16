@@ -12,7 +12,7 @@
   "module": "./dist/finder-ui.es.js",
   "types": "./dist/index.d.ts",
   "files": ["dist", "LICENSE", "README.md"],
-  "sideEffects": ["*.css"],
+  "sideEffects": true,
   "exports": {
     ".": {
       "import": {
@@ -23,8 +23,7 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/finder-ui.umd.js"
       }
-    },
-    "./style.css": "./dist/finder-ui.css"
+    }
   },
   "scripts": {
     "dev": "vite",

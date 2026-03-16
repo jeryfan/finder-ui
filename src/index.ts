@@ -1,4 +1,17 @@
-import './styles/index.css'
+// Auto-inject styles at runtime (no separate CSS import needed)
+import cssText from './styles/index.css?inline'
+
+function injectStyles() {
+  if (typeof document === 'undefined') return
+  const id = '__finder-ui-styles__'
+  if (document.getElementById(id)) return
+  const style = document.createElement('style')
+  style.id = id
+  style.textContent = cssText
+  document.head.appendChild(style)
+}
+
+injectStyles()
 
 // Utils
 export { cn } from '@/utils'
