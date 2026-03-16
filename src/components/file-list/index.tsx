@@ -293,15 +293,23 @@ export function FileList() {
         )}
       </div>
 
-      <div className="flex h-6 shrink-0 items-center border-t border-[#EAE9E6] bg-[#F6F5F433] px-3 text-[10px] leading-4 text-[#666666]">
+      <div className="flex h-6 shrink-0 items-center gap-2 border-t border-[#EAE9E6] bg-[#F6F5F433] px-3 text-[10px] leading-4 text-[#666666]">
         <span>{sortedFiles.length} items</span>
         {selectedPaths.size > 0 && (
-          <span className="ml-2">{selectedPaths.size} selected</span>
+          <span>{selectedPaths.size} selected</span>
         )}
         {uploadingFiles.length > 0 && (
-          <span className="ml-auto">uploading {uploadingFiles.length} file(s)...</span>
+          <span className="flex items-center gap-1">
+            <LoaderIcon className="h-3 w-3 text-[#3B82F6]" />
+            uploading {uploadingFiles.length} files
+          </span>
         )}
-        {uploadingFiles.length === 0 && loading && <span className="ml-auto">refreshing</span>}
+        {uploadingFiles.length === 0 && loading && (
+          <span className="flex items-center gap-1">
+            <LoaderIcon className="h-3 w-3 text-[#3B82F6]" />
+            refreshing
+          </span>
+        )}
       </div>
     </>
   )
