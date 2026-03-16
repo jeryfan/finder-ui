@@ -1,3 +1,53 @@
+/*
+ * Scoped preflight — essential Tailwind resets scoped to .finder-ui-root.
+ * Uses :where() to keep specificity at (0,0,0) so any Tailwind utility
+ * class trivially overrides these defaults.
+ *
+ * This ensures finder-ui components render correctly regardless of host CSS,
+ * without leaking styles to the host or overriding Tailwind utilities.
+ */
+:where(.finder-ui-root),
+:where(.finder-ui-root) :where(*),
+:where(.finder-ui-root) :where(*::before),
+:where(.finder-ui-root) :where(*::after) {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: currentColor;
+}
+
+:where(.finder-ui-root) :where(img, svg, video, canvas) {
+  display: block;
+  vertical-align: middle;
+  max-width: 100%;
+}
+
+:where(.finder-ui-root) :where(button, input, select, textarea) {
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+:where(.finder-ui-root) :where(h1, h2, h3, h4, h5, h6) {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+:where(.finder-ui-root) :where(a) {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+:where(.finder-ui-root) :where(ol, ul) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Theme variables — keep normal specificity for CSS custom properties */
 .finder-ui-root {
   --color-background: #fcfbf8;
   --color-foreground: #2e2929;
@@ -9,6 +59,9 @@
   --color-primary: #f59e0b;
   color: var(--color-foreground);
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
 }
 
 .finder-ui-root[data-finder-theme='target'] {

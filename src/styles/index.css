@@ -1,4 +1,14 @@
-@import "tailwindcss" layer(finder-ui);
+/* Tailwind theme in a layer (variables only, no conflict risk) */
+@import "tailwindcss/theme.css" layer(theme);
+/* Utilities WITHOUT preflight and NOT layered.
+ * - No preflight: avoids injecting our own element resets
+ * - Unlayered: utilities beat host element resets by class specificity
+ * Note: when the host also uses Tailwind, same-named classes may produce
+ * duplicate CSS rules. This is harmless when both resolve to the same
+ * visual result. For properties where v3 and v4 differ (e.g. translate),
+ * components should avoid relying on those utilities and use inline styles
+ * or alternative approaches instead. */
+@import "tailwindcss/utilities.css";
 @plugin "@tailwindcss/typography";
 
 @source "../**/*.{ts,tsx}";
@@ -14,4 +24,4 @@
   --color-primary: #f59e0b;
 }
 
-@import "./theme.css" layer(finder-ui);
+@import "./theme.css";

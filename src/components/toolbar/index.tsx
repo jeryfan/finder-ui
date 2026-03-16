@@ -104,8 +104,8 @@ export function Toolbar({
         </button>
       </div>
 
-      <div className="relative">
-        <svg className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-[#666666] pointer-events-none" viewBox="0 0 24 24" fill="none">
+      <div className="relative flex items-center">
+        <svg className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-[#666666]" viewBox="0 0 24 24" fill="none">
           <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.6" />
           <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
         </svg>

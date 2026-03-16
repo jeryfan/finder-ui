@@ -67,7 +67,7 @@ export function ContextMenu() {
   return createPortal(
     <div
       ref={menuRef}
-      className="fixed z-[9999] min-w-[180px] bg-white border border-[#EAE9E6] rounded-lg py-1 text-sm shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)]"
+      className="finder-ui-root fixed z-[9999] min-w-[180px] bg-white border border-[#EAE9E6] rounded-lg py-1 text-sm shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)]"
       style={{ left: x, top: y }}
       onClick={(event) => event.stopPropagation()}
       data-context-menu="true"
@@ -82,7 +82,7 @@ export function ContextMenu() {
               onBatchDownload(selectedFiles)
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <DownloadIcon className="w-4 h-4" />
             Download All
@@ -97,7 +97,7 @@ export function ContextMenu() {
               onOpen(targetFile)
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <EyeIcon className="w-4 h-4" />
             Open
@@ -107,7 +107,7 @@ export function ContextMenu() {
               onDownload(targetFile)
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <DownloadIcon className="w-4 h-4" />
             Download
@@ -125,7 +125,7 @@ export function ContextMenu() {
               onBatchDownload(selectedFiles)
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <DownloadIcon className="w-4 h-4" />
             Download All
@@ -140,7 +140,7 @@ export function ContextMenu() {
               onOpen(targetFile)
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <FolderOpenIcon className="w-4 h-4" />
             Open
@@ -150,7 +150,7 @@ export function ContextMenu() {
               onUpload(false, targetFile.path)
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <UploadIcon className="w-4 h-4" />
             Upload Files
@@ -160,7 +160,7 @@ export function ContextMenu() {
               onUpload(true, targetFile.path)
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <FolderIcon className="w-4 h-4" />
             Upload Folder
@@ -175,7 +175,7 @@ export function ContextMenu() {
               onUpload(false)
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <UploadIcon className="w-4 h-4" />
             Upload Files
@@ -185,7 +185,7 @@ export function ContextMenu() {
               onUpload(true)
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <FolderIcon className="w-4 h-4" />
             Upload Folder
@@ -196,7 +196,7 @@ export function ContextMenu() {
               onRefresh()
               closeContextMenu()
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929]"
+            className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#F6F5F4] transition-colors text-left text-[#2E2929] border-0"
           >
             <RefreshIcon className="w-4 h-4" />
             Refresh
