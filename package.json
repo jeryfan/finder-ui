@@ -1,17 +1,30 @@
 {
   "name": "@jeryfan/finder-ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "license": "MIT",
   "description": "A macOS Finder-style file browser component for React",
-  "keywords": ["react", "file-browser", "finder", "file-manager", "ui-component"],
-  "repository": { "type": "git", "url": "https://github.com/jeryfan/finder-ui.git" },
+  "keywords": [
+    "react",
+    "file-browser",
+    "finder",
+    "file-manager",
+    "ui-component"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jeryfan/finder-ui.git"
+  },
   "homepage": "https://github.com/jeryfan/finder-ui",
   "author": "jeryfan",
   "main": "./dist/finder-ui.umd.js",
   "module": "./dist/finder-ui.es.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "LICENSE", "README.md"],
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "sideEffects": true,
   "exports": {
     ".": {
