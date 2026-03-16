@@ -1,4 +1,5 @@
 import { Finder, type SidebarTab, type FileEntry } from './'
+import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS } from './constants'
 
 // ── Icons ──────────────────────────────────────────────────────
 
@@ -59,9 +60,16 @@ function App() {
 
   const handleOpenFile = async (file: FileEntry): Promise<string | void> => {
     if (file.type !== 'file') return
-    const res = await fetch(
-      `/api/files?fileName=${encodeURIComponent(file.path)}&t=${Date.now()}`,
-    )
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
+    const url = `/api/files?fileName=${encodeURIComponent(file.path)}&t=${Date.now()}`
+
+    if (IMAGE_EXTENSIONS.has(ext) || VIDEO_EXTENSIONS.has(ext)) {
+      const res = await fetch(url)
+      const blob = await res.blob()
+      return URL.createObjectURL(blob)
+    }
+
+    const res = await fetch(url)
     const data = await res.json()
     return data.file.content
   }

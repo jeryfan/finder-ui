@@ -14,7 +14,7 @@ function injectStyles() {
 injectStyles()
 
 // Utils
-export { cn } from '@/utils'
+export { cn, isImageFile, isVideoFile, isMarkdownFile, isCodeFile } from '@/utils'
 
 // Types
 export type {
@@ -70,6 +70,11 @@ export {
   MaximizeIcon,
   MinimizeIcon,
   CloseIcon,
+  PlusIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+  RotateIcon,
+  FitToWindowIcon,
 } from '@/icons'
 export type { IconProps } from '@/icons'
 
@@ -78,3 +83,6 @@ export { getFileIcon, getFilePreviewType } from '@/utils/file-icons'
 
 // File utilities
 export { readEntryFiles } from '@/utils/read-entry-files'
+
+// Constants
+export { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, MARKDOWN_EXTENSIONS, CODE_EXTENSIONS } from '@/constants'

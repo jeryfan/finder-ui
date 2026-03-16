@@ -2,6 +2,8 @@ import type { FileEntry, MimeResolvable } from '@/types'
 import {
   MARKDOWN_EXTENSIONS,
   CODE_EXTENSIONS,
+  IMAGE_EXTENSIONS,
+  VIDEO_EXTENSIONS,
 } from '@/constants'
 
 export const cn = (...classes: Array<string | false | null | undefined>) =>
@@ -16,6 +18,8 @@ export const extractExtension = (name: string) => {
 
 export const isMarkdownFile = (name: string) => MARKDOWN_EXTENSIONS.has(extractExtension(name))
 export const isCodeFile = (name: string) => CODE_EXTENSIONS.has(extractExtension(name))
+export const isImageFile = (name: string) => IMAGE_EXTENSIONS.has(extractExtension(name))
+export const isVideoFile = (name: string) => VIDEO_EXTENSIONS.has(extractExtension(name))
 
 export const resolveEntryMimeType = (entry: MimeResolvable) =>
   (entry.mimeType || '')

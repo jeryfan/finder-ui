@@ -3,7 +3,9 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { marked } from 'marked'
 import CodeMirror from '@uiw/react-codemirror'
 import { LoaderIcon } from '@/icons'
-import { extractExtension, isMarkdownFile, isCodeFile } from '@/utils'
+import { extractExtension, isMarkdownFile, isCodeFile, isImageFile, isVideoFile } from '@/utils'
+import { ImagePreview } from './image-preview'
+import { VideoPreview } from './video-preview'
 import type { PreviewWindow } from '@/types'
 
 marked.setOptions({ breaks: true, gfm: true })
@@ -35,6 +37,8 @@ export function PreviewBody({
   onRefresh,
 }: PreviewBodyProps) {
   const isMarkdown = isMarkdownFile(preview.name)
+  const isImage = isImageFile(preview.name)
+  const isVideo = isVideoFile(preview.name)
   const isCode = isCodeFile(preview.name)
   const isMarkdownEditing = isMarkdown && preview.isEditing
   const shouldUseCodeEditor = isCode || isMarkdownEditing
@@ -63,6 +67,14 @@ export function PreviewBody({
         </div>
       </div>
     )
+  }
+
+  if (isImage) {
+    return <ImagePreview src={preview.content} alt={preview.name} />
+  }
+
+  if (isVideo) {
+    return <VideoPreview src={preview.content} />
   }
 
   if (isMarkdown && !preview.isEditing) {

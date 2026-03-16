@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { cn, isMarkdownFile } from '@/utils'
+import { cn, isMarkdownFile, isImageFile, isVideoFile } from '@/utils'
 import { getFileIcon } from '@/utils/file-icons'
 import {
   SaveIcon,
@@ -101,8 +101,11 @@ export function GroupedMode({
           {previews.map((preview) => {
             const isActiveTab = activePreview.path === preview.path
             const isMarkdownTab = isMarkdownFile(preview.name)
+            const isImageTab = isImageFile(preview.name)
+            const isVideoTab = isVideoFile(preview.name)
             const isMarkdownPreviewTab = isMarkdownTab && !preview.isEditing
             const isMarkdownEditTab = isMarkdownTab && preview.isEditing
+            const isEditableNonMarkdown = !isMarkdownTab && !isImageTab && !isVideoTab
             const canSaveTab = updateEnabled && preview.draftContent !== preview.content && !preview.isSaving && !preview.isLoading
 
             return (
@@ -171,7 +174,7 @@ export function GroupedMode({
                     </button>
                   </>
                 )}
-                {isActiveTab && updateEnabled && !isMarkdownTab && (
+                {isActiveTab && updateEnabled && isEditableNonMarkdown && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation()

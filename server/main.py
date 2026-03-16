@@ -7,6 +7,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from seed import seed_if_needed
 
@@ -108,10 +109,25 @@ def list_directory(path: str) -> dict:
     return {"success": True, "files": files, "totalCount": len(files)}
 
 
-def read_file(file_name: str) -> dict:
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp", ".ico"}
+VIDEO_EXTENSIONS = {".mp4", ".avi", ".mov", ".wmv", ".flv", ".webm", ".mkv", ".m4v"}
+
+BINARY_EXTENSIONS = IMAGE_EXTENSIONS | VIDEO_EXTENSIONS
+
+
+def read_file(file_name: str) -> dict | FileResponse:
     file_path = safe_resolve(BASE_DIR, file_name)
     if not file_path.is_file():
         raise HTTPException(404, f"File not found: {file_name}")
+
+    # Return binary response for image/video files (matching target website behavior)
+    if file_path.suffix.lower() in BINARY_EXTENSIONS:
+        return FileResponse(
+            path=file_path,
+            media_type=guess_mime(file_path.name),
+            filename=file_path.name,
+            content_disposition_type="inline",
+        )
 
     content = file_path.read_text(encoding="utf-8")
     return {

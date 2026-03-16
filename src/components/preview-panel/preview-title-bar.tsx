@@ -8,7 +8,7 @@ import {
   MaximizeIcon,
   LoaderIcon,
 } from '@/icons'
-import { isMarkdownFile } from '@/utils'
+import { isMarkdownFile, isImageFile, isVideoFile } from '@/utils'
 import { getFileIcon } from '@/utils/file-icons'
 import type { PreviewWindow } from '@/types'
 
@@ -34,6 +34,8 @@ export function PreviewTitleBar({
   onSetEditing,
 }: PreviewTitleBarProps) {
   const isMarkdown = isMarkdownFile(preview.name)
+  const isImage = isImageFile(preview.name)
+  const isVideo = isVideoFile(preview.name)
   const isMarkdownPreviewMode = isMarkdown && !preview.isEditing
   const isMarkdownEditMode = isMarkdown && preview.isEditing
   const hasChanges = preview.draftContent !== preview.content
@@ -73,7 +75,7 @@ export function PreviewTitleBar({
             <EyeIcon className="h-3.5 w-3.5" />
           </button>
         )}
-        {updateEnabled && (isMarkdownEditMode || !isMarkdown) && (
+        {updateEnabled && (isMarkdownEditMode || (!isMarkdown && !isImage && !isVideo)) && (
           <button
             onClick={() => onSave(preview)}
             className={`flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors ${
