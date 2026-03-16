@@ -23,6 +23,7 @@ export function PreviewPanel({
     activePreviewPath,
     previewMode,
     updateEnabled,
+    files,
     setActivePreviewPath,
     setPreviewMode,
     closePreview,
@@ -31,6 +32,7 @@ export function PreviewPanel({
     setPreviewSaving,
     refreshPreview,
     onSavePreview,
+    onOpen,
   } = useFinderStore()
 
   const storeApi = useFinderStoreApi()
@@ -94,6 +96,7 @@ export function PreviewPanel({
           activePreviewPath={activePreviewPath}
           previewLeft={previewLeft}
           updateEnabled={updateEnabled}
+          files={files}
           renderMarkdown={renderMarkdown}
           onSave={(p) => void handleSave(p)}
           onRefresh={handleRefresh}
@@ -102,6 +105,7 @@ export function PreviewPanel({
           onDraftChange={updatePreviewDraft}
           onSetActivePreviewPath={setActivePreviewPath}
           onSetPreviewMode={setPreviewMode}
+          onOpenFile={onOpen}
         />
       )}
     </>

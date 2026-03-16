@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn, isMarkdownFile } from '@/utils'
 import { getFileIcon } from '@/utils/file-icons'
 import {
@@ -9,10 +9,11 @@ import {
   CloseIcon,
   MinimizeIcon,
   LoaderIcon,
+  PlusIcon,
 } from '@/icons'
 import { PREVIEW_TOP_INSET, PREVIEW_BOTTOM_INSET } from './constants'
 import { PreviewBody } from './preview-body'
-import type { PreviewWindow } from '@/types'
+import type { PreviewWindow, FileEntry } from '@/types'
 
 export type GroupedModeProps = {
   previews: PreviewWindow[]
@@ -20,6 +21,7 @@ export type GroupedModeProps = {
   activePreviewPath: string | null
   previewLeft: number
   updateEnabled: boolean
+  files: FileEntry[]
   renderMarkdown?: (content: string) => React.ReactNode
   onSave: (preview: PreviewWindow) => void
   onRefresh: (path: string) => void
@@ -28,6 +30,7 @@ export type GroupedModeProps = {
   onDraftChange: (path: string, content: string) => void
   onSetActivePreviewPath: (path: string) => void
   onSetPreviewMode: (mode: 'split' | 'grouped') => void
+  onOpenFile: (file: FileEntry) => void
 }
 
 export function GroupedMode({
@@ -36,6 +39,7 @@ export function GroupedMode({
   activePreviewPath,
   previewLeft,
   updateEnabled,
+  files,
   renderMarkdown,
   onSave,
   onRefresh,
@@ -44,8 +48,11 @@ export function GroupedMode({
   onDraftChange,
   onSetActivePreviewPath,
   onSetPreviewMode,
+  onOpenFile,
 }: GroupedModeProps) {
   const groupedTabsRef = useRef<HTMLDivElement | null>(null)
+  const [addMenuOpen, setAddMenuOpen] = useState(false)
+  const addMenuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (previews.length === 0 || !activePreviewPath || !groupedTabsRef.current)
@@ -57,9 +64,23 @@ export function GroupedMode({
     activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
   }, [activePreviewPath, previews.length])
 
+  useEffect(() => {
+    if (!addMenuOpen) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) {
+        setAddMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [addMenuOpen])
+
   const handleSave = (preview: PreviewWindow) => {
     onSave(preview)
   }
+
+  const openPaths = new Set(previews.map(p => p.path))
+  const availableFiles = files.filter(f => f.type === 'file' && !openPaths.has(f.path))
 
   return (
     <div
@@ -150,6 +171,28 @@ export function GroupedMode({
                     </button>
                   </>
                 )}
+                {isActiveTab && updateEnabled && !isMarkdownTab && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleSave(preview)
+                    }}
+                    disabled={!canSaveTab && !preview.isSaving}
+                    className={cn(
+                      'flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors',
+                      preview.isSaving
+                        ? 'pointer-events-none'
+                        : canSaveTab
+                          ? 'hover:text-[#2E2929]'
+                          : 'cursor-not-allowed opacity-50',
+                    )}
+                    title="Save"
+                  >
+                    {preview.isSaving
+                      ? <LoaderIcon className="h-3.5 w-3.5" />
+                      : <SaveIcon className="h-3.5 w-3.5" />}
+                  </button>
+                )}
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
@@ -168,41 +211,36 @@ export function GroupedMode({
           })}
         </div>
         <div className="flex shrink-0 items-center gap-1">
-          {updateEnabled && isMarkdownFile(activePreview.name) && !activePreview.isEditing && (
+          <div className="relative" ref={addMenuRef}>
             <button
-              onClick={() => onSetEditing(activePreview.path, true)}
+              onClick={() => setAddMenuOpen(prev => !prev)}
               className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
-              title="Edit"
+              title="Add file"
             >
-              <EditIcon className="h-3.5 w-3.5" />
+              <PlusIcon className="h-3.5 w-3.5" />
             </button>
-          )}
-          {updateEnabled && isMarkdownFile(activePreview.name) && activePreview.isEditing && (
-            <button
-              onClick={() => onSetEditing(activePreview.path, false)}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
-              title="Preview"
-            >
-              <EyeIcon className="h-3.5 w-3.5" />
-            </button>
-          )}
-          {updateEnabled && (!isMarkdownFile(activePreview.name) || activePreview.isEditing) && (
-            <button
-              onClick={() => handleSave(activePreview)}
-              disabled={activePreview.draftContent === activePreview.content && !activePreview.isSaving}
-              className={cn(
-                'flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors',
-                activePreview.isSaving
-                  ? 'pointer-events-none'
-                  : activePreview.draftContent !== activePreview.content
-                    ? 'hover:bg-[#F6F5F4] hover:text-[#2E2929]'
-                    : 'cursor-not-allowed opacity-50',
-              )}
-              title="Save"
-            >
-              {activePreview.isSaving ? <LoaderIcon className="h-3.5 w-3.5" /> : <SaveIcon className="h-3.5 w-3.5" />}
-            </button>
-          )}
+            {addMenuOpen && (
+              <div className="absolute right-0 top-full z-50 mt-1 max-h-60 min-w-[180px] overflow-y-auto rounded-lg border border-[#EAE9E6] bg-white py-1 shadow-lg">
+                {availableFiles.length === 0 ? (
+                  <div className="px-3 py-2 text-xs text-[#999999]">No files available</div>
+                ) : (
+                  availableFiles.map(file => (
+                    <button
+                      key={file.path}
+                      className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-[#2E2929] transition-colors hover:bg-[#F6F5F4]"
+                      onClick={() => {
+                        onOpenFile(file)
+                        setAddMenuOpen(false)
+                      }}
+                    >
+                      {getFileIcon(file, 'h-3.5 w-3.5 shrink-0')}
+                      <span className="truncate">{file.name}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
           <button
             onClick={() => onRefresh(activePreview.path)}
             className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F480] hover:text-[#2E2929]"
