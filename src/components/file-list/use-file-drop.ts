@@ -44,7 +44,7 @@ export function useFileDrop(
       .filter((entry): entry is FileSystemEntry => entry != null)
 
     if (entries.length > 0) {
-      const nestedFiles = await Promise.all(entries.map(readEntryFiles))
+      const nestedFiles = await Promise.all(entries.map((e) => readEntryFiles(e)))
       const allFiles = nestedFiles.flat()
       if (allFiles.length > 0) {
         onDropFiles(allFiles, currentPath)
