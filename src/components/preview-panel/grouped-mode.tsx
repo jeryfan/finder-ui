@@ -8,6 +8,7 @@ import {
   Eye,
   Loader2,
   Minimize2,
+  PenLine,
   Plus,
   RefreshCwIcon,
   Save,
@@ -152,7 +153,7 @@ export function GroupedMode({
                     className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors hover:text-[#2E2929]"
                     title="Edit"
                   >
-                    <EditIcon className="h-3.5 w-3.5" />
+                    <PenLine className="h-3.5 w-3.5" />
                   </button>
                 )}
                 {isActiveTab && updateEnabled && isMarkdownEditTab && (
