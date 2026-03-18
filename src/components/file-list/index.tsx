@@ -495,7 +495,7 @@ export function FileList() {
                           onDoubleClick={(event) => handleEntryDoubleClick(entry, event)}
                           onContextMenu={(event) => handleContextMenu(event, entry)}
                           className={cn(
-                            "flex flex-col items-center p-2 rounded-lg transition-colors text-center group",
+                            "flex flex-col items-center p-2 rounded-lg transition-colors text-center group cursor-pointer",
                             selectedPaths.has(entry.path)
                               ? "bg-black/5 outline outline-1 outline-black/30 relative z-10"
                               : "hover:bg-muted",
@@ -595,7 +595,7 @@ export function FileList() {
                   onDoubleClick={(event) => handleEntryDoubleClick(entry, event)}
                   onContextMenu={(event) => handleContextMenu(event, entry)}
                   className={cn(
-                    "w-full flex items-center gap-2 px-2 py-1 rounded-md transition-colors text-left leading-[25.6px] group",
+                    "w-full flex items-center gap-2 px-2 py-1 rounded-md transition-colors text-left leading-[25.6px] group cursor-pointer",
                     selectedPaths.has(entry.path)
                       ? "bg-black/5 ring-1 ring-black/30"
                       : "hover:bg-muted",
