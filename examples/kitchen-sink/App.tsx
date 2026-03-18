@@ -59,7 +59,7 @@ const zhCN: Partial<FinderLocale> = {
 
 export default function KitchenSinkExample() {
   const [tree, setTree] = useState(initialTree)
-  const [theme, setTheme] = useState<'target' | 'graphite' | 'clean'>('target')
+  const [theme, setTheme] = useState<'default' | 'graphite' | 'minimal'>('default')
   const [lang, setLang] = useState<'en' | 'zh'>('en')
 
   const parentOf = (p: string) => {
@@ -151,7 +151,7 @@ export default function KitchenSinkExample() {
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ padding: '8px 12px', display: 'flex', gap: 8, borderBottom: '1px solid #eee', alignItems: 'center', flexWrap: 'wrap' }}>
         <span style={{ fontSize: 13, color: '#666' }}>Theme:</span>
-        {(['target', 'graphite', 'clean'] as const).map((t) => (
+        {(['default', 'graphite', 'minimal'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTheme(t)}

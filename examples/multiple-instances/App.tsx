@@ -11,7 +11,7 @@ export default function MultipleInstancesExample() {
         <div style={{ flex: 1, minWidth: 0 }}>
           <Finder
             style={{ height: '100%' }}
-            theme="target"
+            theme="default"
             tabs={[
               { key: 'docs', label: 'Documents', rootPath: '/Documents' },
               { key: 'projects', label: 'Projects', rootPath: '/Projects' },

@@ -28,7 +28,7 @@ export function FinderInner({
   locale,
   className,
   style,
-  theme = 'target',
+  theme = 'default',
 }: FinderProps) {
   const {
     currentPath,

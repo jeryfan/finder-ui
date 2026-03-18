@@ -37,8 +37,8 @@ export type FinderProps = {
   className?: string
   /** Inline styles for the root element. Use to set dimensions, e.g. `{ height: '100vh' }` */
   style?: React.CSSProperties
-  /** Theme variant. Default: 'target' */
-  theme?: 'target' | 'graphite' | 'clean'
+  /** Theme variant. Defaults to 'default' when omitted. */
+  theme?: 'default' | 'graphite' | 'minimal'
 }
 
 export function Finder(props: FinderProps) {

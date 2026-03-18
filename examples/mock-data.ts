@@ -94,7 +94,7 @@ Welcome to the project! This is a **demo** file system.
     {
       name: 'finder-ui-demo',
       version: '1.0.0',
-      theme: 'target',
+      theme: 'default',
       features: { preview: true, upload: true, search: true },
     },
     null,

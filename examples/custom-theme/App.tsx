@@ -3,13 +3,13 @@ import { Finder } from '../../src'
 import { mockFetchFiles, mockOpenFile } from '../mock-data'
 
 const themes = [
-  { key: 'target' as const, label: 'Target (Amber)' },
+  { key: 'default' as const, label: 'Default (Amber)' },
   { key: 'graphite' as const, label: 'Graphite (Blue)' },
-  { key: 'clean' as const, label: 'Clean (Green)' },
+  { key: 'minimal' as const, label: 'Minimal (Green)' },
 ]
 
 export default function CustomThemeExample() {
-  const [theme, setTheme] = useState<'target' | 'graphite' | 'clean'>('target')
+  const [theme, setTheme] = useState<'default' | 'graphite' | 'minimal'>('default')
   const [customBg, setCustomBg] = useState(false)
 
   return (

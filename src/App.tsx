@@ -52,7 +52,7 @@ function triggerDownload(content: string, filename: string) {
   URL.revokeObjectURL(url)
 }
 
-const THEMES = ['target', 'graphite', 'clean'] as const
+const THEMES = ['default', 'graphite', 'minimal'] as const
 type Theme = (typeof THEMES)[number]
 
 const LOCALES: Record<string, Partial<FinderLocale>> = {
@@ -63,7 +63,7 @@ const LOCALES: Record<string, Partial<FinderLocale>> = {
 // ── App ────────────────────────────────────────────────────────
 
 function App() {
-  const [theme, setTheme] = useState<Theme>('target')
+  const [theme, setTheme] = useState<Theme>('default')
   const [localeKey, setLocaleKey] = useState('en')
 
   const handleFetchFiles = async (path: string): Promise<FileEntry[]> => {
