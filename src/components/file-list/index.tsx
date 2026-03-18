@@ -233,7 +233,7 @@ export function FileList() {
     <>
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-auto p-3 relative"
+        className="flex-1 overflow-auto p-3 relative outline-none"
         tabIndex={0}
         role="listbox"
         aria-label="File list"
@@ -241,7 +241,10 @@ export function FileList() {
         onClick={(event) => {
           const target = event.target as HTMLElement;
           if (target.closest('[data-file-row="true"]')) return;
-          if (!event.metaKey && !event.ctrlKey) clearSelection();
+          if (!event.metaKey && !event.ctrlKey) {
+            clearSelection();
+            setFocusedIndex(-1);
+          }
         }}
         onContextMenu={(event) => {
           const target = event.target as HTMLElement;
@@ -494,7 +497,7 @@ export function FileList() {
                           className={cn(
                             "flex flex-col items-center p-2 rounded-lg transition-colors text-center group",
                             selectedPaths.has(entry.path)
-                              ? "bg-black/5 ring-1 ring-black/30"
+                              ? "bg-black/5 outline outline-1 outline-black/30 relative z-10"
                               : "hover:bg-[#F6F5F4]",
                             focusedIndex === flatIndex && !selectedPaths.has(entry.path) && "ring-2 ring-[#F59E0B]/50",
                           )}
@@ -586,6 +589,7 @@ export function FileList() {
                     width: '100%',
                     height: `${virtualItem.size}px`,
                     transform: `translateY(${virtualItem.start}px)`,
+                    zIndex: selectedPaths.has(entry.path) ? 1 : undefined,
                   }}
                   onClick={(event) => handleEntryClick(entry, event)}
                   onDoubleClick={(event) => handleEntryDoubleClick(entry, event)}
