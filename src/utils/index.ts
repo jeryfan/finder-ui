@@ -4,6 +4,7 @@ import {
   CODE_EXTENSIONS,
   IMAGE_EXTENSIONS,
   VIDEO_EXTENSIONS,
+  AUDIO_EXTENSIONS,
 } from '@/constants'
 
 export const cn = (...classes: Array<string | false | null | undefined>) =>
@@ -20,6 +21,9 @@ export const isMarkdownFile = (name: string) => MARKDOWN_EXTENSIONS.has(extractE
 export const isCodeFile = (name: string) => CODE_EXTENSIONS.has(extractExtension(name))
 export const isImageFile = (name: string) => IMAGE_EXTENSIONS.has(extractExtension(name))
 export const isVideoFile = (name: string) => VIDEO_EXTENSIONS.has(extractExtension(name))
+export const isAudioFile = (name: string) => AUDIO_EXTENSIONS.has(extractExtension(name))
+export const isCsvFile = (name: string) => extractExtension(name) === 'csv'
+export const isPdfFile = (name: string) => extractExtension(name) === 'pdf'
 
 export const resolveEntryMimeType = (entry: MimeResolvable) =>
   (entry.mimeType || '')

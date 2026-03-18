@@ -1,5 +1,8 @@
-import { Finder, type SidebarTab, type FileEntry } from './'
-import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS } from './constants'
+import { useState } from 'react'
+import { Finder, type SidebarTab, type FileEntry, type FinderLocale } from './'
+import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './constants'
+import { enLocale } from './locale/en'
+import { zhCNLocale } from './locale/zh-CN'
 
 // ── Icons ──────────────────────────────────────────────────────
 
@@ -49,9 +52,20 @@ function triggerDownload(content: string, filename: string) {
   URL.revokeObjectURL(url)
 }
 
+const THEMES = ['target', 'graphite', 'clean'] as const
+type Theme = (typeof THEMES)[number]
+
+const LOCALES: Record<string, Partial<FinderLocale>> = {
+  en: enLocale,
+  'zh-CN': zhCNLocale,
+}
+
 // ── App ────────────────────────────────────────────────────────
 
 function App() {
+  const [theme, setTheme] = useState<Theme>('target')
+  const [localeKey, setLocaleKey] = useState('en')
+
   const handleFetchFiles = async (path: string): Promise<FileEntry[]> => {
     const res = await fetch(`/api/files?path=${encodeURIComponent(path)}`)
     const data = await res.json()
@@ -63,7 +77,7 @@ function App() {
     const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
     const url = `/api/files?fileName=${encodeURIComponent(file.path)}&t=${Date.now()}`
 
-    if (IMAGE_EXTENSIONS.has(ext) || VIDEO_EXTENSIONS.has(ext)) {
+    if (IMAGE_EXTENSIONS.has(ext) || VIDEO_EXTENSIONS.has(ext) || AUDIO_EXTENSIONS.has(ext) || ext === 'pdf') {
       const res = await fetch(url)
       const blob = await res.blob()
       return URL.createObjectURL(blob)
@@ -136,9 +150,51 @@ function App() {
         WebkitFontSmoothing: 'antialiased',
       }}
     >
-      {/* ── Outer App Sidebar (w-64 = 256px, matching target) ── */}
+      {/* ── Outer App Sidebar ── */}
       <aside className="h-full w-64 flex-shrink-0 flex flex-col px-4">
-        <div className="flex-shrink-0 pt-4 pb-1" />
+        <div className="flex-shrink-0 pt-4 pb-1">
+          <h2 className="text-xs font-semibold text-[#666666] uppercase tracking-wider mb-3">Demo Controls</h2>
+
+          <div className="space-y-3">
+            <div>
+              <label className="text-[10px] font-medium text-[#999] uppercase tracking-wider">Theme</label>
+              <div className="flex gap-1 mt-1">
+                {THEMES.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTheme(t)}
+                    className={`px-2 py-1 text-xs rounded-md border transition-colors ${
+                      theme === t
+                        ? 'bg-[#2E2929] text-white border-[#2E2929]'
+                        : 'bg-white text-[#2E2929] border-[#EAE9E6] hover:bg-[#F6F5F4]'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[10px] font-medium text-[#999] uppercase tracking-wider">Locale</label>
+              <div className="flex gap-1 mt-1">
+                {Object.keys(LOCALES).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setLocaleKey(key)}
+                    className={`px-2 py-1 text-xs rounded-md border transition-colors ${
+                      localeKey === key
+                        ? 'bg-[#2E2929] text-white border-[#2E2929]'
+                        : 'bg-white text-[#2E2929] border-[#EAE9E6] hover:bg-[#F6F5F4]'
+                    }`}
+                  >
+                    {key}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="flex-1 min-h-0" />
         <div className="pt-1 pb-4 flex-shrink-0" />
       </aside>
@@ -149,6 +205,8 @@ function App() {
           tabs={TABS}
           defaultTab="projects"
           style={{ height: '100%', width: '100%' }}
+          theme={theme}
+          locale={LOCALES[localeKey]}
           onFetchFiles={handleFetchFiles}
           onOpenFile={handleOpenFile}
           onSave={handleSave}

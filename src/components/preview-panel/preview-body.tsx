@@ -8,9 +8,14 @@ import {
   isCodeFile,
   isImageFile,
   isVideoFile,
+  isAudioFile,
+  isCsvFile,
+  isPdfFile,
 } from "@/utils";
 import { ImagePreview } from "./image-preview";
 import { VideoPreview } from "./video-preview";
+import { AudioPreview } from "./audio-preview";
+import { TablePreview } from "./table-preview";
 import type { PreviewWindow } from "@/types";
 import { Loader2 } from "lucide-react";
 
@@ -45,6 +50,9 @@ export function PreviewBody({
   const isMarkdown = isMarkdownFile(preview.name);
   const isImage = isImageFile(preview.name);
   const isVideo = isVideoFile(preview.name);
+  const isAudio = isAudioFile(preview.name);
+  const isCsv = isCsvFile(preview.name);
+  const isPdf = isPdfFile(preview.name);
   const isCode = isCodeFile(preview.name);
   const isMarkdownEditing = isMarkdown && preview.isEditing;
   const shouldUseCodeEditor = isCode || isMarkdownEditing;
@@ -81,6 +89,26 @@ export function PreviewBody({
 
   if (isVideo) {
     return <VideoPreview src={preview.content} />;
+  }
+
+  if (isAudio) {
+    return <AudioPreview src={preview.content} name={preview.name} />;
+  }
+
+  if (isPdf) {
+    return (
+      <div className="h-full w-full">
+        <iframe
+          src={preview.content}
+          className="h-full w-full border-0"
+          title={preview.name}
+        />
+      </div>
+    );
+  }
+
+  if (isCsv) {
+    return <TablePreview content={preview.draftContent} name={preview.name} />;
   }
 
   if (isMarkdown && !preview.isEditing) {

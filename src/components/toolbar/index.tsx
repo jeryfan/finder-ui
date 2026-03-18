@@ -7,6 +7,7 @@ export type ToolbarProps = {
   breadcrumbs: Array<{ label: string; path: string }>
   viewMode: 'list' | 'grouped'
   searchQuery: string
+  searchPlaceholder?: string
   onGoBack: () => void
   onGoForward: () => void
   onNavigate: (path: string) => void
@@ -20,6 +21,7 @@ export function Toolbar({
   breadcrumbs,
   viewMode,
   searchQuery,
+  searchPlaceholder = 'Search',
   onGoBack,
   onGoForward,
   onNavigate,
@@ -113,7 +115,7 @@ export function Toolbar({
           type="text"
           value={searchQuery}
           onChange={event => onSearchChange(event.target.value)}
-          placeholder="Search"
+          placeholder={searchPlaceholder}
           className="w-32 h-7 pl-7 pr-2 text-xs bg-[#F6F5F480] border border-[#EAE9E6] rounded-md text-[#2E2929] focus:outline-none focus:ring-1 focus:ring-[#F59E0B]"
         />
       </div>

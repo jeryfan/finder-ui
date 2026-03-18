@@ -1,5 +1,6 @@
 import type { StateCreator } from 'zustand'
 import type { StoreState, FileListSlice } from '../types'
+import { enLocale } from '@/locale/en'
 
 export const createFileListSlice: StateCreator<StoreState, [], [], FileListSlice> = (set) => ({
   files: [],
@@ -57,4 +58,17 @@ export const createFileListSlice: StateCreator<StoreState, [], [], FileListSlice
   })),
 
   setUploadingFiles: (files) => set({ uploadingFiles: files }),
+
+  selectAll: () => set((state) => ({
+    selectedPaths: new Set(state.files.map((f) => f.path)),
+  })),
+
+  renamingPath: null,
+  setRenamingPath: (path) => set({ renamingPath: path }),
+
+  isCreatingFolder: false,
+  setIsCreatingFolder: (creating) => set({ isCreatingFolder: creating }),
+
+  locale: enLocale,
+  setLocale: (locale) => set({ locale }),
 })

@@ -14,7 +14,7 @@ function injectStyles() {
 injectStyles()
 
 // Utils
-export { cn, isImageFile, isVideoFile, isMarkdownFile, isCodeFile } from '@/utils'
+export { cn, isImageFile, isVideoFile, isMarkdownFile, isCodeFile, isAudioFile, isCsvFile, isPdfFile } from '@/utils'
 
 // Types
 export type {
@@ -76,4 +76,9 @@ export { getFileIcon, getFilePreviewType } from '@/utils/file-icons'
 export { readEntryFiles } from '@/utils/read-entry-files'
 
 // Constants
-export { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, MARKDOWN_EXTENSIONS, CODE_EXTENSIONS } from '@/constants'
+export { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, MARKDOWN_EXTENSIONS, CODE_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants'
+
+// Locale
+export type { FinderLocale } from '@/locale'
+export { enLocale } from '@/locale/en'
+export { zhCNLocale } from '@/locale/zh-CN'

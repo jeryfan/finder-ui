@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createFinderStore, FinderStoreContext } from '@/store'
 import type { SidebarTab, FileEntry } from '@/types'
+import type { FinderLocale } from '@/locale'
 import { FinderInner } from './finder-inner'
 
 export type FinderProps = {
@@ -20,10 +21,18 @@ export type FinderProps = {
   onUpload?: (files: File[], targetPath?: string) => Promise<void> | void
   /** Handle save of edited file content in preview */
   onSave?: (path: string, content: string) => Promise<void> | void
+  /** Handle file rename */
+  onRename?: (file: FileEntry, newName: string) => Promise<void> | void
+  /** Handle file/folder deletion */
+  onDelete?: (files: FileEntry[]) => Promise<void> | void
+  /** Handle new folder creation */
+  onCreateFolder?: (parentPath: string, name: string) => Promise<void> | void
   /** Whether files can be edited in the preview panel. Default: false */
   editable?: boolean
   /** Custom markdown content renderer */
   renderMarkdown?: (content: string) => React.ReactNode
+  /** Locale overrides for i18n */
+  locale?: Partial<FinderLocale>
   /** Additional CSS class name for the root element */
   className?: string
   /** Inline styles for the root element. Use to set dimensions, e.g. `{ height: '100vh' }` */

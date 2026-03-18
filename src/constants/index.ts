@@ -14,6 +14,7 @@ export const BRACES_EXTENSIONS = new Set(['json', 'yaml', 'yml', 'toml'])
 export const SPREADSHEET_EXTENSIONS = new Set(['csv', 'xls', 'xlsx', 'xlsm'])
 export const TEXT_EXTENSIONS = new Set(['txt', 'log'])
 export const ARCHIVE_EXTENSIONS = new Set(['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz'])
+export const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a'])
 
 export const PREVIEWABLE_EXTENSIONS = new Set([
   ...MARKDOWN_EXTENSIONS,
