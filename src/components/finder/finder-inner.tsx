@@ -7,6 +7,7 @@ import { PreviewPanel } from '@/components/preview-panel'
 import { getPreviewLeftPaneWidth } from '@/components/preview-panel/constants'
 import { useFinderStore, useFinderStoreApi } from '@/store'
 import { cn } from '@/utils'
+import { enLocale } from '@/locale/en'
 import type { FileEntry } from '@/types'
 import type { FinderProps } from './index'
 
@@ -19,8 +20,12 @@ export function FinderInner({
   onBatchDownload,
   onUpload,
   onSave,
+  onRename,
+  onDelete,
+  onCreateFolder,
   editable = false,
   renderMarkdown,
+  locale,
   className,
   style,
   theme = 'target',
@@ -33,6 +38,7 @@ export function FinderInner({
     viewMode,
     searchQuery,
     previews,
+    locale: storeLocale,
     setTabs,
     setActiveTab,
     setFiles,
@@ -47,6 +53,16 @@ export function FinderInner({
     setSavePreviewHandler,
     setNavigateToPathHandler,
     setDropFilesHandler,
+    setRenameHandler,
+    setDeleteHandler,
+    setCreateFolderHandler,
+    setHasRename,
+    setHasDelete,
+    setHasCreateFolder,
+    setHasUpload,
+    setHasDownload,
+    setHasBatchDownload,
+    setLocale,
     setCurrentPath,
     navigateTo,
     goBack,
@@ -65,12 +81,18 @@ export function FinderInner({
   const batchDownloadRef = useRef(onBatchDownload)
   const uploadRef = useRef(onUpload)
   const saveRef = useRef(onSave)
+  const renameRef = useRef(onRename)
+  const deleteRef = useRef(onDelete)
+  const createFolderRef = useRef(onCreateFolder)
   fetchFilesRef.current = onFetchFiles
   openFileRef.current = onOpenFile
   downloadRef.current = onDownload
   batchDownloadRef.current = onBatchDownload
   uploadRef.current = onUpload
   saveRef.current = onSave
+  renameRef.current = onRename
+  deleteRef.current = onDelete
+  createFolderRef.current = onCreateFolder
 
   // Hidden file input for triggering native file picker
   const fileInputRef = useRef<HTMLInputElement | null>(null)
@@ -151,6 +173,11 @@ export function FinderInner({
 
     setUpdateEnabled(editable)
 
+    // Set locale
+    if (locale) {
+      setLocale({ ...enLocale, ...locale })
+    }
+
     // Navigation handler — used by goBack/goForward and directory double-click
     setNavigateToPathHandler((path: string) => {
       loadFiles(path)
@@ -197,6 +224,26 @@ export function FinderInner({
     setDropFilesHandler((files, targetPath) => {
       performUpload(files, targetPath)
     })
+    setRenameHandler(async (file, newName) => {
+      await renameRef.current?.(file, newName)
+      loadFiles(storeApi.getState().currentPath)
+    })
+    setDeleteHandler(async (files) => {
+      await deleteRef.current?.(files)
+      loadFiles(storeApi.getState().currentPath)
+    })
+    setCreateFolderHandler(async (parentPath, name) => {
+      await createFolderRef.current?.(parentPath, name)
+      loadFiles(storeApi.getState().currentPath)
+    })
+
+    // Set capability flags based on which handlers were provided
+    setHasRename(!!onRename)
+    setHasDelete(!!onDelete)
+    setHasCreateFolder(!!onCreateFolder)
+    setHasUpload(!!onUpload)
+    setHasDownload(!!onDownload)
+    setHasBatchDownload(!!onBatchDownload)
 
     setRefreshHandler(() => {
       loadFiles(storeApi.getState().currentPath)
@@ -230,6 +277,11 @@ export function FinderInner({
   useEffect(() => {
     setUpdateEnabled(editable)
   }, [editable, setUpdateEnabled])
+
+  // --- Sync locale prop ---
+  useEffect(() => {
+    setLocale(locale ? { ...enLocale, ...locale } : enLocale)
+  }, [locale, setLocale])
 
   // --- Breadcrumbs ---
   const breadcrumbs = useMemo(() => {
@@ -310,6 +362,7 @@ export function FinderInner({
                       breadcrumbs={breadcrumbs}
                       viewMode={viewMode}
                       searchQuery={searchQuery}
+                      searchPlaceholder={storeLocale.search}
                       onGoBack={goBack}
                       onGoForward={goForward}
                       onNavigate={handleNavigate}

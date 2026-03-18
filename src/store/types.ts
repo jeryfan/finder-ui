@@ -1,4 +1,5 @@
 import type { SidebarTab, TabKey, FileEntry, ContextMenuTargetType, PreviewMode, PreviewWindow } from '@/types'
+import type { FinderLocale } from '@/locale'
 
 export interface ContextMenuState {
   isOpen: boolean
@@ -56,6 +57,13 @@ export interface FileListSlice {
   setSearchQuery: (query: string) => void
   setFileLoading: (path: string, loading: boolean) => void
   setUploadingFiles: (files: Array<{ name: string; type: 'file' | 'directory' }>) => void
+  selectAll: () => void
+  renamingPath: string | null
+  setRenamingPath: (path: string | null) => void
+  isCreatingFolder: boolean
+  setIsCreatingFolder: (creating: boolean) => void
+  locale: FinderLocale
+  setLocale: (locale: FinderLocale) => void
 }
 
 export interface PreviewSlice {
@@ -99,4 +107,22 @@ export interface HandlersSlice {
   setNavigateToPathHandler: (handler: (path: string) => void) => void
   onDropFiles: (files: File[], targetPath?: string) => void
   setDropFilesHandler: (handler: (files: File[], targetPath?: string) => void) => void
+  onRename: (file: FileEntry, newName: string) => Promise<void> | void
+  setRenameHandler: (handler: (file: FileEntry, newName: string) => Promise<void> | void) => void
+  onDelete: (files: FileEntry[]) => Promise<void> | void
+  setDeleteHandler: (handler: (files: FileEntry[]) => Promise<void> | void) => void
+  onCreateFolder: (parentPath: string, name: string) => Promise<void> | void
+  setCreateFolderHandler: (handler: (parentPath: string, name: string) => Promise<void> | void) => void
+  hasRename: boolean
+  setHasRename: (has: boolean) => void
+  hasDelete: boolean
+  setHasDelete: (has: boolean) => void
+  hasCreateFolder: boolean
+  setHasCreateFolder: (has: boolean) => void
+  hasUpload: boolean
+  setHasUpload: (has: boolean) => void
+  hasDownload: boolean
+  setHasDownload: (has: boolean) => void
+  hasBatchDownload: boolean
+  setHasBatchDownload: (has: boolean) => void
 }
