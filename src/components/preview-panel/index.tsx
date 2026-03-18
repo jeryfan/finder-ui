@@ -5,8 +5,6 @@ import { PREVIEW_GAP, GROUPED_PREVIEW_GAP } from './constants'
 import { SplitMode } from './split-mode'
 import { GroupedMode } from './grouped-mode'
 
-export { getPreviewLeftPaneWidth } from './constants'
-
 export type PreviewPanelProps = {
   leftPaneWidth: number
   renderMarkdown?: (content: string) => React.ReactNode
