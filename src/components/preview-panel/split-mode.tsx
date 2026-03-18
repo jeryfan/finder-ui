@@ -49,7 +49,7 @@ export function SplitMode({
       {previews.map((preview) => (
         <div
           key={preview.path}
-          className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[#EAE9E6] bg-white"
+          className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border bg-card"
         >
           <PreviewTitleBar
             preview={preview}
@@ -61,7 +61,7 @@ export function SplitMode({
             onClose={onClose}
             onSetEditing={onSetEditing}
           />
-          <div className="min-h-0 flex-1 select-text overflow-hidden bg-white outline-none">
+          <div className="min-h-0 flex-1 select-text overflow-hidden bg-card outline-none">
             <PreviewBody
               preview={preview}
               updateEnabled={updateEnabled}

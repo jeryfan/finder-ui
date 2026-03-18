@@ -40,7 +40,7 @@ export function TablePreview({ content }: TablePreviewProps) {
 
   if (rows.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-[#666666]">
+      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
         Empty file
       </div>
     );
@@ -58,7 +58,7 @@ export function TablePreview({ content }: TablePreviewProps) {
             {header.map((cell, index) => (
               <th
                 key={index}
-                className="border border-[#EAE9E6] bg-[#F6F5F4] px-3 py-1.5 text-left font-semibold text-[#2E2929] whitespace-nowrap"
+                className="border border-border bg-muted px-3 py-1.5 text-left font-semibold text-foreground whitespace-nowrap"
               >
                 {cell}
               </th>
@@ -67,11 +67,11 @@ export function TablePreview({ content }: TablePreviewProps) {
         </thead>
         <tbody>
           {body.map((row, rowIndex) => (
-            <tr key={rowIndex} className="hover:bg-[#F6F5F4]/50">
+            <tr key={rowIndex} className="hover:bg-muted/50">
               {row.map((cell, cellIndex) => (
                 <td
                   key={cellIndex}
-                  className="border border-[#EAE9E6] px-3 py-1 text-[#2E2929] whitespace-nowrap"
+                  className="border border-border px-3 py-1 text-foreground whitespace-nowrap"
                 >
                   {cell}
                 </td>
@@ -81,7 +81,7 @@ export function TablePreview({ content }: TablePreviewProps) {
         </tbody>
       </table>
       {truncated && (
-        <p className="mt-3 text-center text-xs text-[#666666]">
+        <p className="mt-3 text-center text-xs text-muted-foreground">
           Showing first {MAX_ROWS} rows of {rows.length - 1} total
         </p>
       )}

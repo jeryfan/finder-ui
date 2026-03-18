@@ -95,7 +95,7 @@ export function ImagePreview({ src, alt }: ImagePreviewProps) {
   return (
     <div
       ref={containerRef}
-      className="relative h-full w-full overflow-hidden bg-[#F6F5F4]"
+      className="relative h-full w-full overflow-hidden bg-muted"
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
       style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
@@ -117,27 +117,27 @@ export function ImagePreview({ src, alt }: ImagePreviewProps) {
       </div>
 
       {/* Floating toolbar */}
-      <div className="absolute right-3 top-3 flex items-center gap-1 rounded-lg border border-[#EAE9E6] bg-white/90 px-1.5 py-1 shadow-sm backdrop-blur-sm">
+      <div className="absolute right-3 top-3 flex items-center gap-1 rounded-lg border border-border bg-card/90 px-1.5 py-1 shadow-sm backdrop-blur-sm">
         <button
           onClick={() => setZoom(prev => Math.max(MIN_ZOOM, prev - ZOOM_STEP))}
-          className="flex h-7 w-7 items-center justify-center rounded text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+          className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           title="Zoom out"
         >
           <ZoomOutIcon className="h-4 w-4" />
         </button>
-        <span className="min-w-[40px] select-none text-center text-xs font-medium text-[#666666]">
+        <span className="min-w-[40px] select-none text-center text-xs font-medium text-muted-foreground">
           {zoomPercent}%
         </span>
         <button
           onClick={() => setZoom(prev => Math.min(MAX_ZOOM, prev + ZOOM_STEP))}
-          className="flex h-7 w-7 items-center justify-center rounded text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+          className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           title="Zoom in"
         >
           <ZoomInIcon className="h-4 w-4" />
         </button>
         <button
           onClick={() => setRotation(prev => (prev + 90) % 360)}
-          className="flex h-7 w-7 items-center justify-center rounded text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+          className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           title="Rotate"
         >
           <RotateIcon className="h-4 w-4" />
@@ -147,7 +147,7 @@ export function ImagePreview({ src, alt }: ImagePreviewProps) {
             fitToWindow()
             setRotation(0)
           }}
-          className="flex h-7 w-7 items-center justify-center rounded text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+          className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           title="Fit to window"
         >
           <FitToWindowIcon className="h-4 w-4" />

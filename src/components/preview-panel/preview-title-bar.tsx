@@ -42,10 +42,10 @@ export function PreviewTitleBar({
   const canSave = updateEnabled && hasChanges && !preview.isSaving;
 
   return (
-    <div className="flex h-10 cursor-default items-center gap-2 border-b border-[#EAE9E6] bg-white px-3">
+    <div className="flex h-10 cursor-default items-center gap-2 border-b border-border bg-card px-3">
       <div className="flex min-w-0 flex-1 items-center gap-2">
         {getFileIcon(preview, "h-3.5 w-3.5 shrink-0")}
-        <span className="truncate text-sm font-medium text-[#2E2929]">
+        <span className="truncate text-sm font-medium text-foreground">
           {preview.name}
         </span>
       </div>
@@ -53,7 +53,7 @@ export function PreviewTitleBar({
         {onDownloadPreview && (
           <button
             onClick={() => void onDownloadPreview(preview.path)}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             title="Download"
           >
             <Download className="h-3.5 w-3.5" />
@@ -62,7 +62,7 @@ export function PreviewTitleBar({
         {updateEnabled && isMarkdownPreviewMode && (
           <button
             onClick={() => onSetEditing(preview.path, true)}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             title="Edit"
           >
             <PenLine className="h-3.5 w-3.5" />
@@ -71,7 +71,7 @@ export function PreviewTitleBar({
         {updateEnabled && isMarkdownEditMode && (
           <button
             onClick={() => onSetEditing(preview.path, false)}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             title="Preview"
           >
             <Eye className="h-3.5 w-3.5" />
@@ -81,11 +81,11 @@ export function PreviewTitleBar({
           (isMarkdownEditMode || (!isMarkdown && !isImage && !isVideo)) && (
             <button
               onClick={() => onSave(preview)}
-              className={`flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors ${
+              className={`flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors ${
                 preview.isSaving
                   ? "pointer-events-none"
                   : canSave
-                    ? "hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+                    ? "hover:bg-muted hover:text-foreground"
                     : "cursor-not-allowed opacity-50"
               }`}
               disabled={!canSave && !preview.isSaving}
@@ -100,21 +100,21 @@ export function PreviewTitleBar({
           )}
         <button
           onClick={() => onRefresh(preview.path)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           title="Refresh"
         >
           <RefreshCwIcon className="h-3.5 w-3.5" />
         </button>
         <button
           onClick={() => onMaximize(preview.path)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           title="Switch to grouped mode"
         >
           <Maximize2Icon className="h-3.5 w-3.5" />
         </button>
         <button
           onClick={() => onClose(preview.path)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           title="Close"
         >
           <X className="h-4 w-4" />

@@ -332,7 +332,7 @@ export function FinderInner({
   return (
     <div
       className={cn(
-        'h-full w-full relative overflow-hidden select-none finder-ui-root bg-[#F9F6F1]',
+        'h-full w-full relative overflow-hidden select-none finder-ui-root bg-background',
         '[&_*]:[scrollbar-width:none] [&_*::-webkit-scrollbar]:hidden',
         className,
       )}
@@ -350,9 +350,9 @@ export function FinderInner({
             className="overflow-hidden transition-all duration-300 ease-out absolute inset-0"
             style={previews.length > 0 ? { width: `${leftPaneWidth}px` } : undefined}
           >
-            <div className="relative overflow-hidden bg-white rounded-2xl border border-[#EAE9E6] transition-all duration-300 ease-out flex-1 h-full">
+            <div className="relative overflow-hidden bg-card rounded-2xl border border-border transition-all duration-300 ease-out flex-1 h-full">
               <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                <div className="h-full flex bg-white text-[#2E2929] overflow-hidden select-none" data-finder-window="true">
+                <div className="h-full flex bg-card text-foreground overflow-hidden select-none" data-finder-window="true">
                   <Sidebar tabs={tabs} />
 
                   <section className="flex-1 flex flex-col min-w-0">

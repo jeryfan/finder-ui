@@ -6,7 +6,7 @@ type AudioPreviewProps = {
 export function AudioPreview({ src, name }: AudioPreviewProps) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4 p-6">
-      <div className="text-sm font-medium text-[#2E2929] truncate max-w-full">
+      <div className="text-sm font-medium text-foreground truncate max-w-full">
         {name}
       </div>
       <audio

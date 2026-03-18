@@ -29,13 +29,13 @@ export function Toolbar({
   onSearchChange,
 }: ToolbarProps) {
   return (
-    <div className="flex h-10 shrink-0 items-center gap-2 border-b border-[#EAE9E6] bg-[#F6F5F433] px-3">
-      <div className="flex items-center gap-0.5">
+    <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border bg-muted/20 px-3">
+      <div className="flex shrink-0 items-center gap-0.5">
         <button
           onClick={onGoBack}
           disabled={historyIndex <= 0}
           className={cn(
-            'p-1 rounded hover:bg-[#F6F5F4] transition-colors',
+            'p-1 rounded hover:bg-muted transition-colors',
             historyIndex <= 0 && 'cursor-not-allowed opacity-30',
           )}
           aria-label="Back"
@@ -46,7 +46,7 @@ export function Toolbar({
           onClick={onGoForward}
           disabled={historyIndex >= historyStackLength - 1}
           className={cn(
-            'p-1 rounded hover:bg-[#F6F5F4] transition-colors',
+            'p-1 rounded hover:bg-muted transition-colors',
             historyIndex >= historyStackLength - 1 && 'cursor-not-allowed opacity-30',
           )}
           aria-label="Forward"
@@ -55,9 +55,9 @@ export function Toolbar({
         </button>
       </div>
 
-      <div className="flex min-w-0 flex-1 items-center gap-1 text-sm font-medium">
+      <div className="flex min-w-0 flex-1 items-center gap-1 text-sm font-medium whitespace-nowrap overflow-hidden">
         {breadcrumbs.length === 1
-          ? <span className="font-semibold text-[#2E2929]">{breadcrumbs[0].label}</span>
+          ? <span className="font-semibold text-foreground">{breadcrumbs[0].label}</span>
           : breadcrumbs.map((crumb, index) => {
               const isLast = index === breadcrumbs.length - 1
               return (
@@ -66,21 +66,21 @@ export function Toolbar({
                     onClick={() => onNavigate(crumb.path)}
                     className={cn(
                       'truncate text-sm transition-colors',
-                      isLast ? 'font-semibold text-[#2E2929]' : 'font-medium text-[#2E2929] hover:text-[#2E2929]/80',
+                      isLast ? 'font-semibold text-foreground' : 'font-medium text-foreground hover:text-foreground/80',
                     )}
                   >
                     {crumb.label}
                   </button>
-                  {!isLast && <BreadcrumbSep className="h-4 w-4 text-[#666666]" />}
+                  {!isLast && <BreadcrumbSep className="h-4 w-4 text-muted-foreground" />}
                 </div>
               )
             })}
       </div>
 
-      <div className="flex items-center gap-0.5 border border-[#EAE9E6] rounded-md p-0.5">
+      <div className="flex shrink-0 items-center gap-0.5 border border-border rounded-md p-0.5">
         <button
           onClick={() => onViewModeChange('grouped')}
-          className={cn('p-1 rounded transition-colors', viewMode === 'grouped' ? 'bg-[#F6F5F4]' : 'hover:bg-[#F6F5F480]')}
+          className={cn('p-1 rounded transition-colors', viewMode === 'grouped' ? 'bg-muted' : 'hover:bg-muted/50')}
           aria-label="Grouped view"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -92,7 +92,7 @@ export function Toolbar({
         </button>
         <button
           onClick={() => onViewModeChange('list')}
-          className={cn('p-1 rounded transition-colors', viewMode === 'list' ? 'bg-[#F6F5F4]' : 'hover:bg-[#F6F5F480]')}
+          className={cn('p-1 rounded transition-colors', viewMode === 'list' ? 'bg-muted' : 'hover:bg-muted/50')}
           aria-label="List view"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -106,8 +106,8 @@ export function Toolbar({
         </button>
       </div>
 
-      <div className="relative flex items-center">
-        <svg className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-[#666666]" viewBox="0 0 24 24" fill="none">
+      <div className="relative flex shrink-0 items-center">
+        <svg className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-muted-foreground" viewBox="0 0 24 24" fill="none">
           <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.6" />
           <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
         </svg>
@@ -116,7 +116,7 @@ export function Toolbar({
           value={searchQuery}
           onChange={event => onSearchChange(event.target.value)}
           placeholder={searchPlaceholder}
-          className="w-32 h-7 pl-7 pr-2 text-xs bg-[#F6F5F480] border border-[#EAE9E6] rounded-md text-[#2E2929] focus:outline-none focus:ring-1 focus:ring-[#F59E0B]"
+          className="w-32 h-7 pl-7 pr-2 text-xs bg-muted/50 border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
     </div>

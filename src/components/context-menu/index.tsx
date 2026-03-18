@@ -285,7 +285,7 @@ export function ContextMenu() {
   return createPortal(
     <div
       ref={menuRef}
-      className="finder-ui-root fixed z-[9999] min-w-[180px] bg-white border border-[#EAE9E6] rounded-lg py-1 text-sm shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] outline-none"
+      className="finder-ui-root fixed z-[9999] min-w-[180px] bg-card border border-border rounded-lg py-1 text-sm shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] outline-none"
       style={{ left: x, top: y }}
       onClick={(event) => event.stopPropagation()}
       onKeyDown={handleKeyDown}
@@ -294,22 +294,22 @@ export function ContextMenu() {
       tabIndex={-1}
     >
       {hasHeader && (
-        <div className="px-3 py-1.5 text-xs text-[#666666] border-b border-[#EAE9E6]">
+        <div className="px-3 py-1.5 text-xs text-muted-foreground border-b border-border">
           {locale.itemsSelected(selectedCount)}
         </div>
       )}
       {menuItems.map((item, index) => (
         <div key={item.label}>
           {item.divider && (
-            <div className="my-1 border-t border-[#EAE9E6]" />
+            <div className="my-1 border-t border-border" />
           )}
           <button
             role="menuitem"
             onClick={item.action}
             onMouseEnter={() => setFocusedItemIndex(index)}
             className={cn(
-              "w-full flex items-center gap-2 px-3 py-1.5 transition-colors text-left text-[#2E2929] border-0",
-              focusedItemIndex === index ? "bg-[#F6F5F4]" : "hover:bg-[#F6F5F4]",
+              "w-full flex items-center gap-2 px-3 py-1.5 transition-colors text-left text-foreground border-0",
+              focusedItemIndex === index ? "bg-muted" : "hover:bg-muted",
             )}
           >
             {item.icon}

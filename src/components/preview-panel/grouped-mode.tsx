@@ -104,7 +104,7 @@ export function GroupedMode({
       }}
     >
       {/* Tabs */}
-      <div className="flex h-10 items-center gap-2 rounded-t-2xl border border-[#EAE9E6] border-b-0 bg-white px-3">
+      <div className="flex h-10 items-center gap-2 rounded-t-2xl border border-border border-b-0 bg-card px-3">
         <div
           ref={groupedTabsRef}
           className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto overflow-y-hidden whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -131,8 +131,8 @@ export function GroupedMode({
                 className={cn(
                   "group flex h-7 shrink-0 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors",
                   isActiveTab
-                    ? "bg-[#F6F5F4] text-[#2E2929]"
-                    : "text-[#666666] hover:bg-[#F6F5F480] hover:text-[#2E2929]",
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
                 )}
               >
                 <button
@@ -150,7 +150,7 @@ export function GroupedMode({
                       onSetActivePreviewPath(preview.path);
                       onSetEditing(preview.path, true);
                     }}
-                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors hover:text-[#2E2929]"
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground"
                     title="Edit"
                   >
                     <PenLine className="h-3.5 w-3.5" />
@@ -163,7 +163,7 @@ export function GroupedMode({
                         e.stopPropagation();
                         onSetEditing(preview.path, false);
                       }}
-                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors hover:text-[#2E2929]"
+                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground"
                       title="Preview"
                     >
                       <Eye className="h-3.5 w-3.5" />
@@ -175,11 +175,11 @@ export function GroupedMode({
                       }}
                       disabled={!canSaveTab && !preview.isSaving}
                       className={cn(
-                        "flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors",
+                        "flex h-5 w-5 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors",
                         preview.isSaving
                           ? "pointer-events-none"
                           : canSaveTab
-                            ? "hover:text-[#2E2929]"
+                            ? "hover:text-foreground"
                             : "cursor-not-allowed opacity-50",
                       )}
                       title="Save"
@@ -200,11 +200,11 @@ export function GroupedMode({
                     }}
                     disabled={!canSaveTab && !preview.isSaving}
                     className={cn(
-                      "flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#666666] transition-colors",
+                      "flex h-5 w-5 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors",
                       preview.isSaving
                         ? "pointer-events-none"
                         : canSaveTab
-                          ? "hover:text-[#2E2929]"
+                          ? "hover:text-foreground"
                           : "cursor-not-allowed opacity-50",
                     )}
                     title="Save"
@@ -239,22 +239,22 @@ export function GroupedMode({
           <div className="relative" ref={addMenuRef}>
             <button
               onClick={() => setAddMenuOpen((prev) => !prev)}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               title="Add file"
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
             {addMenuOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1 max-h-60 min-w-[180px] overflow-y-auto rounded-lg border border-[#EAE9E6] bg-white py-1 shadow-lg">
+              <div className="absolute right-0 top-full z-50 mt-1 max-h-60 min-w-[180px] overflow-y-auto rounded-lg border border-border bg-card py-1 shadow-lg">
                 {availableFiles.length === 0 ? (
-                  <div className="px-3 py-2 text-xs text-[#999999]">
+                  <div className="px-3 py-2 text-xs text-muted-foreground">
                     No files available
                   </div>
                 ) : (
                   availableFiles.map((file) => (
                     <button
                       key={file.path}
-                      className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-[#2E2929] transition-colors hover:bg-[#F6F5F4]"
+                      className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-foreground transition-colors hover:bg-muted"
                       onClick={() => {
                         onOpenFile(file);
                         setAddMenuOpen(false);
@@ -270,14 +270,14 @@ export function GroupedMode({
           </div>
           <button
             onClick={() => onRefresh(activePreview.path)}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F480] hover:text-[#2E2929]"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
             title="Refresh"
           >
             <RefreshCwIcon className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => onSetPreviewMode("split")}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] transition-colors hover:bg-[#F6F5F4] hover:text-[#2E2929]"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             title="Ungroup windows"
           >
             <Minimize2 className="h-3.5 w-3.5" />
@@ -286,8 +286,8 @@ export function GroupedMode({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-hidden rounded-b-2xl border border-[#EAE9E6] bg-white">
-        <div className="h-full select-text overflow-hidden bg-white outline-none">
+      <div className="flex-1 overflow-hidden rounded-b-2xl border border-border bg-card">
+        <div className="h-full select-text overflow-hidden bg-card outline-none">
           <PreviewBody
             preview={activePreview}
             updateEnabled={updateEnabled}

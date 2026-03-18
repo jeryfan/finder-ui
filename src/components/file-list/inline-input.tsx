@@ -58,7 +58,7 @@ export function InlineInput({ defaultValue, onConfirm, onCancel, className }: In
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
       onClick={(e) => e.stopPropagation()}
-      className={className ?? "flex-1 text-sm bg-white border border-[#F59E0B] rounded px-1 py-0 outline-none focus:ring-1 focus:ring-[#F59E0B]"}
+      className={className ?? "flex-1 text-sm bg-card border border-primary rounded px-1 py-0 outline-none focus:ring-1 focus:ring-primary"}
     />
   );
 }

@@ -26,7 +26,7 @@ const defaultRenderMarkdown = (content: string) => {
   if (typeof html !== "string") return null;
   return (
     <div
-      className="prose prose-sm max-w-none prose-headings:text-[#2E2929] prose-p:text-[#2E2929] prose-strong:text-[#2E2929] prose-code:text-[#2E2929] prose-pre:bg-[#F6F5F4] prose-pre:text-[#2E2929]"
+      className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-pre:text-foreground"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -62,7 +62,7 @@ export function PreviewBody({
   if (preview.isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2 className="h-8 w-8 text-[#666666]" />
+        <Loader2 className="h-8 w-8 text-muted-foreground" />
       </div>
     );
   }
@@ -73,7 +73,7 @@ export function PreviewBody({
         <div>
           <p className="text-sm text-red-600">{preview.error}</p>
           <button
-            className="mt-2 text-xs text-[#F59E0B] hover:underline"
+            className="mt-2 text-xs text-primary hover:underline"
             onClick={() => onRefresh(preview.path)}
           >
             Retry
@@ -114,7 +114,7 @@ export function PreviewBody({
   if (isMarkdown && !preview.isEditing) {
     const renderer = renderMarkdown ?? defaultRenderMarkdown;
     return (
-      <div className="h-full overflow-auto bg-white p-6 text-sm leading-6 text-[#2E2929]">
+      <div className="h-full overflow-auto bg-card p-6 text-sm leading-6 text-foreground">
         {renderer(preview.draftContent)}
       </div>
     );
@@ -143,7 +143,7 @@ export function PreviewBody({
 
   return (
     <textarea
-      className="h-full w-full resize-none border-0 bg-transparent p-4 font-mono text-[13px] leading-5 text-[#2E2929] focus:outline-none"
+      className="h-full w-full resize-none border-0 bg-transparent p-4 font-mono text-[13px] leading-5 text-foreground focus:outline-none"
       value={preview.draftContent}
       onChange={(event) => onDraftChange(preview.path, event.target.value)}
       spellCheck={false}
