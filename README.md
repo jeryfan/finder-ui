@@ -1,6 +1,6 @@
 # finder-ui
 
-A macOS Finder-style file browser component for React.
+A macOS Finder-style file browser component for React. **Designed for Agent sandbox environments** — providing secure, isolated file browsing and operations for AI agents to efficiently manage files in restricted environments.
 
 ## Install
 
