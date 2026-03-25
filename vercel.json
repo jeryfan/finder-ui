@@ -3,14 +3,14 @@
   "buildCommand": "pnpm run build:demo",
   "outputDirectory": "dist-demo",
   "functions": {
-    "api/index.py": {
-      "runtime": "python3.12"
+    "server/index.py": {
+      "runtime": "python3.11"
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "destination": "/server/index.py"
     },
     {
       "source": "/((?!api/).*)",
