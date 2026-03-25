@@ -1,4 +1,4 @@
-import { isMarkdownFile, isImageFile, isVideoFile } from "@/utils";
+import { isMarkdownFile, isHtmlFile, isImageFile, isVideoFile } from "@/utils";
 import { getFileIcon } from "@/utils/file-icons";
 import type { PreviewWindow } from "@/types";
 import {
@@ -34,10 +34,12 @@ export function PreviewTitleBar({
   onSetEditing,
 }: PreviewTitleBarProps) {
   const isMarkdown = isMarkdownFile(preview.name);
+  const isHtml = isHtmlFile(preview.name);
   const isImage = isImageFile(preview.name);
   const isVideo = isVideoFile(preview.name);
-  const isMarkdownPreviewMode = isMarkdown && !preview.isEditing;
-  const isMarkdownEditMode = isMarkdown && preview.isEditing;
+  const isPreviewable = isMarkdown || isHtml;
+  const isPreviewMode = isPreviewable && !preview.isEditing;
+  const isEditMode = isPreviewable && preview.isEditing;
   const hasChanges = preview.draftContent !== preview.content;
   const canSave = updateEnabled && hasChanges && !preview.isSaving;
 
@@ -59,7 +61,7 @@ export function PreviewTitleBar({
             <Download className="h-3.5 w-3.5" />
           </button>
         )}
-        {updateEnabled && isMarkdownPreviewMode && (
+        {updateEnabled && isPreviewMode && (
           <button
             onClick={() => onSetEditing(preview.path, true)}
             className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -68,7 +70,7 @@ export function PreviewTitleBar({
             <PenLine className="h-3.5 w-3.5" />
           </button>
         )}
-        {updateEnabled && isMarkdownEditMode && (
+        {updateEnabled && isEditMode && (
           <button
             onClick={() => onSetEditing(preview.path, false)}
             className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -78,7 +80,7 @@ export function PreviewTitleBar({
           </button>
         )}
         {updateEnabled &&
-          (isMarkdownEditMode || (!isMarkdown && !isImage && !isVideo)) && (
+          (isEditMode || (!isPreviewable && !isImage && !isVideo)) && (
             <button
               onClick={() => onSave(preview)}
               className={`flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors ${

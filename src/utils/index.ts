@@ -1,6 +1,7 @@
 import type { FileEntry, MimeResolvable } from '@/types'
 import {
   MARKDOWN_EXTENSIONS,
+  HTML_EXTENSIONS,
   CODE_EXTENSIONS,
   IMAGE_EXTENSIONS,
   VIDEO_EXTENSIONS,
@@ -18,6 +19,7 @@ export const extractExtension = (name: string) => {
 }
 
 export const isMarkdownFile = (name: string) => MARKDOWN_EXTENSIONS.has(extractExtension(name))
+export const isHtmlFile = (name: string) => HTML_EXTENSIONS.has(extractExtension(name))
 export const isCodeFile = (name: string) => CODE_EXTENSIONS.has(extractExtension(name))
 export const isImageFile = (name: string) => IMAGE_EXTENSIONS.has(extractExtension(name))
 export const isVideoFile = (name: string) => VIDEO_EXTENSIONS.has(extractExtension(name))

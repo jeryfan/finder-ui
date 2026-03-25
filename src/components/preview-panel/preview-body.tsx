@@ -5,6 +5,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import {
   extractExtension,
   isMarkdownFile,
+  isHtmlFile,
   isCodeFile,
   isImageFile,
   isVideoFile,
@@ -48,6 +49,7 @@ export function PreviewBody({
   onRefresh,
 }: PreviewBodyProps) {
   const isMarkdown = isMarkdownFile(preview.name);
+  const isHtml = isHtmlFile(preview.name);
   const isImage = isImageFile(preview.name);
   const isVideo = isVideoFile(preview.name);
   const isAudio = isAudioFile(preview.name);
@@ -55,7 +57,8 @@ export function PreviewBody({
   const isPdf = isPdfFile(preview.name);
   const isCode = isCodeFile(preview.name);
   const isMarkdownEditing = isMarkdown && preview.isEditing;
-  const shouldUseCodeEditor = isCode || isMarkdownEditing;
+  const isHtmlEditing = isHtml && preview.isEditing;
+  const shouldUseCodeEditor = isCode || isMarkdownEditing || isHtmlEditing;
   const codeExtension = extractExtension(preview.name);
   const codeMirrorExtensions = codeExtension === "json" ? [jsonLanguage()] : [];
 
@@ -116,6 +119,19 @@ export function PreviewBody({
     return (
       <div className="h-full overflow-auto bg-card p-6 text-sm leading-6 text-foreground">
         {renderer(preview.draftContent)}
+      </div>
+    );
+  }
+
+  if (isHtml && !preview.isEditing) {
+    return (
+      <div className="h-full w-full">
+        <iframe
+          srcDoc={preview.draftContent}
+          className="h-full w-full border-0 bg-white"
+          title={preview.name}
+          sandbox="allow-same-origin"
+        />
       </div>
     );
   }

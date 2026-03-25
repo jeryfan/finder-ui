@@ -1,10 +1,12 @@
 // File extension constants
 export const MARKDOWN_EXTENSIONS = new Set(['md', 'markdown', 'mdx'])
 
+export const HTML_EXTENSIONS = new Set(['html', 'htm'])
+
 export const CODE_EXTENSIONS = new Set([
   'py', 'ts', 'tsx', 'js', 'jsx', 'json', 'yml', 'yaml', 'toml', 'ini',
   'sh', 'bash', 'zsh', 'rb', 'go', 'rs', 'java', 'c', 'cc', 'cpp', 'h', 'hpp',
-  'sql', 'css', 'scss', 'html', 'xml', 'txt', 'log', 'env', 'conf', 'cfg',
+  'sql', 'css', 'scss', 'xml', 'txt', 'log', 'env', 'conf', 'cfg',
 ])
 
 export const IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico'])
@@ -18,6 +20,7 @@ export const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4
 
 export const PREVIEWABLE_EXTENSIONS = new Set([
   ...MARKDOWN_EXTENSIONS,
+  ...HTML_EXTENSIONS,
   ...CODE_EXTENSIONS,
   ...TEXT_EXTENSIONS,
   'csv',
