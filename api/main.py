@@ -9,7 +9,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from seed import seed_if_needed
+from api.seed import seed_if_needed
 
 BASE_DIR = Path(__file__).resolve().parent / "data"
 
