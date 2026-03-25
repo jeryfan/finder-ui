@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 
 from api.seed import seed_if_needed
 
-BASE_DIR = Path(__file__).resolve().parent / "data"
+BASE_DIR = Path("/tmp/data")
 
 MIME_OVERRIDES: dict[str, str] = {
     ".ts": "text/typescript",
@@ -89,22 +89,26 @@ def list_directory(path: str) -> dict:
     files = []
     for entry in sorted(dir_path.iterdir(), key=lambda p: p.name):
         if entry.is_dir():
-            files.append({
-                "name": entry.name,
-                "path": f"/{entry.relative_to(BASE_DIR).as_posix()}",
-                "size": 0,
-                "type": "directory",
-                "lastModified": iso_mtime(entry),
-            })
+            files.append(
+                {
+                    "name": entry.name,
+                    "path": f"/{entry.relative_to(BASE_DIR).as_posix()}",
+                    "size": 0,
+                    "type": "directory",
+                    "lastModified": iso_mtime(entry),
+                }
+            )
         else:
-            files.append({
-                "name": entry.name,
-                "path": f"/{entry.relative_to(BASE_DIR).as_posix()}",
-                "size": entry.stat().st_size,
-                "type": "file",
-                "lastModified": iso_mtime(entry),
-                "mimeType": guess_mime(entry.name),
-            })
+            files.append(
+                {
+                    "name": entry.name,
+                    "path": f"/{entry.relative_to(BASE_DIR).as_posix()}",
+                    "size": entry.stat().st_size,
+                    "type": "file",
+                    "lastModified": iso_mtime(entry),
+                    "mimeType": guess_mime(entry.name),
+                }
+            )
 
     return {"success": True, "files": files, "totalCount": len(files)}
 
@@ -158,12 +162,14 @@ async def upload_files(
         content = await f.read()
         dest = target / f.filename
         dest.write_bytes(content)
-        results.append({
-            "filename": f.filename,
-            "path": f"/{dest.relative_to(BASE_DIR).as_posix()}",
-            "size": len(content),
-            "mimetype": guess_mime(f.filename),
-        })
+        results.append(
+            {
+                "filename": f.filename,
+                "path": f"/{dest.relative_to(BASE_DIR).as_posix()}",
+                "size": len(content),
+                "mimetype": guess_mime(f.filename),
+            }
+        )
 
     return {
         "success": True,
