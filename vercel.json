@@ -1,13 +1,18 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "npm run build:demo",
+  "buildCommand": "pnpm run build:demo",
   "outputDirectory": "dist-demo",
   "framework": "vite",
-  "rewrites": [
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 10
+    }
+  },
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
     }
   ],
   "headers": [

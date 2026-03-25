@@ -7,16 +7,17 @@ import sys
 import os
 
 # Add server directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'server'))
+server_dir = os.path.join(os.path.dirname(__file__), '..', 'server')
+sys.path.insert(0, server_dir)
 
 # Import the FastAPI app
 from main import app
 
-# Vercel expects a handler function
+# Import mangum for ASGI wrapper
 from mangum import Mangum
 
-# Create ASGI handler for Vercel
+# Vercel expects a handler function
 handler = Mangum(app, lifespan="off")
 
-# For local development, you can still run: uv run uvicorn main:app --reload
-# from the server/ directory
+# app variable is also needed for Vercel
+__all__ = ['handler', 'app']
