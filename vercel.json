@@ -4,7 +4,7 @@
   "outputDirectory": "dist-demo",
   "functions": {
     "server/index.py": {
-      "runtime": "python3.11"
+      "runtime": "python@3.11"
     }
   },
   "rewrites": [
