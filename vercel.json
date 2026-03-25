@@ -4,7 +4,7 @@
   "outputDirectory": "dist-demo",
   "functions": {
     "api/index.py": {
-      "runtime": "python@3.11.0"
+      "excludeFiles" :"{api/data/**}"
     }
   },
   "rewrites": [
