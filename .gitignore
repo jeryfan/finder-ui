@@ -18,7 +18,7 @@ __pycache__/
 .venv/
 
 # Server generated data
-server/data/
+api/data/
 
 # Editor directories and files
 .vscode/*
