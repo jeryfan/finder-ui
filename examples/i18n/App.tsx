@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Finder } from '../../src'
 import type { FinderLocale } from '../../src'
-import { mockFetchFiles, mockOpenFile } from '../mock-data'
+import { fetchFiles, openFile } from '../api'
 
 const jaLocale: Partial<FinderLocale> = {
   search: '検索',
@@ -95,11 +95,11 @@ export default function I18nExample() {
         <Finder
           style={{ height: '100%' }}
           tabs={[
-            { key: 'docs', label: 'Documents', rootPath: '/Documents' },
+            { key: 'docs', label: 'Documents', rootPath: '/projects/docs' },
             { key: 'all', label: 'All Files', rootPath: '/' },
           ]}
-          onFetchFiles={mockFetchFiles}
-          onOpenFile={mockOpenFile}
+          onFetchFiles={fetchFiles}
+          onOpenFile={openFile}
           locale={locales[localeKey].value}
         />
       </div>

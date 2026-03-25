@@ -1,5 +1,5 @@
 import { Finder } from '../../src'
-import { mockFetchFiles, mockOpenFile } from '../mock-data'
+import { fetchFiles, openFile } from '../api'
 
 export default function MultipleInstancesExample() {
   return (
@@ -13,11 +13,11 @@ export default function MultipleInstancesExample() {
             style={{ height: '100%' }}
             theme="default"
             tabs={[
-              { key: 'docs', label: 'Documents', rootPath: '/Documents' },
-              { key: 'projects', label: 'Projects', rootPath: '/Projects' },
+              { key: 'docs', label: 'Documents', rootPath: '/projects/docs' },
+              { key: 'projects', label: 'Projects', rootPath: '/projects' },
             ]}
-            onFetchFiles={mockFetchFiles}
-            onOpenFile={mockOpenFile}
+            onFetchFiles={fetchFiles}
+            onOpenFile={openFile}
           />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -25,11 +25,11 @@ export default function MultipleInstancesExample() {
             style={{ height: '100%' }}
             theme="graphite"
             tabs={[
-              { key: 'photos', label: 'Photos', rootPath: '/Photos' },
-              { key: 'music', label: 'Music', rootPath: '/Music' },
+              { key: 'notes', label: 'Notes', rootPath: '/notes' },
+              { key: 'archives', label: 'Archives', rootPath: '/archives' },
             ]}
-            onFetchFiles={mockFetchFiles}
-            onOpenFile={mockOpenFile}
+            onFetchFiles={fetchFiles}
+            onOpenFile={openFile}
           />
         </div>
       </div>

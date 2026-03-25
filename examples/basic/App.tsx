@@ -1,12 +1,12 @@
 import { Finder } from '../../src'
-import { mockFetchFiles } from '../mock-data'
+import { fetchFiles } from '../api'
 
 export default function BasicExample() {
   return (
     <Finder
       style={{ height: '100%' }}
       tabs={[{ key: 'files', label: 'Files', rootPath: '/' }]}
-      onFetchFiles={mockFetchFiles}
+      onFetchFiles={fetchFiles}
     />
   )
 }

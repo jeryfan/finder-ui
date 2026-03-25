@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Finder } from '../../src'
-import { mockFetchFiles, mockOpenFile } from '../mock-data'
+import { fetchFiles, openFile } from '../api'
 
 const themes = [
   { key: 'default' as const, label: 'Default (Amber)' },
@@ -47,10 +47,10 @@ export default function CustomThemeExample() {
           className={customBg ? 'custom-bg' : undefined}
           tabs={[
             { key: 'all', label: 'All Files', rootPath: '/' },
-            { key: 'photos', label: 'Photos', rootPath: '/Photos' },
+            { key: 'projects', label: 'Projects', rootPath: '/projects' },
           ]}
-          onFetchFiles={mockFetchFiles}
-          onOpenFile={mockOpenFile}
+          onFetchFiles={fetchFiles}
+          onOpenFile={openFile}
         />
       </div>
     </div>
