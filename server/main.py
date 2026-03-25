@@ -52,7 +52,7 @@ def iso_mtime(p: Path) -> str:
 
 # ── App ──────────────────────────────────────────────────────────
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 app.add_middleware(
     CORSMiddleware,
@@ -67,7 +67,7 @@ def startup() -> None:
     seed_if_needed(BASE_DIR)
 
 
-@app.get("/api/files")
+@app.get("/files")
 async def handle_files(
     path: str | None = None,
     fileName: str | None = None,
@@ -144,7 +144,7 @@ def read_file(file_name: str) -> dict | FileResponse:
     }
 
 
-@app.post("/api/files/upload")
+@app.post("/files/upload")
 async def upload_files(
     path: str = Form(...),
     files: list[UploadFile] = File(...),
