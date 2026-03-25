@@ -1,6 +1,5 @@
 """
 Vercel Serverless Function entry point for the FastAPI backend.
-This file proxies requests to the FastAPI app in the server directory.
 """
 
 import sys
@@ -16,8 +15,16 @@ from main import app
 # Import mangum for ASGI wrapper
 from mangum import Mangum
 
-# Vercel expects a handler function
-handler = Mangum(app, lifespan="off")
+# Create ASGI handler
+_asgi_handler = Mangum(app, lifespan="off")
 
-# app variable is also needed for Vercel
-__all__ = ['handler', 'app']
+
+def handler(event, context):
+    """Vercel serverless function handler."""
+    return _asgi_handler(event, context)
+
+
+# For local development
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
