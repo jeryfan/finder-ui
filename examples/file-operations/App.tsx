@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { Finder } from "../../src";
-import type { FileEntry } from "../../src";
 import { fetchFiles, openFile, saveFile, uploadFiles } from "../api";
 
 export default function FileOperationsExample() {

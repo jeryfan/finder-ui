@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Finder } from '../../src'
-import type { FileEntry, FinderLocale } from '../../src'
+import type { FinderLocale } from '../../src'
 import { fetchFiles, openFile, saveFile, uploadFiles } from '../api'
 
 const zhCN: Partial<FinderLocale> = {

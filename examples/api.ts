@@ -1,5 +1,5 @@
-import type { FileEntry } from '../../src'
-import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '../../src/constants'
+import type { FileEntry } from '../'
+import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '../src/constants'
 
 const API_BASE = '/api'
 
