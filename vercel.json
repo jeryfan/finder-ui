@@ -2,13 +2,19 @@
   "version": 2,
   "buildCommand": "pnpm run build:demo",
   "outputDirectory": "dist-demo",
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.9",
+      "includeFiles": "server/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "destination": "/api"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]
