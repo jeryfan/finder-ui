@@ -84,15 +84,28 @@ export function FinderInner({
   const renameRef = useRef(onRename)
   const deleteRef = useRef(onDelete)
   const createFolderRef = useRef(onCreateFolder)
-  fetchFilesRef.current = onFetchFiles
-  openFileRef.current = onOpenFile
-  downloadRef.current = onDownload
-  batchDownloadRef.current = onBatchDownload
-  uploadRef.current = onUpload
-  saveRef.current = onSave
-  renameRef.current = onRename
-  deleteRef.current = onDelete
-  createFolderRef.current = onCreateFolder
+
+  useEffect(() => {
+    fetchFilesRef.current = onFetchFiles
+    openFileRef.current = onOpenFile
+    downloadRef.current = onDownload
+    batchDownloadRef.current = onBatchDownload
+    uploadRef.current = onUpload
+    saveRef.current = onSave
+    renameRef.current = onRename
+    deleteRef.current = onDelete
+    createFolderRef.current = onCreateFolder
+  }, [
+    onFetchFiles,
+    onOpenFile,
+    onDownload,
+    onBatchDownload,
+    onUpload,
+    onSave,
+    onRename,
+    onDelete,
+    onCreateFolder,
+  ])
 
   // Hidden file input for triggering native file picker
   const fileInputRef = useRef<HTMLInputElement | null>(null)

@@ -1,5 +1,5 @@
-import { Finder } from '../../src'
-import { fetchFiles } from '../api'
+import { Finder } from 'finder-ui'
+import { fetchFiles } from '../../api'
 
 export default function BasicExample() {
   return (

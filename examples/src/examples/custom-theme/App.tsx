@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Finder } from '../../src'
-import { fetchFiles, openFile } from '../api'
+import { Finder } from 'finder-ui'
+import { fetchFiles, openFile } from '../../api'
 
 const themes = [
   { key: 'default' as const, label: 'Default (Amber)' },
@@ -40,7 +40,7 @@ export default function CustomThemeExample() {
         </label>
       </div>
       <div style={{ flex: 1, minHeight: 0 }}>
-        <style>{`.custom-bg { --finder-bg: #f0e6ff; --finder-bg-sidebar: #e8dcf5; }`}</style>
+        <style>{`.custom-bg { --color-background: #f0e6ff; --color-sidebar: #e8dcf5; }`}</style>
         <Finder
           style={{ height: '100%' }}
           theme={theme}

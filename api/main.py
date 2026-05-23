@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 
 from api.seed import seed_if_needed
 
-BASE_DIR = Path("/tmp/data")
+BASE_DIR = Path("/tmp/data").resolve()
 
 MIME_OVERRIDES: dict[str, str] = {
     ".ts": "text/typescript",

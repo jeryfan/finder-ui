@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Finder } from '../../src'
-import type { FinderLocale } from '../../src'
-import { fetchFiles, openFile } from '../api'
+import { Finder } from 'finder-ui'
+import type { FinderLocale } from 'finder-ui'
+import { fetchFiles, openFile } from '../../api'
 
 const jaLocale: Partial<FinderLocale> = {
   search: '検索',

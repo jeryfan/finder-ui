@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { Finder } from "../../src";
-import { fetchFiles, openFile, saveFile, uploadFiles } from "../api";
+import { Finder } from "finder-ui";
+import { fetchFiles, openFile, saveFile, uploadFiles } from "../../api";
 
 export default function FileOperationsExample() {
   const onSave = useCallback(async (path: string, content: string) => {

@@ -112,6 +112,7 @@ export function FileList() {
   }, [filteredFiles, sortField, sortOrder]);
 
   // Virtual scrolling for list mode
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Virtual owns these imperative helpers; the component does not pass them through memoized boundaries.
   const listVirtualizer = useVirtualizer({
     count: sortedFiles.length + uploadingFiles.length,
     getScrollElement: () => scrollContainerRef.current,
@@ -504,7 +505,7 @@ export function FileList() {
                         >
                           <div className="w-14 h-14 mb-1 flex items-center justify-center">
                             {fileLoadingStates[entry.path] ? (
-                              <Loader2 className="w-8 h-8 text-blue-600" />
+                              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                             ) : (
                               getFileIcon(entry, "w-8 h-8")
                             )}
@@ -604,7 +605,7 @@ export function FileList() {
                 >
                   <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
                     {fileLoadingStates[entry.path] ? (
-                      <Loader2 className="w-4 h-4 text-blue-600" />
+                      <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
                     ) : (
                       getFileIcon(entry)
                     )}
@@ -639,13 +640,13 @@ export function FileList() {
         {selectedPaths.size > 0 && <span>{locale.selected(selectedPaths.size)}</span>}
         {uploadingFiles.length > 0 && (
           <span className="flex items-center gap-1">
-            <Loader2 className="h-3 w-3 text-[#3B82F6]" />
+            <Loader2 className="h-3 w-3 animate-spin text-[#3B82F6]" />
             {locale.uploading(uploadingFiles.length)}
           </span>
         )}
         {uploadingFiles.length === 0 && loading && (
           <span className="flex items-center gap-1">
-            <Loader2 className="h-3 w-3 text-[#3B82F6]" />
+            <Loader2 className="h-3 w-3 animate-spin text-[#3B82F6]" />
             {locale.refreshing}
           </span>
         )}

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
-import { Finder } from '../../src'
-import type { FinderLocale } from '../../src'
-import { fetchFiles, openFile, saveFile, uploadFiles } from '../api'
+import { Finder } from 'finder-ui'
+import type { FinderLocale } from 'finder-ui'
+import { fetchFiles, openFile, saveFile, uploadFiles } from '../../api'
 
 const zhCN: Partial<FinderLocale> = {
   search: '搜索', noFiles: '没有找到文件', tryDifferentSearch: '请尝试其他搜索词',

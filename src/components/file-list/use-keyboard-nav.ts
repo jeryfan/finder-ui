@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { FileEntry } from '@/types'
 
 export type KeyboardNavActions = {
@@ -34,13 +34,19 @@ export function useKeyboardNavigation({
   actions,
   containerRef,
 }: KeyboardNavOptions) {
-  const [focusedIndex, setFocusedIndex] = useState(-1)
+  const [focusedPath, setFocusedPath] = useState<string | null>(null)
+  const focusedIndex = useMemo(
+    () => focusedPath ? sortedFiles.findIndex((file) => file.path === focusedPath) : -1,
+    [focusedPath, sortedFiles],
+  )
   const focusedIndexRef = useRef(focusedIndex)
-  focusedIndexRef.current = focusedIndex
 
-  // Reset focused index when files change
   useEffect(() => {
-    setFocusedIndex(-1)
+    focusedIndexRef.current = focusedIndex
+  }, [focusedIndex])
+
+  const setFocusedIndex = useCallback((index: number) => {
+    setFocusedPath(sortedFiles[index]?.path ?? null)
   }, [sortedFiles])
 
   const scrollToIndex = useCallback((index: number) => {
@@ -56,10 +62,10 @@ export function useKeyboardNavigation({
     if (maxIndex < 0) return -1
     const current = focusedIndexRef.current
     const next = current < 0 ? 0 : Math.max(0, Math.min(maxIndex, current + delta))
-    setFocusedIndex(next)
+    setFocusedPath(sortedFiles[next].path)
     scrollToIndex(next)
     return next
-  }, [sortedFiles.length, scrollToIndex])
+  }, [sortedFiles, scrollToIndex])
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     const target = event.target as HTMLElement
@@ -161,7 +167,7 @@ export function useKeyboardNavigation({
         break
       }
     }
-  }, [sortedFiles, viewMode, actions, moveFocus, containerRef])
+  }, [sortedFiles, viewMode, actions, moveFocus, containerRef, setFocusedIndex])
 
   useEffect(() => {
     const container = containerRef.current

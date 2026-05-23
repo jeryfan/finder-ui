@@ -1,5 +1,5 @@
-import { Finder } from '../../src'
-import { fetchFiles, openFile } from '../api'
+import { Finder } from 'finder-ui'
+import { fetchFiles, openFile } from '../../api'
 
 export default function MultipleInstancesExample() {
   return (

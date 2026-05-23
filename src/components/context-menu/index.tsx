@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFinderStore } from "@/store";
 import { FolderOpenIcon, FolderIcon, UploadIcon } from "@/icons";
 import { cn } from "@/utils";
@@ -39,6 +39,11 @@ export function ContextMenu() {
   const [focusedItemIndex, setFocusedItemIndex] = useState(-1);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
+  const handleClose = useCallback(() => {
+    setFocusedItemIndex(-1);
+    closeContextMenu();
+  }, [closeContextMenu]);
+
   // Close menu on outside click
   useEffect(() => {
     if (!isOpen) return;
@@ -46,7 +51,7 @@ export function ContextMenu() {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (!target.closest('[data-context-menu="true"]')) {
-        closeContextMenu();
+        handleClose();
       }
     };
 
@@ -57,7 +62,7 @@ export function ContextMenu() {
       document.removeEventListener("click", handleClickOutside, true);
       document.removeEventListener("contextmenu", handleClickOutside, true);
     };
-  }, [isOpen, closeContextMenu]);
+  }, [isOpen, handleClose]);
 
   // Adjust position to keep menu within viewport
   useEffect(() => {
@@ -77,10 +82,9 @@ export function ContextMenu() {
     }
   }, [isOpen, x, y]);
 
-  // Reset focused index and focus menu when it opens
+  // Focus menu when it opens.
   useEffect(() => {
     if (isOpen) {
-      setFocusedItemIndex(-1);
       requestAnimationFrame(() => menuRef.current?.focus());
     }
   }, [isOpen]);
@@ -91,163 +95,191 @@ export function ContextMenu() {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
-        closeContextMenu();
+        handleClose();
       }
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, closeContextMenu]);
+  }, [isOpen, handleClose]);
 
   // Build menu items based on context
-  const selectedFiles = files.filter((f) => selectedPaths.has(f.path));
+  const selectedFiles = useMemo(
+    () => files.filter((f) => selectedPaths.has(f.path)),
+    [files, selectedPaths],
+  );
   const selectedCount = selectedFiles.length;
 
-  const menuItems: MenuItem[] = [];
+  const menuItems: MenuItem[] = useMemo(() => {
+    const items: MenuItem[] = [];
 
-  if (targetType === "file" && selectedCount > 1) {
-    if (hasBatchDownload) {
-      menuItems.push({
-        label: locale.downloadAll,
-        icon: <Download className="w-4 h-4" />,
-        action: () => { onBatchDownload(selectedFiles); closeContextMenu(); },
-      });
+    if (targetType === "file" && selectedCount > 1) {
+      if (hasBatchDownload) {
+        items.push({
+          label: locale.downloadAll,
+          icon: <Download className="w-4 h-4" />,
+          action: () => { onBatchDownload(selectedFiles); handleClose(); },
+        });
+      }
+      if (hasDelete) {
+        items.push({
+          label: locale.delete,
+          icon: <Trash2 className="w-4 h-4" />,
+          action: () => {
+            if (window.confirm(locale.deleteMultipleConfirm(selectedCount))) {
+              onDelete(selectedFiles);
+            }
+            handleClose();
+          },
+        });
+      }
     }
-    if (hasDelete) {
-      menuItems.push({
-        label: locale.delete,
-        icon: <Trash2 className="w-4 h-4" />,
-        action: () => {
-          if (window.confirm(locale.deleteMultipleConfirm(selectedCount))) {
-            onDelete(selectedFiles);
-          }
-          closeContextMenu();
-        },
-      });
-    }
-  }
 
-  if (targetType === "file" && selectedCount <= 1 && targetFile) {
-    menuItems.push({
-      label: locale.open,
-      icon: <Eye className="w-4 h-4" />,
-      action: () => { onOpen(targetFile); closeContextMenu(); },
-    });
-    if (hasDownload) {
-      menuItems.push({
-        label: locale.download,
-        icon: <Download className="w-4 h-4" />,
-        action: () => { onDownload(targetFile); closeContextMenu(); },
+    if (targetType === "file" && selectedCount <= 1 && targetFile) {
+      items.push({
+        label: locale.open,
+        icon: <Eye className="w-4 h-4" />,
+        action: () => { onOpen(targetFile); handleClose(); },
       });
+      if (hasDownload) {
+        items.push({
+          label: locale.download,
+          icon: <Download className="w-4 h-4" />,
+          action: () => { onDownload(targetFile); handleClose(); },
+        });
+      }
+      if (hasRename) {
+        items.push({
+          label: locale.rename,
+          icon: <Pencil className="w-4 h-4" />,
+          action: () => { setRenamingPath(targetFile.path); handleClose(); },
+        });
+      }
+      if (hasDelete) {
+        items.push({
+          label: locale.delete,
+          icon: <Trash2 className="w-4 h-4" />,
+          action: () => {
+            if (window.confirm(locale.deleteConfirm(targetFile.name))) {
+              onDelete([targetFile]);
+            }
+            handleClose();
+          },
+        });
+      }
     }
-    if (hasRename) {
-      menuItems.push({
-        label: locale.rename,
-        icon: <Pencil className="w-4 h-4" />,
-        action: () => { setRenamingPath(targetFile.path); closeContextMenu(); },
-      });
-    }
-    if (hasDelete) {
-      menuItems.push({
-        label: locale.delete,
-        icon: <Trash2 className="w-4 h-4" />,
-        action: () => {
-          if (window.confirm(locale.deleteConfirm(targetFile.name))) {
-            onDelete([targetFile]);
-          }
-          closeContextMenu();
-        },
-      });
-    }
-  }
 
-  if (targetType === "folder" && selectedCount > 1) {
-    if (hasBatchDownload) {
-      menuItems.push({
-        label: locale.downloadAll,
-        icon: <Download className="w-4 h-4" />,
-        action: () => { onBatchDownload(selectedFiles); closeContextMenu(); },
-      });
+    if (targetType === "folder" && selectedCount > 1) {
+      if (hasBatchDownload) {
+        items.push({
+          label: locale.downloadAll,
+          icon: <Download className="w-4 h-4" />,
+          action: () => { onBatchDownload(selectedFiles); handleClose(); },
+        });
+      }
+      if (hasDelete) {
+        items.push({
+          label: locale.delete,
+          icon: <Trash2 className="w-4 h-4" />,
+          action: () => {
+            if (window.confirm(locale.deleteMultipleConfirm(selectedCount))) {
+              onDelete(selectedFiles);
+            }
+            handleClose();
+          },
+        });
+      }
     }
-    if (hasDelete) {
-      menuItems.push({
-        label: locale.delete,
-        icon: <Trash2 className="w-4 h-4" />,
-        action: () => {
-          if (window.confirm(locale.deleteMultipleConfirm(selectedCount))) {
-            onDelete(selectedFiles);
-          }
-          closeContextMenu();
-        },
-      });
-    }
-  }
 
-  if (targetType === "folder" && selectedCount <= 1 && targetFile) {
-    menuItems.push({
-      label: locale.open,
-      icon: <FolderOpenIcon className="w-4 h-4" />,
-      action: () => { onOpen(targetFile); closeContextMenu(); },
-    });
-    if (hasUpload) {
-      menuItems.push({
-        label: locale.uploadFiles,
-        icon: <UploadIcon className="w-4 h-4" />,
-        action: () => { onUpload(false, targetFile.path); closeContextMenu(); },
+    if (targetType === "folder" && selectedCount <= 1 && targetFile) {
+      items.push({
+        label: locale.open,
+        icon: <FolderOpenIcon className="w-4 h-4" />,
+        action: () => { onOpen(targetFile); handleClose(); },
       });
-      menuItems.push({
-        label: locale.uploadFolder,
-        icon: <FolderIcon className="w-4 h-4" />,
-        action: () => { onUpload(true, targetFile.path); closeContextMenu(); },
-      });
+      if (hasUpload) {
+        items.push({
+          label: locale.uploadFiles,
+          icon: <UploadIcon className="w-4 h-4" />,
+          action: () => { onUpload(false, targetFile.path); handleClose(); },
+        });
+        items.push({
+          label: locale.uploadFolder,
+          icon: <FolderIcon className="w-4 h-4" />,
+          action: () => { onUpload(true, targetFile.path); handleClose(); },
+        });
+      }
+      if (hasRename) {
+        items.push({
+          label: locale.rename,
+          icon: <Pencil className="w-4 h-4" />,
+          action: () => { setRenamingPath(targetFile.path); handleClose(); },
+        });
+      }
+      if (hasDelete) {
+        items.push({
+          label: locale.delete,
+          icon: <Trash2 className="w-4 h-4" />,
+          action: () => {
+            if (window.confirm(locale.deleteConfirm(targetFile.name))) {
+              onDelete([targetFile]);
+            }
+            handleClose();
+          },
+        });
+      }
     }
-    if (hasRename) {
-      menuItems.push({
-        label: locale.rename,
-        icon: <Pencil className="w-4 h-4" />,
-        action: () => { setRenamingPath(targetFile.path); closeContextMenu(); },
-      });
-    }
-    if (hasDelete) {
-      menuItems.push({
-        label: locale.delete,
-        icon: <Trash2 className="w-4 h-4" />,
-        action: () => {
-          if (window.confirm(locale.deleteConfirm(targetFile.name))) {
-            onDelete([targetFile]);
-          }
-          closeContextMenu();
-        },
-      });
-    }
-  }
 
-  if (targetType === "empty") {
-    if (hasCreateFolder) {
-      menuItems.push({
-        label: locale.newFolder,
-        icon: <FolderPlus className="w-4 h-4" />,
-        action: () => { setIsCreatingFolder(true); closeContextMenu(); },
+    if (targetType === "empty") {
+      if (hasCreateFolder) {
+        items.push({
+          label: locale.newFolder,
+          icon: <FolderPlus className="w-4 h-4" />,
+          action: () => { setIsCreatingFolder(true); handleClose(); },
+        });
+      }
+      if (hasUpload) {
+        items.push({
+          label: locale.uploadFiles,
+          icon: <UploadIcon className="w-4 h-4" />,
+          action: () => { onUpload(false); handleClose(); },
+        });
+        items.push({
+          label: locale.uploadFolder,
+          icon: <FolderIcon className="w-4 h-4" />,
+          action: () => { onUpload(true); handleClose(); },
+        });
+      }
+      items.push({
+        label: locale.refresh,
+        icon: <RefreshCwIcon className="w-4 h-4" />,
+        action: () => { onRefresh(); handleClose(); },
+        divider: items.length > 0,
       });
     }
-    if (hasUpload) {
-      menuItems.push({
-        label: locale.uploadFiles,
-        icon: <UploadIcon className="w-4 h-4" />,
-        action: () => { onUpload(false); closeContextMenu(); },
-      });
-      menuItems.push({
-        label: locale.uploadFolder,
-        icon: <FolderIcon className="w-4 h-4" />,
-        action: () => { onUpload(true); closeContextMenu(); },
-      });
-    }
-    menuItems.push({
-      label: locale.refresh,
-      icon: <RefreshCwIcon className="w-4 h-4" />,
-      action: () => { onRefresh(); closeContextMenu(); },
-      divider: menuItems.length > 0,
-    });
-  }
+
+    return items;
+  }, [
+    handleClose,
+    hasBatchDownload,
+    hasCreateFolder,
+    hasDelete,
+    hasDownload,
+    hasRename,
+    hasUpload,
+    locale,
+    onBatchDownload,
+    onDelete,
+    onDownload,
+    onOpen,
+    onRefresh,
+    onUpload,
+    selectedCount,
+    selectedFiles,
+    setIsCreatingFolder,
+    setRenamingPath,
+    targetFile,
+    targetType,
+  ]);
 
   // Keyboard navigation for menu items
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {

@@ -39,11 +39,13 @@
     }
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --config examples/vite.config.ts",
+    "dev:api": "uv run --project api python -m uvicorn api.main:app --host 127.0.0.1 --port 8010",
+    "dev:lib": "vite",
     "build": "tsc -b && vite build",
-    "build:demo": "vite build --config vite.demo.config.ts",
+    "build:demo": "vite build --config examples/vite.config.ts",
     "lint": "eslint .",
-    "preview": "vite preview",
+    "preview": "vite preview --config examples/vite.config.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

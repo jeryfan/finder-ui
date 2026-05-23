@@ -12,7 +12,6 @@ export default defineConfig({
       tsconfigPath: './tsconfig.app.json',
       entryRoot: 'src',
       include: ['src/**/*'],
-      exclude: ['src/App.tsx', 'src/main.tsx'],
     })
   ],
   build: {
@@ -61,16 +60,5 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src')
     }
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-    },
-    watch: {
-      ignored: ['**/server/**'],
-    },
   },
 })

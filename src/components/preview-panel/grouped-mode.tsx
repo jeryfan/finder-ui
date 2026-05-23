@@ -185,7 +185,7 @@ export function GroupedMode({
                       title="Save"
                     >
                       {preview.isSaving ? (
-                        <Loader2 className="h-3.5 w-3.5" />
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       ) : (
                         <Save className="h-3.5 w-3.5" />
                       )}
@@ -210,7 +210,7 @@ export function GroupedMode({
                     title="Save"
                   >
                     {preview.isSaving ? (
-                      <Loader2 className="h-3.5 w-3.5" />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     ) : (
                       <Save className="h-3.5 w-3.5" />
                     )}

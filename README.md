@@ -89,11 +89,11 @@ Each `<Finder>` creates an isolated store — multiple instances on the same pag
 
 ## Examples
 
-Run the development server and navigate to `http://localhost:5173/#examples` to see all examples:
+Run the API server and the examples app, then open `http://127.0.0.1:5273/`:
 
 ```bash
-npm run dev
-# open http://localhost:5173/#examples
+pnpm dev:api
+pnpm dev
 ```
 
 | Example | Description |

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Finder, type SidebarTab, type FileEntry, type FinderLocale } from './'
-import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './constants'
-import { enLocale } from './locale/en'
-import { zhCNLocale } from './locale/zh-CN'
+import { Finder, type SidebarTab, type FileEntry, type FinderLocale } from 'finder-ui'
+import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from 'finder-ui'
+import { enLocale } from 'finder-ui'
+import { zhCNLocale } from 'finder-ui'
 
 // ── Icons ──────────────────────────────────────────────────────
 
