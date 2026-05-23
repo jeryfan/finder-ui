@@ -1,17 +1,23 @@
-# finder-ui
+# @jeryfan/finder-ui
 
 A macOS Finder-style file browser component for React. **Designed for Agent sandbox environments** — providing secure, isolated file browsing and operations for AI agents to efficiently manage files in restricted environments.
 
 ## Install
 
 ```bash
-npm install finder-ui
+npm install @jeryfan/finder-ui
+```
+
+If you install directly from GitHub:
+
+```bash
+npm install github:jeryfan/finder-ui
 ```
 
 ## Quick Start
 
 ```tsx
-import { Finder } from 'finder-ui'
+import { Finder } from '@jeryfan/finder-ui'
 
 function App() {
   return (
@@ -49,7 +55,7 @@ function App() {
 | `locale` | `Partial<FinderLocale>` | No | Localization strings (defaults to English) |
 | `className` | `string` | No | Additional CSS class for root element |
 | `style` | `CSSProperties` | No | Inline styles for root element (e.g. dimensions) |
-| `theme` | `'target' \| 'graphite' \| 'clean'` | No | Theme variant (default: `'target'`) |
+| `theme` | `'default' \| 'graphite' \| 'minimal'` | No | Theme variant (default: `'default'`) |
 
 ## Keyboard Shortcuts
 
@@ -96,11 +102,11 @@ npm run dev
 | **With Preview** | File preview for Markdown, code, CSV, images, and audio |
 | **File Operations** | Full CRUD — rename, delete, create folder, upload, and save |
 | **Internationalization** | Dynamic locale switching (English, Chinese, Japanese) |
-| **Custom Theme** | Theme switching (target/graphite/clean) and CSS variable overrides |
+| **Custom Theme** | Theme switching (default/graphite/minimal) and CSS variable overrides |
 | **Multiple Instances** | Two independent Finder instances side by side |
 | **Kitchen Sink** | All features combined — multi-tab, preview, editing, i18n, themes, CRUD |
 
-All examples use frontend mock data with no backend required.
+The bundled examples call the local `/api` endpoints through the Vite dev server proxy.
 
 ## Peer Dependencies
 
