@@ -136,14 +136,14 @@ export function FinderInner({
       setFiles(entries)
     } catch (err) {
       if (controller.signal.aborted) return
-      setLoadError(err instanceof Error ? err.message : 'Failed to load files')
+      setLoadError(err instanceof Error ? err.message : storeApi.getState().locale.failedToLoad)
       setFiles([])
     } finally {
       if (!controller.signal.aborted) {
         setLoading(false)
       }
     }
-  }, [setLoading, setLoadError, setFiles, setCurrentPath])
+  }, [setLoading, setLoadError, setFiles, setCurrentPath, storeApi])
 
   // Upload wrapper — manages uploadingFiles state and auto-refreshes
   const performUpload = useCallback(async (files: File[], targetPath?: string) => {
@@ -299,7 +299,7 @@ export function FinderInner({
   // --- Breadcrumbs ---
   const breadcrumbs = useMemo(() => {
     const tab = tabs.find(t => t.key === activeTab)
-    const tabLabel = tab?.label ?? 'Files'
+    const tabLabel = tab?.label ?? storeLocale.sidebarTitle
     const rootPath = tab?.rootPath ?? '/'
     const items: Array<{ label: string; path: string }> = [{ label: tabLabel, path: rootPath }]
     if (currentPath === rootPath) return items
@@ -314,7 +314,7 @@ export function FinderInner({
       items.push({ label: segment, path: cursor })
     }
     return items
-  }, [activeTab, currentPath, tabs])
+  }, [activeTab, currentPath, storeLocale.sidebarTitle, tabs])
 
   // --- Handlers ---
   const handleNavigate = (path: string) => {
@@ -375,7 +375,7 @@ export function FinderInner({
                       breadcrumbs={breadcrumbs}
                       viewMode={viewMode}
                       searchQuery={searchQuery}
-                      searchPlaceholder={storeLocale.search}
+                      locale={storeLocale}
                       onGoBack={goBack}
                       onGoForward={goForward}
                       onNavigate={handleNavigate}

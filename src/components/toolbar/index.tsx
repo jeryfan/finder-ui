@@ -1,4 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon, ChevronRightIcon as BreadcrumbSep } from '@/icons'
+import type { FinderLocale } from '@/locale'
 import { cn } from '@/utils'
 
 export type ToolbarProps = {
@@ -7,7 +8,7 @@ export type ToolbarProps = {
   breadcrumbs: Array<{ label: string; path: string }>
   viewMode: 'list' | 'grouped'
   searchQuery: string
-  searchPlaceholder?: string
+  locale: FinderLocale
   onGoBack: () => void
   onGoForward: () => void
   onNavigate: (path: string) => void
@@ -21,7 +22,7 @@ export function Toolbar({
   breadcrumbs,
   viewMode,
   searchQuery,
-  searchPlaceholder = 'Search',
+  locale,
   onGoBack,
   onGoForward,
   onNavigate,
@@ -38,7 +39,7 @@ export function Toolbar({
             'p-1 rounded hover:bg-muted transition-colors',
             historyIndex <= 0 && 'cursor-not-allowed opacity-30',
           )}
-          aria-label="Back"
+          aria-label={locale.back}
         >
           <ChevronLeftIcon className="h-4 w-4" />
         </button>
@@ -49,7 +50,7 @@ export function Toolbar({
             'p-1 rounded hover:bg-muted transition-colors',
             historyIndex >= historyStackLength - 1 && 'cursor-not-allowed opacity-30',
           )}
-          aria-label="Forward"
+          aria-label={locale.forward}
         >
           <ChevronRightIcon className="h-4 w-4" />
         </button>
@@ -81,7 +82,7 @@ export function Toolbar({
         <button
           onClick={() => onViewModeChange('grouped')}
           className={cn('p-1 rounded transition-colors', viewMode === 'grouped' ? 'bg-muted' : 'hover:bg-muted/50')}
-          aria-label="Grouped view"
+          aria-label={locale.groupedView}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <rect width="7" height="7" x="3" y="3" rx="1" />
@@ -93,7 +94,7 @@ export function Toolbar({
         <button
           onClick={() => onViewModeChange('list')}
           className={cn('p-1 rounded transition-colors', viewMode === 'list' ? 'bg-muted' : 'hover:bg-muted/50')}
-          aria-label="List view"
+          aria-label={locale.listView}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M3 5h.01" />
@@ -115,7 +116,7 @@ export function Toolbar({
           type="text"
           value={searchQuery}
           onChange={event => onSearchChange(event.target.value)}
-          placeholder={searchPlaceholder}
+          placeholder={locale.search}
           className="w-32 h-7 pl-7 pr-2 text-xs bg-muted/50 border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>

@@ -1,24 +1,20 @@
-import { json as jsonLanguage } from "@codemirror/lang-json";
-import { oneDark } from "@codemirror/theme-one-dark";
 import { marked } from "marked";
-import CodeMirror from "@uiw/react-codemirror";
-import {
-  extractExtension,
-  isMarkdownFile,
-  isHtmlFile,
-  isCodeFile,
-  isImageFile,
-  isVideoFile,
-  isAudioFile,
-  isCsvFile,
-  isPdfFile,
-} from "@/utils";
 import { ImagePreview } from "./image-preview";
 import { VideoPreview } from "./video-preview";
 import { AudioPreview } from "./audio-preview";
 import { TablePreview } from "./table-preview";
 import type { PreviewWindow } from "@/types";
-import { Loader2 } from "lucide-react";
+import type { FinderLocale } from "@/locale";
+import { getPreviewContentKind } from "./preview-content-kind";
+import {
+  CodePreviewEditor,
+  HtmlPreviewFrame,
+  MarkdownPreviewContent,
+  PdfPreviewFrame,
+  PlainTextPreviewEditor,
+  PreviewErrorState,
+  PreviewLoadingState,
+} from "./preview-content";
 
 marked.setOptions({ breaks: true, gfm: true });
 
@@ -36,6 +32,7 @@ const defaultRenderMarkdown = (content: string) => {
 export type PreviewBodyProps = {
   preview: PreviewWindow;
   updateEnabled: boolean;
+  locale: FinderLocale;
   renderMarkdown?: (content: string) => React.ReactNode;
   onDraftChange: (path: string, content: string) => void;
   onRefresh: (path: string) => void;
@@ -44,126 +41,77 @@ export type PreviewBodyProps = {
 export function PreviewBody({
   preview,
   updateEnabled,
+  locale,
   renderMarkdown,
   onDraftChange,
   onRefresh,
 }: PreviewBodyProps) {
-  const isMarkdown = isMarkdownFile(preview.name);
-  const isHtml = isHtmlFile(preview.name);
-  const isImage = isImageFile(preview.name);
-  const isVideo = isVideoFile(preview.name);
-  const isAudio = isAudioFile(preview.name);
-  const isCsv = isCsvFile(preview.name);
-  const isPdf = isPdfFile(preview.name);
-  const isCode = isCodeFile(preview.name);
-  const isMarkdownEditing = isMarkdown && preview.isEditing;
-  const isHtmlEditing = isHtml && preview.isEditing;
-  const shouldUseCodeEditor = isCode || isMarkdownEditing || isHtmlEditing;
-  const codeExtension = extractExtension(preview.name);
-  const codeMirrorExtensions = codeExtension === "json" ? [jsonLanguage()] : [];
+  const contentKind = getPreviewContentKind(preview);
 
   if (preview.isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PreviewLoadingState />;
   }
 
   if (preview.error) {
     return (
-      <div className="flex h-full items-center justify-center p-4 text-center">
-        <div>
-          <p className="text-sm text-red-600">{preview.error}</p>
-          <button
-            className="mt-2 text-xs text-primary hover:underline"
-            onClick={() => onRefresh(preview.path)}
-          >
-            Retry
-          </button>
-        </div>
-      </div>
+      <PreviewErrorState
+        preview={preview}
+        locale={locale}
+        onRefresh={onRefresh}
+      />
     );
   }
 
-  if (isImage) {
-    return <ImagePreview src={preview.content} alt={preview.name} />;
+  if (contentKind.isImage) {
+    return <ImagePreview src={preview.content} alt={preview.name} locale={locale} />;
   }
 
-  if (isVideo) {
+  if (contentKind.isVideo) {
     return <VideoPreview src={preview.content} />;
   }
 
-  if (isAudio) {
-    return <AudioPreview src={preview.content} name={preview.name} />;
+  if (contentKind.isAudio) {
+    return <AudioPreview src={preview.content} name={preview.name} locale={locale} />;
   }
 
-  if (isPdf) {
-    return (
-      <div className="h-full w-full">
-        <iframe
-          src={preview.content}
-          className="h-full w-full border-0"
-          title={preview.name}
-        />
-      </div>
-    );
+  if (contentKind.isPdf) {
+    return <PdfPreviewFrame preview={preview} />;
   }
 
-  if (isCsv) {
-    return <TablePreview content={preview.draftContent} name={preview.name} />;
+  if (contentKind.isCsv) {
+    return <TablePreview content={preview.draftContent} locale={locale} />;
   }
 
-  if (isMarkdown && !preview.isEditing) {
+  if (contentKind.isMarkdown && !preview.isEditing) {
     const renderer = renderMarkdown ?? defaultRenderMarkdown;
     return (
-      <div className="h-full overflow-auto bg-card p-6 text-sm leading-6 text-foreground">
-        {renderer(preview.draftContent)}
-      </div>
+      <MarkdownPreviewContent
+        preview={preview}
+        renderMarkdown={renderer}
+      />
     );
   }
 
-  if (isHtml && !preview.isEditing) {
-    return (
-      <div className="h-full w-full">
-        <iframe
-          srcDoc={preview.draftContent}
-          className="h-full w-full border-0 bg-white"
-          title={preview.name}
-          sandbox="allow-same-origin"
-        />
-      </div>
-    );
+  if (contentKind.isHtml && !preview.isEditing) {
+    return <HtmlPreviewFrame preview={preview} />;
   }
 
-  if (shouldUseCodeEditor) {
+  if (contentKind.shouldUseCodeEditor) {
     return (
-      <div className="h-full overflow-auto bg-[#282C34] text-[13px] leading-[18.2px]">
-        <CodeMirror
-          value={preview.draftContent}
-          height="100%"
-          theme={oneDark}
-          extensions={codeMirrorExtensions}
-          editable={updateEnabled}
-          basicSetup={{
-            lineNumbers: true,
-            foldGutter: true,
-            highlightActiveLine: true,
-            highlightActiveLineGutter: true,
-          }}
-          onChange={(value) => onDraftChange(preview.path, value)}
-        />
-      </div>
+      <CodePreviewEditor
+        preview={preview}
+        updateEnabled={updateEnabled}
+        extension={contentKind.extension}
+        onDraftChange={onDraftChange}
+      />
     );
   }
 
   return (
-    <textarea
-      className="h-full w-full resize-none border-0 bg-transparent p-4 font-mono text-[13px] leading-5 text-foreground focus:outline-none"
-      value={preview.draftContent}
-      onChange={(event) => onDraftChange(preview.path, event.target.value)}
-      spellCheck={false}
-      readOnly={!updateEnabled}
+    <PlainTextPreviewEditor
+      preview={preview}
+      updateEnabled={updateEnabled}
+      onDraftChange={onDraftChange}
     />
   );
 }

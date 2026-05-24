@@ -1,15 +1,27 @@
 import { createPortal } from "react-dom";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import { useFinderStore } from "@/store";
 import { FolderOpenIcon, FolderIcon, UploadIcon } from "@/icons";
+import type { IconProps } from "@/icons";
 import { cn } from "@/utils";
 import { Download, Eye, RefreshCwIcon, Pencil, Trash2, FolderPlus } from "lucide-react";
+import { buildContextMenuItems } from "./context-menu-items";
+import type { ContextMenuIconName } from "./context-menu-items";
+import { useContextMenuLayer } from "./use-context-menu-layer";
 
-type MenuItem = {
-  label: string;
-  icon: React.ReactNode;
-  action: () => void;
-  divider?: boolean;
+type ContextMenuIconComponent = (props: IconProps) => React.ReactNode;
+
+const contextMenuIcons: Record<ContextMenuIconName, ContextMenuIconComponent> = {
+  download: Download,
+  openFile: Eye,
+  openFolder: FolderOpenIcon,
+  rename: Pencil,
+  delete: Trash2,
+  uploadFiles: UploadIcon,
+  uploadFolder: FolderIcon,
+  newFolder: FolderPlus,
+  refresh: RefreshCwIcon,
 };
 
 export function ContextMenu() {
@@ -44,221 +56,37 @@ export function ContextMenu() {
     closeContextMenu();
   }, [closeContextMenu]);
 
-  // Close menu on outside click
-  useEffect(() => {
-    if (!isOpen) return;
+  useContextMenuLayer({ isOpen, x, y, menuRef, onClose: handleClose });
 
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('[data-context-menu="true"]')) {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside, true);
-    document.addEventListener("contextmenu", handleClickOutside, true);
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside, true);
-      document.removeEventListener("contextmenu", handleClickOutside, true);
-    };
-  }, [isOpen, handleClose]);
-
-  // Adjust position to keep menu within viewport
-  useEffect(() => {
-    if (!isOpen || !menuRef.current) return;
-    const rect = menuRef.current.getBoundingClientRect();
-    const adjustedX =
-      x + rect.width > window.innerWidth
-        ? window.innerWidth - rect.width - 4
-        : x;
-    const adjustedY =
-      y + rect.height > window.innerHeight
-        ? window.innerHeight - rect.height - 4
-        : y;
-    if (adjustedX !== x || adjustedY !== y) {
-      menuRef.current.style.left = `${Math.max(0, adjustedX)}px`;
-      menuRef.current.style.top = `${Math.max(0, adjustedY)}px`;
-    }
-  }, [isOpen, x, y]);
-
-  // Focus menu when it opens.
-  useEffect(() => {
-    if (isOpen) {
-      requestAnimationFrame(() => menuRef.current?.focus());
-    }
-  }, [isOpen]);
-
-  // Keyboard close
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        handleClose();
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, handleClose]);
-
-  // Build menu items based on context
   const selectedFiles = useMemo(
     () => files.filter((f) => selectedPaths.has(f.path)),
     [files, selectedPaths],
   );
   const selectedCount = selectedFiles.length;
 
-  const menuItems: MenuItem[] = useMemo(() => {
-    const items: MenuItem[] = [];
-
-    if (targetType === "file" && selectedCount > 1) {
-      if (hasBatchDownload) {
-        items.push({
-          label: locale.downloadAll,
-          icon: <Download className="w-4 h-4" />,
-          action: () => { onBatchDownload(selectedFiles); handleClose(); },
-        });
-      }
-      if (hasDelete) {
-        items.push({
-          label: locale.delete,
-          icon: <Trash2 className="w-4 h-4" />,
-          action: () => {
-            if (window.confirm(locale.deleteMultipleConfirm(selectedCount))) {
-              onDelete(selectedFiles);
-            }
-            handleClose();
-          },
-        });
-      }
-    }
-
-    if (targetType === "file" && selectedCount <= 1 && targetFile) {
-      items.push({
-        label: locale.open,
-        icon: <Eye className="w-4 h-4" />,
-        action: () => { onOpen(targetFile); handleClose(); },
-      });
-      if (hasDownload) {
-        items.push({
-          label: locale.download,
-          icon: <Download className="w-4 h-4" />,
-          action: () => { onDownload(targetFile); handleClose(); },
-        });
-      }
-      if (hasRename) {
-        items.push({
-          label: locale.rename,
-          icon: <Pencil className="w-4 h-4" />,
-          action: () => { setRenamingPath(targetFile.path); handleClose(); },
-        });
-      }
-      if (hasDelete) {
-        items.push({
-          label: locale.delete,
-          icon: <Trash2 className="w-4 h-4" />,
-          action: () => {
-            if (window.confirm(locale.deleteConfirm(targetFile.name))) {
-              onDelete([targetFile]);
-            }
-            handleClose();
-          },
-        });
-      }
-    }
-
-    if (targetType === "folder" && selectedCount > 1) {
-      if (hasBatchDownload) {
-        items.push({
-          label: locale.downloadAll,
-          icon: <Download className="w-4 h-4" />,
-          action: () => { onBatchDownload(selectedFiles); handleClose(); },
-        });
-      }
-      if (hasDelete) {
-        items.push({
-          label: locale.delete,
-          icon: <Trash2 className="w-4 h-4" />,
-          action: () => {
-            if (window.confirm(locale.deleteMultipleConfirm(selectedCount))) {
-              onDelete(selectedFiles);
-            }
-            handleClose();
-          },
-        });
-      }
-    }
-
-    if (targetType === "folder" && selectedCount <= 1 && targetFile) {
-      items.push({
-        label: locale.open,
-        icon: <FolderOpenIcon className="w-4 h-4" />,
-        action: () => { onOpen(targetFile); handleClose(); },
-      });
-      if (hasUpload) {
-        items.push({
-          label: locale.uploadFiles,
-          icon: <UploadIcon className="w-4 h-4" />,
-          action: () => { onUpload(false, targetFile.path); handleClose(); },
-        });
-        items.push({
-          label: locale.uploadFolder,
-          icon: <FolderIcon className="w-4 h-4" />,
-          action: () => { onUpload(true, targetFile.path); handleClose(); },
-        });
-      }
-      if (hasRename) {
-        items.push({
-          label: locale.rename,
-          icon: <Pencil className="w-4 h-4" />,
-          action: () => { setRenamingPath(targetFile.path); handleClose(); },
-        });
-      }
-      if (hasDelete) {
-        items.push({
-          label: locale.delete,
-          icon: <Trash2 className="w-4 h-4" />,
-          action: () => {
-            if (window.confirm(locale.deleteConfirm(targetFile.name))) {
-              onDelete([targetFile]);
-            }
-            handleClose();
-          },
-        });
-      }
-    }
-
-    if (targetType === "empty") {
-      if (hasCreateFolder) {
-        items.push({
-          label: locale.newFolder,
-          icon: <FolderPlus className="w-4 h-4" />,
-          action: () => { setIsCreatingFolder(true); handleClose(); },
-        });
-      }
-      if (hasUpload) {
-        items.push({
-          label: locale.uploadFiles,
-          icon: <UploadIcon className="w-4 h-4" />,
-          action: () => { onUpload(false); handleClose(); },
-        });
-        items.push({
-          label: locale.uploadFolder,
-          icon: <FolderIcon className="w-4 h-4" />,
-          action: () => { onUpload(true); handleClose(); },
-        });
-      }
-      items.push({
-        label: locale.refresh,
-        icon: <RefreshCwIcon className="w-4 h-4" />,
-        action: () => { onRefresh(); handleClose(); },
-        divider: items.length > 0,
-      });
-    }
-
-    return items;
-  }, [
+  const menuItems = useMemo(() => buildContextMenuItems({
+    targetType,
+    targetFile,
+    selectedFiles,
+    selectedCount,
+    hasRename,
+    hasDelete,
+    hasCreateFolder,
+    hasUpload,
+    hasDownload,
+    hasBatchDownload,
+    locale,
+    onOpen,
+    onDownload,
+    onBatchDownload,
+    onUpload,
+    onRefresh,
+    onDelete,
+    setRenamingPath,
+    setIsCreatingFolder,
+    closeMenu: handleClose,
+    confirm: (message) => window.confirm(message),
+  }), [
     handleClose,
     hasBatchDownload,
     hasCreateFolder,
@@ -281,12 +109,11 @@ export function ContextMenu() {
     targetType,
   ]);
 
-  // Keyboard navigation for menu items
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     switch (event.key) {
       case 'Escape':
         event.preventDefault();
-        closeContextMenu();
+        handleClose();
         break;
       case 'ArrowDown':
         event.preventDefault();
@@ -308,7 +135,7 @@ export function ContextMenu() {
         break;
       }
     }
-  }, [closeContextMenu, focusedItemIndex, menuItems]);
+  }, [focusedItemIndex, handleClose, menuItems]);
 
   if (!isOpen) return null;
 
@@ -330,25 +157,29 @@ export function ContextMenu() {
           {locale.itemsSelected(selectedCount)}
         </div>
       )}
-      {menuItems.map((item, index) => (
-        <div key={item.label}>
-          {item.divider && (
-            <div className="my-1 border-t border-border" />
-          )}
-          <button
-            role="menuitem"
-            onClick={item.action}
-            onMouseEnter={() => setFocusedItemIndex(index)}
-            className={cn(
-              "w-full flex items-center gap-2 px-3 py-1.5 transition-colors text-left text-foreground border-0",
-              focusedItemIndex === index ? "bg-muted" : "hover:bg-muted",
+      {menuItems.map((item, index) => {
+        const Icon = contextMenuIcons[item.icon];
+
+        return (
+          <div key={item.id}>
+            {item.divider && (
+              <div className="my-1 border-t border-border" />
             )}
-          >
-            {item.icon}
-            {item.label}
-          </button>
-        </div>
-      ))}
+            <button
+              role="menuitem"
+              onClick={item.action}
+              onMouseEnter={() => setFocusedItemIndex(index)}
+              className={cn(
+                "w-full flex items-center gap-2 px-3 py-1.5 transition-colors text-left text-foreground border-0",
+                focusedItemIndex === index ? "bg-muted" : "hover:bg-muted",
+              )}
+            >
+              <Icon className="w-4 h-4" />
+              {item.label}
+            </button>
+          </div>
+        );
+      })}
     </div>,
     document.body,
   );

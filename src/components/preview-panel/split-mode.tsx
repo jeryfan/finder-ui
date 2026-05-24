@@ -1,12 +1,13 @@
 import { PREVIEW_TOP_INSET, PREVIEW_BOTTOM_INSET, PREVIEW_GAP } from './constants'
-import { PreviewTitleBar } from './preview-title-bar'
-import { PreviewBody } from './preview-body'
 import type { PreviewWindow } from '@/types'
+import type { FinderLocale } from '@/locale'
+import { SplitPreviewWindow } from './split-preview-window'
 
 export type SplitModeProps = {
   previews: PreviewWindow[]
   previewLeft: number
   updateEnabled: boolean
+  locale: FinderLocale
   renderMarkdown?: (content: string) => React.ReactNode
   onDownloadPreview?: (path: string) => void | Promise<void>
   onSave: (preview: PreviewWindow) => void
@@ -21,6 +22,7 @@ export function SplitMode({
   previews,
   previewLeft,
   updateEnabled,
+  locale,
   renderMarkdown,
   onDownloadPreview,
   onSave,
@@ -47,30 +49,20 @@ export function SplitMode({
       }}
     >
       {previews.map((preview) => (
-        <div
+        <SplitPreviewWindow
           key={preview.path}
-          className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border bg-card"
-        >
-          <PreviewTitleBar
-            preview={preview}
-            updateEnabled={updateEnabled}
-            onDownloadPreview={onDownloadPreview}
-            onSave={onSave}
-            onRefresh={onRefresh}
-            onMaximize={onMaximize}
-            onClose={onClose}
-            onSetEditing={onSetEditing}
-          />
-          <div className="min-h-0 flex-1 select-text overflow-hidden bg-card outline-none">
-            <PreviewBody
-              preview={preview}
-              updateEnabled={updateEnabled}
-              renderMarkdown={renderMarkdown}
-              onDraftChange={onDraftChange}
-              onRefresh={onRefresh}
-            />
-          </div>
-        </div>
+          preview={preview}
+          updateEnabled={updateEnabled}
+          locale={locale}
+          renderMarkdown={renderMarkdown}
+          onDownloadPreview={onDownloadPreview}
+          onSave={onSave}
+          onRefresh={onRefresh}
+          onMaximize={onMaximize}
+          onClose={onClose}
+          onSetEditing={onSetEditing}
+          onDraftChange={onDraftChange}
+        />
       ))}
     </div>
   )

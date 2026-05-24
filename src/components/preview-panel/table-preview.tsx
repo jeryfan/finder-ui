@@ -1,47 +1,21 @@
 import { useMemo } from "react";
+import type { FinderLocale } from "@/locale";
+import { parseCsv } from "./csv";
 
 type TablePreviewProps = {
   content: string;
-  name: string;
+  locale: FinderLocale;
 };
 
 const MAX_ROWS = 100;
 
-function parseCsv(content: string): string[][] {
-  const lines = content.split('\n').filter((line) => line.trim());
-  return lines.map((line) => {
-    const cells: string[] = [];
-    let current = '';
-    let inQuotes = false;
-
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        if (inQuotes && line[i + 1] === '"') {
-          current += '"';
-          i++;
-        } else {
-          inQuotes = !inQuotes;
-        }
-      } else if (char === ',' && !inQuotes) {
-        cells.push(current.trim());
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    cells.push(current.trim());
-    return cells;
-  });
-}
-
-export function TablePreview({ content }: TablePreviewProps) {
+export function TablePreview({ content, locale }: TablePreviewProps) {
   const rows = useMemo(() => parseCsv(content), [content]);
 
   if (rows.length === 0) {
     return (
       <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-        Empty file
+        {locale.emptyFile}
       </div>
     );
   }
@@ -82,7 +56,7 @@ export function TablePreview({ content }: TablePreviewProps) {
       </table>
       {truncated && (
         <p className="mt-3 text-center text-xs text-muted-foreground">
-          Showing first {MAX_ROWS} rows of {rows.length - 1} total
+          {locale.tableRowsTruncated(MAX_ROWS, rows.length - 1)}
         </p>
       )}
     </div>

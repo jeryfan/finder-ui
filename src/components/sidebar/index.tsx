@@ -9,7 +9,7 @@ export type SidebarProps = {
 }
 
 export function Sidebar({ tabs, className }: SidebarProps) {
-  const { activeTab, setActiveTab, navigateTo, onNavigateToPath, clearSelection, openContextMenu } = useFinderStore()
+  const { activeTab, setActiveTab, navigateTo, onNavigateToPath, clearSelection, openContextMenu, locale } = useFinderStore()
 
   const handleTabClick = (tab: SidebarTab) => {
     if (activeTab === tab.key) {
@@ -39,11 +39,11 @@ export function Sidebar({ tabs, className }: SidebarProps) {
     >
       <div className="p-2">
         <div className="mb-2 px-2 text-xs font-medium tracking-[0.6px] text-muted-foreground">
-          Files
+          {locale.sidebarTitle}
         </div>
         {tabs.length === 0 ? (
           <div className="px-2 py-4 text-center text-xs text-muted-foreground">
-            No tabs configured
+            {locale.noTabsConfigured}
           </div>
         ) : (
           <div className="space-y-0.5">
