@@ -1,18 +1,26 @@
-import { ChevronLeftIcon, ChevronRightIcon, ChevronRightIcon as BreadcrumbSep } from '@/icons'
 import type { FinderLocale } from '@/locale'
-import { cn } from '@/utils'
+import {
+  ToolbarBreadcrumbs,
+  type BreadcrumbItem,
+} from './toolbar-breadcrumbs'
+import { ToolbarNavigation } from './toolbar-navigation'
+import { ToolbarSearch } from './toolbar-search'
+import {
+  ToolbarViewToggle,
+  type ToolbarViewMode,
+} from './toolbar-view-toggle'
 
 export type ToolbarProps = {
   historyIndex: number
   historyStackLength: number
-  breadcrumbs: Array<{ label: string; path: string }>
-  viewMode: 'list' | 'grouped'
+  breadcrumbs: BreadcrumbItem[]
+  viewMode: ToolbarViewMode
   searchQuery: string
   locale: FinderLocale
   onGoBack: () => void
   onGoForward: () => void
   onNavigate: (path: string) => void
-  onViewModeChange: (mode: 'list' | 'grouped') => void
+  onViewModeChange: (mode: ToolbarViewMode) => void
   onSearchChange: (value: string) => void
 }
 
@@ -31,95 +39,24 @@ export function Toolbar({
 }: ToolbarProps) {
   return (
     <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border bg-muted/20 px-3">
-      <div className="flex shrink-0 items-center gap-0.5">
-        <button
-          onClick={onGoBack}
-          disabled={historyIndex <= 0}
-          className={cn(
-            'p-1 rounded hover:bg-muted transition-colors',
-            historyIndex <= 0 && 'cursor-not-allowed opacity-30',
-          )}
-          aria-label={locale.back}
-        >
-          <ChevronLeftIcon className="h-4 w-4" />
-        </button>
-        <button
-          onClick={onGoForward}
-          disabled={historyIndex >= historyStackLength - 1}
-          className={cn(
-            'p-1 rounded hover:bg-muted transition-colors',
-            historyIndex >= historyStackLength - 1 && 'cursor-not-allowed opacity-30',
-          )}
-          aria-label={locale.forward}
-        >
-          <ChevronRightIcon className="h-4 w-4" />
-        </button>
-      </div>
-
-      <div className="flex min-w-0 flex-1 items-center gap-1 text-sm font-medium whitespace-nowrap overflow-hidden">
-        {breadcrumbs.length === 1
-          ? <span className="font-semibold text-foreground">{breadcrumbs[0].label}</span>
-          : breadcrumbs.map((crumb, index) => {
-              const isLast = index === breadcrumbs.length - 1
-              return (
-                <div key={crumb.path} className="flex min-w-0 items-center gap-1">
-                  <button
-                    onClick={() => onNavigate(crumb.path)}
-                    className={cn(
-                      'truncate text-sm transition-colors',
-                      isLast ? 'font-semibold text-foreground' : 'font-medium text-foreground hover:text-foreground/80',
-                    )}
-                  >
-                    {crumb.label}
-                  </button>
-                  {!isLast && <BreadcrumbSep className="h-4 w-4 text-muted-foreground" />}
-                </div>
-              )
-            })}
-      </div>
-
-      <div className="flex shrink-0 items-center gap-0.5 border border-border rounded-md p-0.5">
-        <button
-          onClick={() => onViewModeChange('grouped')}
-          className={cn('p-1 rounded transition-colors', viewMode === 'grouped' ? 'bg-muted' : 'hover:bg-muted/50')}
-          aria-label={locale.groupedView}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <rect width="7" height="7" x="3" y="3" rx="1" />
-            <rect width="7" height="7" x="14" y="3" rx="1" />
-            <rect width="7" height="7" x="14" y="14" rx="1" />
-            <rect width="7" height="7" x="3" y="14" rx="1" />
-          </svg>
-        </button>
-        <button
-          onClick={() => onViewModeChange('list')}
-          className={cn('p-1 rounded transition-colors', viewMode === 'list' ? 'bg-muted' : 'hover:bg-muted/50')}
-          aria-label={locale.listView}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M3 5h.01" />
-            <path d="M3 12h.01" />
-            <path d="M3 19h.01" />
-            <path d="M8 5h13" />
-            <path d="M8 12h13" />
-            <path d="M8 19h13" />
-          </svg>
-        </button>
-      </div>
-
-      <div className="relative flex shrink-0 items-center">
-        <svg className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-muted-foreground" viewBox="0 0 24 24" fill="none">
-          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.6" />
-          <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        </svg>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={event => onSearchChange(event.target.value)}
-          placeholder={locale.search}
-          className="w-32 h-7 pl-7 pr-2 text-xs bg-muted/50 border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-        />
-      </div>
+      <ToolbarNavigation
+        historyIndex={historyIndex}
+        historyStackLength={historyStackLength}
+        locale={locale}
+        onGoBack={onGoBack}
+        onGoForward={onGoForward}
+      />
+      <ToolbarBreadcrumbs breadcrumbs={breadcrumbs} onNavigate={onNavigate} />
+      <ToolbarViewToggle
+        viewMode={viewMode}
+        locale={locale}
+        onViewModeChange={onViewModeChange}
+      />
+      <ToolbarSearch
+        searchQuery={searchQuery}
+        locale={locale}
+        onSearchChange={onSearchChange}
+      />
     </div>
   )
 }

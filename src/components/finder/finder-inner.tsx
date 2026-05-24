@@ -1,15 +1,22 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { FileList } from '@/components/file-list'
 import { ContextMenu } from '@/components/context-menu'
 import { Toolbar } from '@/components/toolbar'
 import { PreviewPanel } from '@/components/preview-panel'
 import { getPreviewLeftPaneWidth } from '@/components/preview-panel/constants'
-import { useFinderStore, useFinderStoreApi } from '@/store'
+import { useFinderStore } from '@/store'
 import { cn } from '@/utils'
 import { enLocale } from '@/locale/en'
-import type { FileEntry } from '@/types'
 import type { FinderProps } from './index'
+import { downloadPreviewContent } from './download-preview'
+import { useActiveTabFiles } from './use-active-tab-files'
+import { useFinderBreadcrumbs } from './use-finder-breadcrumbs'
+import { useFinderCallbackRefs } from './use-finder-callback-refs'
+import { useFinderFileLoader } from './use-finder-file-loader'
+import { useFinderHandlers } from './use-finder-handlers'
+import { useFinderInitialization } from './use-finder-initialization'
+import { useFinderUpload } from './use-finder-upload'
 
 export function FinderInner({
   tabs,
@@ -41,21 +48,7 @@ export function FinderInner({
     locale: storeLocale,
     setTabs,
     setActiveTab,
-    setFiles,
-    setLoading,
-    setLoadError,
     setUpdateEnabled,
-    setOpenHandler,
-    setDownloadHandler,
-    setBatchDownloadHandler,
-    setUploadHandler,
-    setRefreshHandler,
-    setSavePreviewHandler,
-    setNavigateToPathHandler,
-    setDropFilesHandler,
-    setRenameHandler,
-    setDeleteHandler,
-    setCreateFolderHandler,
     setHasRename,
     setHasDelete,
     setHasCreateFolder,
@@ -63,39 +56,26 @@ export function FinderInner({
     setHasDownload,
     setHasBatchDownload,
     setLocale,
-    setCurrentPath,
     navigateTo,
     goBack,
     goForward,
     setViewMode,
     setSearchQuery,
-    setUploadingFiles,
   } = useFinderStore()
 
-  const storeApi = useFinderStoreApi()
-
-  // Stable refs for callback props so handlers always use the latest version
-  const fetchFilesRef = useRef(onFetchFiles)
-  const openFileRef = useRef(onOpenFile)
-  const downloadRef = useRef(onDownload)
-  const batchDownloadRef = useRef(onBatchDownload)
-  const uploadRef = useRef(onUpload)
-  const saveRef = useRef(onSave)
-  const renameRef = useRef(onRename)
-  const deleteRef = useRef(onDelete)
-  const createFolderRef = useRef(onCreateFolder)
-
-  useEffect(() => {
-    fetchFilesRef.current = onFetchFiles
-    openFileRef.current = onOpenFile
-    downloadRef.current = onDownload
-    batchDownloadRef.current = onBatchDownload
-    uploadRef.current = onUpload
-    saveRef.current = onSave
-    renameRef.current = onRename
-    deleteRef.current = onDelete
-    createFolderRef.current = onCreateFolder
-  }, [
+  const {
+    fetchFilesRef,
+    openFileRef,
+    downloadRef,
+    batchDownloadRef,
+    uploadRef,
+    saveRef,
+    renameRef,
+    deleteRef,
+    createFolderRef,
+  } = useFinderCallbackRefs({
+    tabs,
+    defaultTab,
     onFetchFiles,
     onOpenFile,
     onDownload,
@@ -105,181 +85,74 @@ export function FinderInner({
     onRename,
     onDelete,
     onCreateFolder,
-  ])
-
-  // Hidden file input for triggering native file picker
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const uploadTargetPathRef = useRef<string | undefined>(undefined)
+    editable,
+    renderMarkdown,
+    locale,
+    className,
+    style,
+    theme,
+  })
 
   // Track previous tab to detect sidebar-initiated changes
   const prevTabRef = useRef<string | undefined>(undefined)
-  // AbortController to cancel stale fetch requests on rapid navigation
-  const fetchAbortRef = useRef<AbortController | null>(null)
 
   const leftPaneWidth = getPreviewLeftPaneWidth(previews.length)
 
-  // Stable loadFiles — zustand setters are referentially stable
-  const loadFiles = useCallback(async (path: string) => {
-    // Cancel any in-flight request
-    fetchAbortRef.current?.abort()
-    const controller = new AbortController()
-    fetchAbortRef.current = controller
+  const loadFiles = useFinderFileLoader(fetchFilesRef)
+  const {
+    fileInputRef,
+    performUpload,
+    requestUpload,
+    handleFileInputChange,
+  } = useFinderUpload({ uploadRef, loadFiles })
 
-    // Immediately show loading in the new directory
-    setFiles([])
-    setCurrentPath(path)
-    setLoading(true)
-    setLoadError(null)
-    try {
-      const entries = await fetchFilesRef.current(path)
-      if (controller.signal.aborted) return
-      setFiles(entries)
-    } catch (err) {
-      if (controller.signal.aborted) return
-      setLoadError(err instanceof Error ? err.message : storeApi.getState().locale.failedToLoad)
-      setFiles([])
-    } finally {
-      if (!controller.signal.aborted) {
-        setLoading(false)
-      }
-    }
-  }, [setLoading, setLoadError, setFiles, setCurrentPath, storeApi])
+  useFinderHandlers({
+    openFileRef,
+    downloadRef,
+    batchDownloadRef,
+    saveRef,
+    renameRef,
+    deleteRef,
+    createFolderRef,
+    requestUpload,
+    performUpload,
+    loadFiles,
+  })
 
-  // Upload wrapper — manages uploadingFiles state and auto-refreshes
-  const performUpload = useCallback(async (files: File[], targetPath?: string) => {
-    const resolvedPath = targetPath ?? storeApi.getState().currentPath
+  useFinderInitialization({
+    tabs,
+    defaultTab,
+    editable,
+    locale,
+    capabilityFlags: {
+      canRename: !!onRename,
+      canDelete: !!onDelete,
+      canCreateFolder: !!onCreateFolder,
+      canUpload: !!onUpload,
+      canDownload: !!onDownload,
+      canBatchDownload: !!onBatchDownload,
+    },
+    previousTabRef: prevTabRef,
+    loadFiles,
+    setTabs,
+    setActiveTab,
+    setUpdateEnabled,
+    setLocale,
+    setHasRename,
+    setHasDelete,
+    setHasCreateFolder,
+    setHasUpload,
+    setHasDownload,
+    setHasBatchDownload,
+  })
 
-    // Detect folder upload via webkitRelativePath
-    const hasRelativePaths = files.some(f => f.webkitRelativePath?.includes('/'))
-    let uploadingItems: Array<{ name: string; type: 'file' | 'directory' }>
-
-    if (hasRelativePaths) {
-      // Extract unique top-level folder names
-      const folderNames = new Set<string>()
-      for (const f of files) {
-        const topDir = f.webkitRelativePath.split('/')[0]
-        if (topDir) folderNames.add(topDir)
-      }
-      uploadingItems = Array.from(folderNames).map(name => ({ name, type: 'directory' }))
-    } else {
-      uploadingItems = files.map(f => ({ name: f.name, type: 'file' as const }))
-    }
-
-    setUploadingFiles(uploadingItems)
-    try {
-      await uploadRef.current?.(files, resolvedPath)
-    } catch (err) {
-      setLoadError(err instanceof Error ? err.message : 'Upload failed')
-    } finally {
-      setUploadingFiles([])
-      loadFiles(storeApi.getState().currentPath)
-    }
-  }, [storeApi, setUploadingFiles, setLoadError, loadFiles])
-
-  // --- Initialization ---
-  useEffect(() => {
-    setTabs(tabs)
-
-    const initialTab = defaultTab || tabs[0]?.key
-    prevTabRef.current = initialTab
-    if (initialTab) setActiveTab(initialTab)
-
-    setUpdateEnabled(editable)
-
-    // Set locale
-    if (locale) {
-      setLocale({ ...enLocale, ...locale })
-    }
-
-    // Navigation handler — used by goBack/goForward and directory double-click
-    setNavigateToPathHandler((path: string) => {
-      loadFiles(path)
-    })
-
-    // Open handler — show loading preview first, then fill content
-    setOpenHandler(async (file: FileEntry) => {
-      const handler = openFileRef.current
-      if (!handler) return
-      storeApi.getState().openPreviewLoading(file)
-      try {
-        const result = await handler(file)
-        if (typeof result === 'string') {
-          storeApi.getState().openPreview(file, result)
-        } else {
-          // Handler didn't return content — close the loading preview
-          storeApi.getState().closePreview(file.path)
-        }
-      } catch {
-        storeApi.getState().setPreviewError(file.path, 'Failed to load file')
-      }
-    })
-
-    // Delegate to latest callback refs so prop changes are respected
-    setDownloadHandler((file) => downloadRef.current?.(file))
-    setBatchDownloadHandler((files) => batchDownloadRef.current?.(files))
-    setUploadHandler((isFolder, targetPath) => {
-      uploadTargetPathRef.current = targetPath
-      const input = fileInputRef.current
-      if (!input) return
-      // Reset so the same file can be re-selected
-      input.value = ''
-      // webkitdirectory for folder selection
-      if (isFolder) {
-        input.setAttribute('webkitdirectory', '')
-      } else {
-        input.removeAttribute('webkitdirectory')
-      }
-      input.click()
-    })
-    setSavePreviewHandler(async (path, content) => {
-      await saveRef.current?.(path, content)
-    })
-    setDropFilesHandler((files, targetPath) => {
-      performUpload(files, targetPath)
-    })
-    setRenameHandler(async (file, newName) => {
-      await renameRef.current?.(file, newName)
-      loadFiles(storeApi.getState().currentPath)
-    })
-    setDeleteHandler(async (files) => {
-      await deleteRef.current?.(files)
-      loadFiles(storeApi.getState().currentPath)
-    })
-    setCreateFolderHandler(async (parentPath, name) => {
-      await createFolderRef.current?.(parentPath, name)
-      loadFiles(storeApi.getState().currentPath)
-    })
-
-    // Set capability flags based on which handlers were provided
-    setHasRename(!!onRename)
-    setHasDelete(!!onDelete)
-    setHasCreateFolder(!!onCreateFolder)
-    setHasUpload(!!onUpload)
-    setHasDownload(!!onDownload)
-    setHasBatchDownload(!!onBatchDownload)
-
-    setRefreshHandler(() => {
-      loadFiles(storeApi.getState().currentPath)
-    })
-
-    // Load initial files
-    const initialRootPath = tabs.find(t => t.key === initialTab)?.rootPath || tabs[0]?.rootPath
-    if (initialRootPath) {
-      loadFiles(initialRootPath)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // --- React to sidebar tab changes ---
-  useEffect(() => {
-    if (activeTab === prevTabRef.current) return
-    prevTabRef.current = activeTab
-    const tab = tabs.find(t => t.key === activeTab)
-    if (!tab) return
-    navigateTo(tab.rootPath)
-    loadFiles(tab.rootPath)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab])
+  useActiveTabFiles({
+    activeTab,
+    tabs,
+    previousTabRef: prevTabRef,
+    navigateTo,
+    loadFiles,
+  })
 
   // --- Sync tabs prop ---
   useEffect(() => {
@@ -296,25 +169,12 @@ export function FinderInner({
     setLocale(locale ? { ...enLocale, ...locale } : enLocale)
   }, [locale, setLocale])
 
-  // --- Breadcrumbs ---
-  const breadcrumbs = useMemo(() => {
-    const tab = tabs.find(t => t.key === activeTab)
-    const tabLabel = tab?.label ?? storeLocale.sidebarTitle
-    const rootPath = tab?.rootPath ?? '/'
-    const items: Array<{ label: string; path: string }> = [{ label: tabLabel, path: rootPath }]
-    if (currentPath === rootPath) return items
-
-    const relativePath = currentPath.startsWith(`${rootPath}/`)
-      ? currentPath.slice(rootPath.length + 1)
-      : currentPath.slice(1)
-    const segments = relativePath.split('/').filter(Boolean)
-    let cursor = rootPath
-    for (const segment of segments) {
-      cursor = `${cursor}/${segment}`
-      items.push({ label: segment, path: cursor })
-    }
-    return items
-  }, [activeTab, currentPath, storeLocale.sidebarTitle, tabs])
+  const breadcrumbs = useFinderBreadcrumbs({
+    tabs,
+    activeTab,
+    currentPath,
+    locale: storeLocale,
+  })
 
   // --- Handlers ---
   const handleNavigate = (path: string) => {
@@ -322,24 +182,10 @@ export function FinderInner({
     loadFiles(path)
   }
 
-  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = event.target.files
-    if (!selectedFiles || selectedFiles.length === 0) return
-    performUpload(Array.from(selectedFiles), uploadTargetPathRef.current)
-  }
-
   const handleDownloadPreview = async (path: string) => {
     const preview = previews.find(p => p.path === path)
     if (!preview) return
-    const blob = new Blob([preview.content], { type: 'text/plain;charset=utf-8' })
-    const href = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = href
-    anchor.download = preview.name
-    document.body.appendChild(anchor)
-    anchor.click()
-    document.body.removeChild(anchor)
-    URL.revokeObjectURL(href)
+    downloadPreviewContent(preview)
   }
 
   return (

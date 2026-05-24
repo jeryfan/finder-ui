@@ -67,6 +67,26 @@ export function useKeyboardNavigation({
     return next
   }, [sortedFiles, scrollToIndex])
 
+  const focusIndex = useCallback((index: number) => {
+    const maxIndex = sortedFiles.length - 1
+    if (maxIndex < 0) return -1
+    const next = Math.max(0, Math.min(maxIndex, index))
+    setFocusedPath(sortedFiles[next].path)
+    scrollToIndex(next)
+    return next
+  }, [scrollToIndex, sortedFiles])
+
+  const selectFocusedFile = useCallback((index: number, extendRange: boolean) => {
+    if (index < 0) return
+    const file = sortedFiles[index]
+    if (!file) return
+    if (extendRange) {
+      actions.onSelectRange(file.path)
+    } else {
+      actions.onSetSelection(new Set([file.path]))
+    }
+  }, [actions, sortedFiles])
+
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     const target = event.target as HTMLElement
     // Don't handle keys when typing in input/textarea
@@ -86,56 +106,40 @@ export function useKeyboardNavigation({
         event.preventDefault()
         const delta = viewMode === 'grouped' ? getColumnsFromContainer(containerRef.current) : 1
         const nextIndex = moveFocus(delta)
-        if (nextIndex >= 0) {
-          const file = sortedFiles[nextIndex]
-          if (shiftKey) {
-            actions.onSelectRange(file.path)
-          } else {
-            actions.onSetSelection(new Set([file.path]))
-          }
-        }
+        selectFocusedFile(nextIndex, shiftKey)
         break
       }
       case 'ArrowUp': {
         event.preventDefault()
         const delta = viewMode === 'grouped' ? getColumnsFromContainer(containerRef.current) : 1
         const nextIndex = moveFocus(-delta)
-        if (nextIndex >= 0) {
-          const file = sortedFiles[nextIndex]
-          if (shiftKey) {
-            actions.onSelectRange(file.path)
-          } else {
-            actions.onSetSelection(new Set([file.path]))
-          }
-        }
+        selectFocusedFile(nextIndex, shiftKey)
         break
       }
       case 'ArrowRight': {
         if (viewMode !== 'grouped') break
         event.preventDefault()
         const nextIndex = moveFocus(1)
-        if (nextIndex >= 0) {
-          const file = sortedFiles[nextIndex]
-          if (shiftKey) {
-            actions.onSelectRange(file.path)
-          } else {
-            actions.onSetSelection(new Set([file.path]))
-          }
-        }
+        selectFocusedFile(nextIndex, shiftKey)
         break
       }
       case 'ArrowLeft': {
         if (viewMode !== 'grouped') break
         event.preventDefault()
         const nextIndex = moveFocus(-1)
-        if (nextIndex >= 0) {
-          const file = sortedFiles[nextIndex]
-          if (shiftKey) {
-            actions.onSelectRange(file.path)
-          } else {
-            actions.onSetSelection(new Set([file.path]))
-          }
-        }
+        selectFocusedFile(nextIndex, shiftKey)
+        break
+      }
+      case 'Home': {
+        event.preventDefault()
+        const nextIndex = focusIndex(0)
+        selectFocusedFile(nextIndex, shiftKey)
+        break
+      }
+      case 'End': {
+        event.preventDefault()
+        const nextIndex = focusIndex(sortedFiles.length - 1)
+        selectFocusedFile(nextIndex, shiftKey)
         break
       }
       case 'Enter': {
@@ -167,7 +171,16 @@ export function useKeyboardNavigation({
         break
       }
     }
-  }, [sortedFiles, viewMode, actions, moveFocus, containerRef, setFocusedIndex])
+  }, [
+    actions,
+    containerRef,
+    focusIndex,
+    moveFocus,
+    selectFocusedFile,
+    setFocusedIndex,
+    sortedFiles,
+    viewMode,
+  ])
 
   useEffect(() => {
     const container = containerRef.current

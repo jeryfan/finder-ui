@@ -1,19 +1,19 @@
 import type { PreviewWindow } from "@/types";
-import { isHtmlFile, isImageFile, isMarkdownFile, isVideoFile } from "@/utils";
+import { getPreviewContentKind } from "./preview-content-kind";
 
 export function getPreviewActionState(
   preview: PreviewWindow,
   updateEnabled: boolean,
   options?: { blockSaveWhileLoading?: boolean },
 ) {
-  const isMarkdown = isMarkdownFile(preview.name);
-  const isHtml = isHtmlFile(preview.name);
-  const isImage = isImageFile(preview.name);
-  const isVideo = isVideoFile(preview.name);
-  const isPreviewable = isMarkdown || isHtml;
-  const isPreviewMode = isPreviewable && !preview.isEditing;
-  const isEditMode = isPreviewable && preview.isEditing;
-  const isEditableFile = !isPreviewable && !isImage && !isVideo;
+  const contentKind = getPreviewContentKind(preview);
+  const previewEditableExtensions = new Set(["md", "markdown", "html", "htm"]);
+  const isPreviewMode =
+    contentKind.kind === "markdown" || contentKind.kind === "html";
+  const isEditMode =
+    contentKind.kind === "code" &&
+    previewEditableExtensions.has(contentKind.extension);
+  const isEditableFile = contentKind.kind === "code" || contentKind.kind === "text";
   const hasChanges = preview.draftContent !== preview.content;
   const blockedByLoading = options?.blockSaveWhileLoading && preview.isLoading;
   const canSave = updateEnabled && hasChanges && !preview.isSaving && !blockedByLoading;

@@ -8,6 +8,7 @@ import { cn } from "@/utils";
 import { Download, Eye, RefreshCwIcon, Pencil, Trash2, FolderPlus } from "lucide-react";
 import { buildContextMenuItems } from "./context-menu-items";
 import type { ContextMenuIconName } from "./context-menu-items";
+import { useContextMenuConfirm } from "./use-context-menu-confirm";
 import { useContextMenuLayer } from "./use-context-menu-layer";
 
 type ContextMenuIconComponent = (props: IconProps) => React.ReactNode;
@@ -50,6 +51,7 @@ export function ContextMenu() {
   const { isOpen, x, y, targetFile, targetType } = contextMenu;
   const [focusedItemIndex, setFocusedItemIndex] = useState(-1);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const confirm = useContextMenuConfirm();
 
   const handleClose = useCallback(() => {
     setFocusedItemIndex(-1);
@@ -85,8 +87,9 @@ export function ContextMenu() {
     setRenamingPath,
     setIsCreatingFolder,
     closeMenu: handleClose,
-    confirm: (message) => window.confirm(message),
+    confirm,
   }), [
+    confirm,
     handleClose,
     hasBatchDownload,
     hasCreateFolder,
