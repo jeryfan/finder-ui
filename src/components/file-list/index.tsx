@@ -71,8 +71,9 @@ export function FileList() {
     handleDrop,
   } = useFileDrop(currentPath, onDropFiles);
 
-  const dateColumnClass = "w-32";
-  const sizeColumnClass = "w-20";
+  const dateColumnClass = "w-32 shrink-0";
+  const sizeColumnClass = "w-20 shrink-0";
+  const listContentClass = "min-w-[360px]";
 
   const sortedFiles = useSortedFiles(files, searchQuery, sortField, sortOrder);
 
@@ -227,6 +228,7 @@ export function FileList() {
         {/* List header */}
         {showListHeader && (
           <FileListHeader
+            className={listContentClass}
             locale={locale}
             sortField={sortField}
             sortOrder={sortOrder}
@@ -291,6 +293,7 @@ export function FileList() {
 
         {viewMode === "list" && hasContent && (
           <VirtualizedListView
+            className={listContentClass}
             virtualizer={listVirtualizer}
             files={sortedFiles}
             uploadingFiles={uploadingFiles}

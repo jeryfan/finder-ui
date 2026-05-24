@@ -7,6 +7,7 @@ export type FileListHeaderProps = {
   locale: FinderLocale;
   sortField: FileSortField;
   sortOrder: FileSortOrder;
+  className?: string;
   dateColumnClass: string;
   sizeColumnClass: string;
   onSort: (field: FileSortField) => void;
@@ -16,6 +17,7 @@ export function FileListHeader({
   locale,
   sortField,
   sortOrder,
+  className,
   dateColumnClass,
   sizeColumnClass,
   onSort,
@@ -32,26 +34,29 @@ export function FileListHeader({
   );
 
   return (
-    <div className="flex items-center gap-2 px-2 py-1 text-[10px] leading-4 font-semibold text-muted-foreground uppercase tracking-wider border-b border-border">
+    <div className={cn(
+      "flex items-center gap-2 px-2 py-1 text-[10px] leading-4 font-semibold text-muted-foreground uppercase tracking-wider border-b border-border",
+      className,
+    )}>
       <button
         onClick={() => onSort("name")}
-        className="flex-1 text-left flex items-center gap-1 hover:text-foreground"
+        className="min-w-0 flex-1 text-left flex items-center gap-1 hover:text-foreground"
       >
-        {locale.name}
+        <span className="truncate">{locale.name}</span>
         {renderSortIcon("name")}
       </button>
       <button
         onClick={() => onSort("lastModified")}
         className={`${dateColumnClass} text-left flex items-center gap-1 hover:text-foreground`}
       >
-        {locale.dateModified}
+        <span className="truncate whitespace-nowrap">{locale.dateModified}</span>
         {renderSortIcon("lastModified")}
       </button>
       <button
         onClick={() => onSort("size")}
         className={`${sizeColumnClass} text-right flex items-center justify-end gap-1 hover:text-foreground`}
       >
-        {locale.size}
+        <span className="truncate whitespace-nowrap">{locale.size}</span>
         {renderSortIcon("size")}
       </button>
     </div>

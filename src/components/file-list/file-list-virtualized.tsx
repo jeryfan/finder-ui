@@ -108,12 +108,14 @@ export function VirtualizedGridView({
 
 export type VirtualizedListViewProps = BaseVirtualizedFileViewProps & {
   virtualizer: Virtualizer<HTMLDivElement, Element>;
+  className?: string;
   dateColumnClass: string;
   sizeColumnClass: string;
 };
 
 export function VirtualizedListView({
   virtualizer,
+  className,
   files,
   uploadingFiles,
   selectedPaths,
@@ -130,7 +132,7 @@ export function VirtualizedListView({
 }: VirtualizedListViewProps) {
   return (
     <div
-      className="mt-0.5"
+      className={className}
       style={{ height: `${virtualizer.getTotalSize()}px`, width: "100%", position: "relative" }}
     >
       {virtualizer.getVirtualItems().map((virtualItem) => {

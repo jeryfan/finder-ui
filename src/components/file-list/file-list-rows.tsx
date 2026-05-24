@@ -213,11 +213,11 @@ export function UploadingListRow({
       ) : (
         <div className="w-4 h-4 flex-shrink-0 rounded bg-muted-foreground/10" />
       )}
-      <span className="flex-1 text-sm truncate text-muted-foreground">
+      <span className="min-w-0 flex-1 text-sm truncate text-muted-foreground">
         {item.name}
       </span>
-      <span className={`${dateColumnClass} text-xs text-muted-foreground`}>--</span>
-      <span className={`${sizeColumnClass} text-xs text-muted-foreground text-right`}>--</span>
+      <span className={`${dateColumnClass} text-xs text-muted-foreground truncate whitespace-nowrap`}>--</span>
+      <span className={`${sizeColumnClass} text-xs text-muted-foreground text-right truncate whitespace-nowrap`}>--</span>
     </div>
   );
 }
@@ -297,7 +297,7 @@ export function FileListRow({
           getFileIcon(entry)
         )}
       </div>
-      <span className="flex-1 text-sm truncate">
+      <span className="min-w-0 flex-1 text-sm truncate">
         {renamingPath === entry.path ? (
           <InlineInput
             defaultValue={entry.name}
@@ -309,10 +309,10 @@ export function FileListRow({
           />
         ) : entry.name}
       </span>
-      <span className={`${dateColumnClass} text-xs text-muted-foreground truncate`}>
+      <span className={`${dateColumnClass} text-xs text-muted-foreground truncate whitespace-nowrap`}>
         {entry.lastModified ? formatDateTimeEN(entry.lastModified) : "--"}
       </span>
-      <span className={`${sizeColumnClass} text-xs text-muted-foreground text-right`}>
+      <span className={`${sizeColumnClass} text-xs text-muted-foreground text-right truncate whitespace-nowrap`}>
         {formatFileSize(entry.size || 0, entry.type)}
       </span>
     </button>
