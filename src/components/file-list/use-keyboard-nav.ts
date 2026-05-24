@@ -10,6 +10,7 @@ export type KeyboardNavActions = {
   onClearSelection: () => void
   onCloseContextMenu: () => void
   onNavigateBack: () => void
+  onDeleteSelected: () => void
 }
 
 export type KeyboardNavOptions = {
@@ -26,6 +27,18 @@ function getColumnsFromContainer(container: HTMLDivElement | null): number {
   const style = window.getComputedStyle(grid)
   const columns = style.gridTemplateColumns.split(' ').length
   return Math.max(1, columns)
+}
+
+export function shouldIgnoreKeyboardNavigation(
+  target: EventTarget | null,
+  container: HTMLElement | null,
+) {
+  if (!(target instanceof HTMLElement)) return true
+  if (container && !container.contains(target)) return true
+
+  return Boolean(target.closest(
+    'input, textarea, select, [contenteditable="true"], [contenteditable=""]',
+  ))
 }
 
 export function useKeyboardNavigation({
@@ -88,9 +101,7 @@ export function useKeyboardNavigation({
   }, [actions, sortedFiles])
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    const target = event.target as HTMLElement
-    // Don't handle keys when typing in input/textarea
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
+    if (shouldIgnoreKeyboardNavigation(event.target, containerRef.current)) return
 
     const { key, shiftKey, metaKey, ctrlKey } = event
 
@@ -170,6 +181,11 @@ export function useKeyboardNavigation({
         actions.onNavigateBack()
         break
       }
+      case 'Delete': {
+        event.preventDefault()
+        actions.onDeleteSelected()
+        break
+      }
     }
   }, [
     actions,
@@ -186,12 +202,9 @@ export function useKeyboardNavigation({
     const container = containerRef.current
     if (!container) return
 
-    const finderWindow = container.closest('[data-finder-window="true"]')
-    const target = finderWindow ?? container
-
-    target.addEventListener('keydown', handleKeyDown as EventListener)
+    container.addEventListener('keydown', handleKeyDown as EventListener)
     return () => {
-      target.removeEventListener('keydown', handleKeyDown as EventListener)
+      container.removeEventListener('keydown', handleKeyDown as EventListener)
     }
   }, [containerRef, handleKeyDown])
 

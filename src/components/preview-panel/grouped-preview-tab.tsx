@@ -41,8 +41,12 @@ export function GroupedPreviewTab({
           ? "bg-muted text-foreground"
           : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
       )}
+      role="presentation"
     >
       <button
+        role="tab"
+        aria-selected={active}
+        tabIndex={active ? 0 : -1}
         onClick={() => onSetActivePreviewPath(preview.path)}
         className="flex min-w-0 flex-1 items-center gap-1.5"
         title={preview.name}
@@ -127,6 +131,7 @@ export function GroupedPreviewTab({
             : "opacity-0 group-hover:opacity-100",
         )}
         title={locale.close}
+        aria-label={locale.close}
       >
         <X className="h-3 w-3" />
       </button>

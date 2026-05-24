@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useFinderStore, useFinderStoreApi } from "@/store";
 import type { FileEntry } from "@/types";
+import { getDeleteSelectionRequest } from "./delete-selection";
 
 export function useFileListKeyboardActions() {
   const {
@@ -11,6 +12,8 @@ export function useFileListKeyboardActions() {
     clearSelection,
     closeContextMenu,
     onOpen,
+    onDelete,
+    onConfirmDelete,
     navigateTo,
     onNavigateToPath,
     goBack,
@@ -37,6 +40,23 @@ export function useFileListKeyboardActions() {
     }
   }, [goBack, onNavigateToPath, storeApi]);
 
+  const deleteSelected = useCallback(async () => {
+    const state = storeApi.getState();
+    if (!state.hasDelete || state.selectedPaths.size === 0) return;
+
+    const request = getDeleteSelectionRequest({
+      files: state.files,
+      selectedPaths: state.selectedPaths,
+      locale: state.locale,
+    });
+    if (!request) return;
+
+    if (await onConfirmDelete(request.files, request.message)) {
+      await onDelete(request.files);
+      clearSelection();
+    }
+  }, [clearSelection, onConfirmDelete, onDelete, storeApi]);
+
   const keyboardActions = useMemo(() => ({
     onOpenEntry: openEntry,
     onToggleSelection: toggleSelection,
@@ -46,9 +66,11 @@ export function useFileListKeyboardActions() {
     onClearSelection: clearSelection,
     onCloseContextMenu: closeContextMenu,
     onNavigateBack: navigateBack,
+    onDeleteSelected: () => void deleteSelected(),
   }), [
     clearSelection,
     closeContextMenu,
+    deleteSelected,
     navigateBack,
     openEntry,
     selectAll,

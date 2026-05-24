@@ -1,7 +1,14 @@
 import { useState, useCallback } from 'react'
-import { Finder } from 'finder-ui'
-import type { FinderLocale } from 'finder-ui'
+import { Finder } from '@jeryfan/finder-ui'
+import type { FileEntry, FinderLocale } from '@jeryfan/finder-ui'
 import { fetchFiles, openFile, saveFile, uploadFiles } from '../../api'
+import { downloadAndSave } from '../download'
+import {
+  ExampleButton,
+  ExampleDivider,
+  ExampleFrame,
+  ExampleNote,
+} from '../shared'
 
 const zhCN: Partial<FinderLocale> = {
   search: '搜索', noFiles: '没有找到文件', tryDifferentSearch: '请尝试其他搜索词',
@@ -30,56 +37,62 @@ export default function KitchenSinkExample() {
     console.log(`[upload] ${files.length} files to ${targetPath ?? '/'}`)
   }, [])
 
+  const onDownload = useCallback(async (file: FileEntry) => {
+    await downloadAndSave(file)
+    console.log(`[download] ${file.name}`)
+  }, [])
+
+  const onBatchDownload = useCallback(async (files: FileEntry[]) => {
+    await Promise.all(files.map(onDownload))
+  }, [onDownload])
+
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '8px 12px', display: 'flex', gap: 8, borderBottom: '1px solid #eee', alignItems: 'center', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 13, color: '#666' }}>Theme:</span>
+    <ExampleFrame
+      toolbar={
+        <>
+        <ExampleNote>Theme:</ExampleNote>
         {(['default', 'graphite', 'minimal'] as const).map((t) => (
-          <button
+          <ExampleButton
             key={t}
             onClick={() => setTheme(t)}
-            style={{
-              padding: '4px 10px', borderRadius: 4, border: '1px solid #ddd', fontSize: 13, cursor: 'pointer',
-              background: theme === t ? '#333' : '#fff', color: theme === t ? '#fff' : '#333',
-            }}
+            active={theme === t}
           >
             {t}
-          </button>
+          </ExampleButton>
         ))}
-        <span style={{ width: 1, height: 20, background: '#ddd' }} />
-        <span style={{ fontSize: 13, color: '#666' }}>Language:</span>
+        <ExampleDivider />
+        <ExampleNote>Language:</ExampleNote>
         {(['en', 'zh'] as const).map((l) => (
-          <button
+          <ExampleButton
             key={l}
             onClick={() => setLang(l)}
-            style={{
-              padding: '4px 10px', borderRadius: 4, border: '1px solid #ddd', fontSize: 13, cursor: 'pointer',
-              background: lang === l ? '#333' : '#fff', color: lang === l ? '#fff' : '#333',
-            }}
+            active={lang === l}
           >
             {l === 'en' ? 'English' : '中文'}
-          </button>
+          </ExampleButton>
         ))}
-      </div>
-      <div style={{ flex: 1, minHeight: 0 }}>
-        <Finder
-          style={{ height: '100%' }}
-          theme={theme}
-          locale={lang === 'zh' ? zhCN : undefined}
-          editable
-          tabs={[
-            { key: 'all', label: 'All Files', rootPath: '/' },
-            { key: 'projects', label: 'Projects', rootPath: '/projects' },
-            { key: 'docs', label: 'Documents', rootPath: '/projects/docs' },
-            { key: 'notes', label: 'Notes', rootPath: '/notes' },
-            { key: 'archives', label: 'Archives', rootPath: '/archives' },
-          ]}
-          onFetchFiles={fetchFiles}
-          onOpenFile={openFile}
-          onUpload={onUpload}
-          onSave={onSave}
-        />
-      </div>
-    </div>
+        </>
+      }
+    >
+      <Finder
+        style={{ height: '100%' }}
+        theme={theme}
+        locale={lang === 'zh' ? zhCN : undefined}
+        editable
+        tabs={[
+          { key: 'all', label: 'All Files', rootPath: '/' },
+          { key: 'projects', label: 'Projects', rootPath: '/projects' },
+          { key: 'docs', label: 'Documents', rootPath: '/projects/docs' },
+          { key: 'notes', label: 'Notes', rootPath: '/notes' },
+          { key: 'archives', label: 'Archives', rootPath: '/archives' },
+        ]}
+        onFetchFiles={fetchFiles}
+        onOpenFile={openFile}
+        onUpload={onUpload}
+        onSave={onSave}
+        onDownload={onDownload}
+        onBatchDownload={onBatchDownload}
+      />
+    </ExampleFrame>
   )
 }

@@ -1,5 +1,5 @@
 import type { FinderLocale } from '@/locale'
-import type { ContextMenuTargetType, FileEntry } from '@/types'
+import type { ContextMenuTargetType, DeleteConfirmHandler, FileEntry } from '@/types'
 
 export type ContextMenuIconName =
   | 'download'
@@ -16,7 +16,7 @@ export type ContextMenuItem = {
   id: string
   label: string
   icon: ContextMenuIconName
-  action: () => void
+  action: () => Promise<void> | void
   divider?: boolean
 }
 
@@ -33,13 +33,13 @@ export type ContextMenuItemBuilderOptions = {
   hasBatchDownload: boolean
   locale: FinderLocale
   onOpen: (file: FileEntry) => void
-  onDownload: (file: FileEntry) => void
-  onBatchDownload: (files: FileEntry[]) => void
+  onDownload: (file: FileEntry) => Promise<void> | void
+  onBatchDownload: (files: FileEntry[]) => Promise<void> | void
   onUpload: (isFolder: boolean, targetPath?: string) => void
   onRefresh: () => void
   onDelete: (files: FileEntry[]) => Promise<void> | void
   setRenamingPath: (path: string | null) => void
   setIsCreatingFolder: (creating: boolean) => void
   closeMenu: () => void
-  confirm: (message: string) => boolean
+  confirm: DeleteConfirmHandler
 }

@@ -21,8 +21,8 @@ export function buildBatchContextMenuItems({
       id: 'download-selected',
       label: locale.downloadAll,
       icon: 'download',
-      action: () => {
-        onBatchDownload(selectedFiles)
+      action: async () => {
+        await onBatchDownload(selectedFiles)
         closeMenu()
       },
     })
@@ -33,9 +33,9 @@ export function buildBatchContextMenuItems({
       id: 'delete-selected',
       label: locale.delete,
       icon: 'delete',
-      action: () => {
-        if (confirm(locale.deleteMultipleConfirm(selectedCount))) {
-          onDelete(selectedFiles)
+      action: async () => {
+        if (await confirm(selectedFiles, locale.deleteMultipleConfirm(selectedCount))) {
+          await onDelete(selectedFiles)
         }
         closeMenu()
       },

@@ -7,6 +7,7 @@ import type {
   FileEntryContextHandler,
   FileEntryMouseHandler,
 } from "./file-list-row-types";
+import { getFileOptionId } from "./file-list-row-types";
 
 export type FileGridRowProps = {
   virtualKey: React.Key;
@@ -64,6 +65,7 @@ export function FileGridRow({
           return (
             <button
               key={entry.path}
+              id={getFileOptionId(flatIndex)}
               data-file-row="true"
               data-file-path={entry.path}
               data-file-index={flatIndex}
@@ -94,8 +96,8 @@ export function FileGridRow({
                 {renamingPath === entry.path ? (
                   <InlineInput
                     defaultValue={entry.name}
-                    onConfirm={(newName) => {
-                      onRename(entry, newName);
+                    onConfirm={async (newName) => {
+                      await onRename(entry, newName);
                       onSetRenamingPath(null);
                     }}
                     onCancel={() => onSetRenamingPath(null)}

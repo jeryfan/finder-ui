@@ -5,13 +5,15 @@ import tailwindcss from '@tailwindcss/vite'
 import { resolve } from 'path'
 
 export default defineConfig({
+  publicDir: false,
   plugins: [
     react(),
     tailwindcss(),
     dts({
       tsconfigPath: './tsconfig.app.json',
       entryRoot: 'src',
-      include: ['src/**/*'],
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
+      exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/__tests__/**'],
     })
   ],
   build: {

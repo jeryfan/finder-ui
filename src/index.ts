@@ -21,6 +21,7 @@ export type {
   TabKey,
   SidebarTab,
   FileEntry,
+  DeleteConfirmHandler,
   ContextMenuTargetType,
   PreviewMode,
   PreviewWindow,

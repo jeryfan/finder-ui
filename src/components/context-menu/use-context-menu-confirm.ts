@@ -1,5 +1,12 @@
-import { useCallback } from "react";
+import { useCallback } from 'react'
+import { useFinderStore } from '@/store'
+import type { FileEntry } from '@/types'
 
 export function useContextMenuConfirm() {
-  return useCallback((message: string) => window.confirm(message), []);
+  const { onConfirmDelete } = useFinderStore()
+
+  return useCallback(
+    (files: FileEntry[], message: string) => onConfirmDelete(files, message),
+    [onConfirmDelete],
+  )
 }

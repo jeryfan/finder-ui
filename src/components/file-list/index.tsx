@@ -20,6 +20,7 @@ import { useGridColumns, useSortedFiles } from "./use-file-list-data";
 import { useFileListDisplayState } from "./use-file-list-display-state";
 import { useFileListVirtualizers } from "./use-file-list-virtualizers";
 import { useKeyboardNavigation } from "./use-keyboard-nav";
+import { getFileOptionId } from "./file-list-row-types";
 
 export function FileList() {
   const {
@@ -119,6 +120,9 @@ export function FileList() {
         role="listbox"
         aria-label={locale.fileListLabel}
         aria-multiselectable="true"
+        aria-activedescendant={
+          focusedIndex >= 0 ? getFileOptionId(focusedIndex) : undefined
+        }
         onClick={handleBackgroundClick}
         onContextMenu={handleBackgroundContextMenu}
         onDragEnter={handleDragEnter}

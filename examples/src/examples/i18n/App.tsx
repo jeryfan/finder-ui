@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Finder } from 'finder-ui'
-import type { FinderLocale } from 'finder-ui'
+import { Finder } from '@jeryfan/finder-ui'
+import type { FinderLocale } from '@jeryfan/finder-ui'
 import { fetchFiles, openFile } from '../../api'
+import { ExampleButton, ExampleFrame, ExampleNote } from '../shared'
 
 const jaLocale: Partial<FinderLocale> = {
   search: '検索',
@@ -70,39 +71,32 @@ export default function I18nExample() {
   const [localeKey, setLocaleKey] = useState('en')
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '8px 12px', display: 'flex', gap: 8, borderBottom: '1px solid #eee', alignItems: 'center' }}>
-        <span style={{ fontSize: 13, color: '#666' }}>Language:</span>
+    <ExampleFrame
+      toolbar={
+        <>
+        <ExampleNote>Language:</ExampleNote>
         {Object.entries(locales).map(([key, { label }]) => (
-          <button
+          <ExampleButton
             key={key}
             onClick={() => setLocaleKey(key)}
-            style={{
-              padding: '4px 12px',
-              borderRadius: 4,
-              border: '1px solid #ddd',
-              background: localeKey === key ? '#333' : '#fff',
-              color: localeKey === key ? '#fff' : '#333',
-              cursor: 'pointer',
-              fontSize: 13,
-            }}
+            active={localeKey === key}
           >
             {label}
-          </button>
+          </ExampleButton>
         ))}
-      </div>
-      <div style={{ flex: 1, minHeight: 0 }}>
-        <Finder
-          style={{ height: '100%' }}
-          tabs={[
-            { key: 'docs', label: 'Documents', rootPath: '/projects/docs' },
-            { key: 'all', label: 'All Files', rootPath: '/' },
-          ]}
-          onFetchFiles={fetchFiles}
-          onOpenFile={openFile}
-          locale={locales[localeKey].value}
-        />
-      </div>
-    </div>
+        </>
+      }
+    >
+      <Finder
+        style={{ height: '100%' }}
+        tabs={[
+          { key: 'docs', label: 'Documents', rootPath: '/projects/docs' },
+          { key: 'all', label: 'All Files', rootPath: '/' },
+        ]}
+        onFetchFiles={fetchFiles}
+        onOpenFile={openFile}
+        locale={locales[localeKey].value}
+      />
+    </ExampleFrame>
   )
 }

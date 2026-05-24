@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { createFinderStore, FinderStoreContext } from '@/store'
-import type { SidebarTab, FileEntry } from '@/types'
+import type { SidebarTab, FileEntry, DeleteConfirmHandler } from '@/types'
 import type { FinderLocale } from '@/locale'
 import { FinderInner } from './finder-inner'
 
@@ -14,9 +14,9 @@ export type FinderProps = {
   /** Handle file open. Return a content string to show it in the preview panel. */
   onOpenFile?: (file: FileEntry) => Promise<string | void> | string | void
   /** Handle single file download */
-  onDownload?: (file: FileEntry) => void
+  onDownload?: (file: FileEntry) => Promise<void> | void
   /** Handle batch file download */
-  onBatchDownload?: (files: FileEntry[]) => void
+  onBatchDownload?: (files: FileEntry[]) => Promise<void> | void
   /** Handle file upload. Receives the selected files and the target directory path. */
   onUpload?: (files: File[], targetPath?: string) => Promise<void> | void
   /** Handle save of edited file content in preview */
@@ -25,6 +25,8 @@ export type FinderProps = {
   onRename?: (file: FileEntry, newName: string) => Promise<void> | void
   /** Handle file/folder deletion */
   onDelete?: (files: FileEntry[]) => Promise<void> | void
+  /** Confirm file/folder deletion. Return false to cancel. Defaults to `window.confirm`. */
+  onConfirmDelete?: DeleteConfirmHandler
   /** Handle new folder creation */
   onCreateFolder?: (parentPath: string, name: string) => Promise<void> | void
   /** Whether files can be edited in the preview panel. Default: false */

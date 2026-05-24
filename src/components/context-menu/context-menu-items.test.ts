@@ -50,7 +50,7 @@ const createOptions = (
 })
 
 describe('buildContextMenuItems', () => {
-  it('builds batch actions for multi-select file targets', () => {
+  it('builds batch actions for multi-select file targets', async () => {
     const options = createOptions({
       targetType: 'file',
       targetFile: fileEntry,
@@ -65,12 +65,12 @@ describe('buildContextMenuItems', () => {
       'delete-selected',
     ])
 
-    items[0].action()
+    await items[0].action()
     expect(options.onBatchDownload).toHaveBeenCalledWith(selectedFiles)
     expect(options.closeMenu).toHaveBeenCalledTimes(1)
 
-    items[1].action()
-    expect(options.confirm).toHaveBeenCalledWith('确定删除 2 个项目吗？')
+    await items[1].action()
+    expect(options.confirm).toHaveBeenCalledWith(selectedFiles, '确定删除 2 个项目吗？')
     expect(options.onDelete).toHaveBeenCalledWith(selectedFiles)
     expect(options.closeMenu).toHaveBeenCalledTimes(2)
   })
@@ -142,7 +142,7 @@ describe('buildContextMenuItems', () => {
     expect(options.onRefresh).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps closing after a delete confirmation is cancelled', () => {
+  it('keeps closing after a delete confirmation is cancelled', async () => {
     const options = createOptions({
       targetType: 'file',
       targetFile: fileEntry,
@@ -153,7 +153,41 @@ describe('buildContextMenuItems', () => {
 
     const items = buildContextMenuItems(options)
 
-    items[3].action()
+    await items[3].action()
+    expect(options.onDelete).not.toHaveBeenCalled()
+    expect(options.closeMenu).toHaveBeenCalledTimes(1)
+  })
+
+  it('waits for async delete confirmation before deleting', async () => {
+    const confirm = vi.fn(async () => true)
+    const options = createOptions({
+      targetType: 'folder',
+      targetFile: folderEntry,
+      selectedFiles: [folderEntry],
+      selectedCount: 1,
+      confirm,
+    })
+
+    const items = buildContextMenuItems(options)
+
+    await items[4].action()
+    expect(confirm).toHaveBeenCalledWith([folderEntry], '确定删除"docs"吗？')
+    expect(options.onDelete).toHaveBeenCalledWith([folderEntry])
+    expect(options.closeMenu).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps closing after async delete confirmation is cancelled', async () => {
+    const options = createOptions({
+      targetType: 'file',
+      targetFile: fileEntry,
+      selectedFiles: [fileEntry],
+      selectedCount: 1,
+      confirm: vi.fn(async () => false),
+    })
+
+    const items = buildContextMenuItems(options)
+
+    await items[3].action()
     expect(options.onDelete).not.toHaveBeenCalled()
     expect(options.closeMenu).toHaveBeenCalledTimes(1)
   })

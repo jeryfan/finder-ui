@@ -19,6 +19,11 @@ export type FileEntry = {
   mimeType?: string
 }
 
+export type DeleteConfirmHandler = (
+  files: FileEntry[],
+  message: string,
+) => Promise<boolean> | boolean
+
 export type ContextMenuTargetType = 'file' | 'folder' | 'empty'
 
 export type FilePreviewType = 'sheet' | 'doc' | 'presentation' | 'markdown' | null

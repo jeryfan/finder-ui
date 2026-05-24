@@ -13,7 +13,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      'finder-ui': resolve(rootDir, 'src/index.ts'),
+      '@jeryfan/finder-ui': resolve(rootDir, 'src/index.ts'),
       '@': resolve(rootDir, 'src'),
     },
   },

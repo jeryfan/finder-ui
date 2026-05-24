@@ -1,6 +1,14 @@
 import { useCallback } from "react";
-import { Finder } from "finder-ui";
-import { fetchFiles, openFile, saveFile, uploadFiles } from "../../api";
+import { Finder } from "@jeryfan/finder-ui";
+import type { FileEntry } from "@jeryfan/finder-ui";
+import {
+  fetchFiles,
+  openFile,
+  saveFile,
+  uploadFiles,
+} from "../../api";
+import { downloadAndSave } from "../download";
+import { ExampleFrame, ExampleNote } from "../shared";
 
 export default function FileOperationsExample() {
   const onSave = useCallback(async (path: string, content: string) => {
@@ -13,31 +21,29 @@ export default function FileOperationsExample() {
     console.log(`[upload] ${files.length} files to ${targetPath ?? "/"}`);
   }, []);
 
+  const onDownload = useCallback(async (file: FileEntry) => {
+    await downloadAndSave(file);
+    console.log(`[download] ${file.name}`);
+  }, []);
+
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <div
-        style={{
-          padding: "8px 12px",
-          fontSize: 13,
-          color: "#666",
-          borderBottom: "1px solid #eee",
-        }}
-      >
-        Open the browser console to see operation logs. Try right-click context
-        menu for Rename / Delete / New Folder.
-      </div>
-      <div style={{ flex: 1, minHeight: 0 }}>
-        <Finder
-          style={{ height: "100%" }}
-          tabs={[{ key: "files", label: "Files", rootPath: "/" }]}
-          onFetchFiles={fetchFiles}
-          onOpenFile={openFile}
-          onUpload={onUpload}
-          onSave={onSave}
-          onDownload={() => {}}
-          editable
-        />
-      </div>
-    </div>
+    <ExampleFrame
+      toolbar={
+        <ExampleNote>
+        Open the browser console to see save, upload, and download operation logs.
+        </ExampleNote>
+      }
+    >
+      <Finder
+        style={{ height: "100%" }}
+        tabs={[{ key: "files", label: "Files", rootPath: "/" }]}
+        onFetchFiles={fetchFiles}
+        onOpenFile={openFile}
+        onUpload={onUpload}
+        onSave={onSave}
+        onDownload={onDownload}
+        editable
+      />
+    </ExampleFrame>
   );
 }

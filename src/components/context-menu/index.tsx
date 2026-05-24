@@ -8,6 +8,7 @@ import { cn } from "@/utils";
 import { Download, Eye, RefreshCwIcon, Pencil, Trash2, FolderPlus } from "lucide-react";
 import { buildContextMenuItems } from "./context-menu-items";
 import type { ContextMenuIconName } from "./context-menu-items";
+import { getNextContextMenuIndex } from "./context-menu-keyboard";
 import { useContextMenuConfirm } from "./use-context-menu-confirm";
 import { useContextMenuLayer } from "./use-context-menu-layer";
 
@@ -118,22 +119,54 @@ export function ContextMenu() {
         event.preventDefault();
         handleClose();
         break;
+      case 'Tab':
+        handleClose();
+        break;
       case 'ArrowDown':
         event.preventDefault();
         setFocusedItemIndex((prev) =>
-          prev < menuItems.length - 1 ? prev + 1 : 0
+          getNextContextMenuIndex({
+            currentIndex: prev,
+            itemCount: menuItems.length,
+            direction: 'next',
+          })
         );
         break;
       case 'ArrowUp':
         event.preventDefault();
         setFocusedItemIndex((prev) =>
-          prev > 0 ? prev - 1 : menuItems.length - 1
+          getNextContextMenuIndex({
+            currentIndex: prev,
+            itemCount: menuItems.length,
+            direction: 'previous',
+          })
         );
         break;
+      case 'Home':
+        event.preventDefault();
+        setFocusedItemIndex((prev) =>
+          getNextContextMenuIndex({
+            currentIndex: prev,
+            itemCount: menuItems.length,
+            direction: 'first',
+          })
+        );
+        break;
+      case 'End':
+        event.preventDefault();
+        setFocusedItemIndex((prev) =>
+          getNextContextMenuIndex({
+            currentIndex: prev,
+            itemCount: menuItems.length,
+            direction: 'last',
+          })
+        );
+        break;
+      case ' ':
       case 'Enter': {
         event.preventDefault();
         if (focusedItemIndex >= 0 && focusedItemIndex < menuItems.length) {
-          menuItems[focusedItemIndex].action();
+          void menuItems[focusedItemIndex].action();
         }
         break;
       }
@@ -154,6 +187,9 @@ export function ContextMenu() {
       data-context-menu="true"
       role="menu"
       tabIndex={-1}
+      aria-activedescendant={
+        focusedItemIndex >= 0 ? `finder-context-menu-item-${menuItems[focusedItemIndex]?.id}` : undefined
+      }
     >
       {hasHeader && (
         <div className="px-3 py-1.5 text-xs text-muted-foreground border-b border-border">
@@ -169,8 +205,9 @@ export function ContextMenu() {
               <div className="my-1 border-t border-border" />
             )}
             <button
+              id={`finder-context-menu-item-${item.id}`}
               role="menuitem"
-              onClick={item.action}
+              onClick={() => void item.action()}
               onMouseEnter={() => setFocusedItemIndex(index)}
               className={cn(
                 "w-full flex items-center gap-2 px-3 py-1.5 transition-colors text-left text-foreground border-0",

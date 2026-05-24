@@ -42,6 +42,7 @@ export function PreviewTitleActions({
           onClick={() => void onDownloadPreview(preview.path)}
           className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           title={locale.download}
+          aria-label={locale.download}
         >
           <Download className="h-3.5 w-3.5" />
         </button>
@@ -84,6 +85,7 @@ export function PreviewTitleActions({
         onClick={() => onRefresh(preview.path)}
         className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         title={locale.refresh}
+        aria-label={locale.refresh}
       >
         <RefreshCwIcon className="h-3.5 w-3.5" />
       </button>
@@ -91,6 +93,7 @@ export function PreviewTitleActions({
         onClick={() => onMaximize(preview.path)}
         className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         title={locale.switchToGroupedMode}
+        aria-label={locale.switchToGroupedMode}
       >
         <Maximize2Icon className="h-3.5 w-3.5" />
       </button>
@@ -98,6 +101,7 @@ export function PreviewTitleActions({
         onClick={() => onClose(preview.path)}
         className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         title={locale.close}
+        aria-label={locale.close}
       >
         <X className="h-4 w-4" />
       </button>

@@ -10,6 +10,7 @@ export function useFinderCallbackRefs({
   onSave,
   onRename,
   onDelete,
+  onConfirmDelete,
   onCreateFolder,
 }: FinderProps) {
   const fetchFilesRef = useRef(onFetchFiles)
@@ -20,6 +21,7 @@ export function useFinderCallbackRefs({
   const saveRef = useRef(onSave)
   const renameRef = useRef(onRename)
   const deleteRef = useRef(onDelete)
+  const confirmDeleteRef = useRef(onConfirmDelete)
   const createFolderRef = useRef(onCreateFolder)
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export function useFinderCallbackRefs({
     saveRef.current = onSave
     renameRef.current = onRename
     deleteRef.current = onDelete
+    confirmDeleteRef.current = onConfirmDelete
     createFolderRef.current = onCreateFolder
   }, [
     onFetchFiles,
@@ -41,6 +44,7 @@ export function useFinderCallbackRefs({
     onSave,
     onRename,
     onDelete,
+    onConfirmDelete,
     onCreateFolder,
   ])
 
@@ -53,6 +57,7 @@ export function useFinderCallbackRefs({
     saveRef,
     renameRef,
     deleteRef,
+    confirmDeleteRef,
     createFolderRef,
   }
 }

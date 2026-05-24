@@ -1,5 +1,7 @@
 import type { FileEntry } from "@/types";
 
+export const getFileOptionId = (index: number) => `finder-file-option-${index}`;
+
 export type UploadingFileItem = {
   name: string;
   type: "file" | "directory";

@@ -1,5 +1,5 @@
-import type { FileEntry } from 'finder-ui'
-import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from 'finder-ui'
+import type { FileEntry } from '@jeryfan/finder-ui'
+import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@jeryfan/finder-ui'
 
 const API_BASE = '/api'
 
@@ -67,16 +67,22 @@ export async function uploadFiles(files: File[], targetPath = '/'): Promise<void
   )
 }
 
-export async function downloadFile(file: FileEntry): Promise<string> {
+export async function downloadFile(file: FileEntry): Promise<Blob> {
   const res = await fetch(
     `${API_BASE}/files?fileName=${encodeURIComponent(file.path)}&t=${Date.now()}`,
   )
-  const data = await res.json()
-  return data.file.content
+  const contentType = res.headers.get('content-type') ?? ''
+  if (contentType.includes('application/json')) {
+    const data = await res.json()
+    return new Blob([data.file.content], {
+      type: data.file.mimeType || 'text/plain;charset=utf-8',
+    })
+  }
+
+  return res.blob()
 }
 
-export function triggerDownload(content: string, filename: string): void {
-  const blob = new Blob([content], { type: 'application/octet-stream' })
+export function triggerDownload(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

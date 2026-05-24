@@ -70,9 +70,9 @@ export function buildFolderContextMenuItems({
       id: 'delete-folder',
       label: locale.delete,
       icon: 'delete',
-      action: () => {
-        if (confirm(locale.deleteConfirm(targetFile.name))) {
-          onDelete([targetFile])
+      action: async () => {
+        if (await confirm([targetFile], locale.deleteConfirm(targetFile.name))) {
+          await onDelete([targetFile])
         }
         closeMenu()
       },

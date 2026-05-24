@@ -18,6 +18,7 @@ export function useFinderHandlers({
   saveRef,
   renameRef,
   deleteRef,
+  confirmDeleteRef,
   createFolderRef,
   requestUpload,
   performUpload,
@@ -34,6 +35,7 @@ export function useFinderHandlers({
     setDropFilesHandler,
     setRenameHandler,
     setDeleteHandler,
+    setConfirmDeleteHandler,
     setCreateFolderHandler,
   } = useFinderStore()
   const storeApi = useFinderStoreApi()
@@ -59,8 +61,12 @@ export function useFinderHandlers({
       }
     })
 
-    setDownloadHandler((file) => downloadRef.current?.(file))
-    setBatchDownloadHandler((files) => batchDownloadRef.current?.(files))
+    setDownloadHandler(async (file) => {
+      await downloadRef.current?.(file)
+    })
+    setBatchDownloadHandler(async (files) => {
+      await batchDownloadRef.current?.(files)
+    })
     setUploadHandler(requestUpload)
     setSavePreviewHandler(async (path, content) => {
       await saveRef.current?.(path, content)
@@ -76,6 +82,11 @@ export function useFinderHandlers({
       await deleteRef.current?.(files)
       loadFiles(storeApi.getState().currentPath)
     })
+    setConfirmDeleteHandler((files, message) => {
+      const handler = confirmDeleteRef.current
+      if (handler) return handler(files, message)
+      return window.confirm(message)
+    })
     setCreateFolderHandler(async (parentPath, name) => {
       await createFolderRef.current?.(parentPath, name)
       loadFiles(storeApi.getState().currentPath)
@@ -87,6 +98,7 @@ export function useFinderHandlers({
     batchDownloadRef,
     createFolderRef,
     deleteRef,
+    confirmDeleteRef,
     downloadRef,
     loadFiles,
     openFileRef,
@@ -97,6 +109,7 @@ export function useFinderHandlers({
     setBatchDownloadHandler,
     setCreateFolderHandler,
     setDeleteHandler,
+    setConfirmDeleteHandler,
     setDownloadHandler,
     setDropFilesHandler,
     setNavigateToPathHandler,

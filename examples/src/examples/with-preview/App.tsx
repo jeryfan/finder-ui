@@ -1,4 +1,4 @@
-import { Finder } from 'finder-ui'
+import { Finder } from '@jeryfan/finder-ui'
 import { fetchFiles, openFile } from '../../api'
 
 export default function WithPreviewExample() {

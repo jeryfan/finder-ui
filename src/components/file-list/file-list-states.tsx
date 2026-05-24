@@ -111,8 +111,8 @@ export function NewFolderInput({
   onCreateFolder,
   onDone,
 }: NewFolderInputProps) {
-  const handleConfirm = (name: string) => {
-    onCreateFolder(currentPath, name);
+  const handleConfirm = async (name: string) => {
+    await onCreateFolder(currentPath, name);
     onDone();
   };
 

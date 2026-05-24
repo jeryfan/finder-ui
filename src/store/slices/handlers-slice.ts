@@ -22,6 +22,8 @@ export const createHandlersSlice: StateCreator<StoreState, [], [], HandlersSlice
   setRenameHandler: (handler) => set({ onRename: handler }),
   onDelete: async () => {},
   setDeleteHandler: (handler) => set({ onDelete: handler }),
+  onConfirmDelete: () => true,
+  setConfirmDeleteHandler: (handler) => set({ onConfirmDelete: handler }),
   onCreateFolder: async () => {},
   setCreateFolderHandler: (handler) => set({ onCreateFolder: handler }),
   hasRename: false,

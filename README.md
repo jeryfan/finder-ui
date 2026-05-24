@@ -43,12 +43,13 @@ function App() {
 | `onFetchFiles` | `(path: string) => Promise<FileEntry[]>` | Yes | Fetch files for a directory path |
 | `defaultTab` | `string` | No | Key of the initially active tab |
 | `onOpenFile` | `(file: FileEntry) => Promise<string \| void>` | No | Handle file open; return content string to show in preview |
-| `onDownload` | `(file: FileEntry) => void` | No | Handle single file download |
-| `onBatchDownload` | `(files: FileEntry[]) => void` | No | Handle batch file download |
+| `onDownload` | `(file: FileEntry) => Promise<void> \| void` | No | Handle single file download |
+| `onBatchDownload` | `(files: FileEntry[]) => Promise<void> \| void` | No | Handle batch file download |
 | `onUpload` | `(files: File[], targetPath?: string) => Promise<void>` | No | Handle file upload |
 | `onSave` | `(path: string, content: string) => Promise<void>` | No | Handle save of edited file content |
 | `onRename` | `(file: FileEntry, newName: string) => Promise<void>` | No | Handle file/folder rename |
 | `onDelete` | `(files: FileEntry[]) => Promise<void>` | No | Handle file/folder deletion |
+| `onConfirmDelete` | `(files: FileEntry[], message: string) => Promise<boolean> \| boolean` | No | Confirm file/folder deletion; return `false` to cancel |
 | `onCreateFolder` | `(parentPath: string, name: string) => Promise<void>` | No | Handle new folder creation |
 | `editable` | `boolean` | No | Enable file editing in preview panel |
 | `renderMarkdown` | `(content: string) => ReactNode` | No | Custom markdown renderer |
@@ -65,7 +66,7 @@ function App() {
 | `Enter` | Open file or enter folder |
 | `Backspace` | Go to parent directory |
 | `⌘/Ctrl + A` | Select all files |
-| `Delete` | Delete selected files |
+| `Delete` | Delete selected files when `onDelete` is provided |
 | `Escape` | Clear selection |
 
 ## Sizing
@@ -89,7 +90,7 @@ Each `<Finder>` creates an isolated store — multiple instances on the same pag
 
 ## Examples
 
-Run the API server and the examples app, then open `http://127.0.0.1:5273/`:
+Run the API server and the examples workbench, then open `http://127.0.0.1:5273/`:
 
 ```bash
 pnpm dev:api
@@ -99,12 +100,12 @@ pnpm dev
 | Example | Description |
 |---------|-------------|
 | **Basic** | Minimal setup — one tab, file listing only (~10 lines) |
-| **With Preview** | File preview for Markdown, code, CSV, images, and audio |
-| **File Operations** | Full CRUD — rename, delete, create folder, upload, and save |
+| **With Preview** | File preview for Markdown, code, CSV, images, audio, video, and PDF |
+| **File Operations** | Upload, save, and download callbacks wired to the local API |
 | **Internationalization** | Dynamic locale switching (English, Chinese, Japanese) |
 | **Custom Theme** | Theme switching (default/graphite/minimal) and CSS variable overrides |
 | **Multiple Instances** | Two independent Finder instances side by side |
-| **Kitchen Sink** | All features combined — multi-tab, preview, editing, i18n, themes, CRUD |
+| **Kitchen Sink** | Multi-tab browsing, preview, editing, i18n, themes, upload, save, and download |
 
 The bundled examples call the local `/api` endpoints through the Vite dev server proxy.
 

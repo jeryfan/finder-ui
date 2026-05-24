@@ -26,6 +26,7 @@ export function PreviewSaveButton({
       disabled={!canSave && !preview.isSaving}
       className={className}
       title={locale.save}
+      aria-label={locale.save}
     >
       {preview.isSaving ? (
         <Loader2 className={cn(iconClassName, "animate-spin")} />
@@ -59,6 +60,7 @@ export function PreviewEditButton({
       onClick={onClick}
       className={className}
       title={isEditAction ? locale.edit : locale.preview}
+      aria-label={isEditAction ? locale.edit : locale.preview}
     >
       <Icon className={iconClassName} />
     </button>

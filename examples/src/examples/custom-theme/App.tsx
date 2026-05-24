@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Finder } from 'finder-ui'
+import { Finder } from '@jeryfan/finder-ui'
 import { fetchFiles, openFile } from '../../api'
+import { ExampleButton, ExampleDivider, ExampleFrame, ExampleNote } from '../shared'
 
 const themes = [
   { key: 'default' as const, label: 'Default (Amber)' },
@@ -13,46 +14,39 @@ export default function CustomThemeExample() {
   const [customBg, setCustomBg] = useState(false)
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '8px 12px', display: 'flex', gap: 8, borderBottom: '1px solid #eee', alignItems: 'center', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 13, color: '#666' }}>Theme:</span>
+    <ExampleFrame
+      toolbar={
+        <>
+        <ExampleNote>Theme:</ExampleNote>
         {themes.map(({ key, label }) => (
-          <button
+          <ExampleButton
             key={key}
             onClick={() => setTheme(key)}
-            style={{
-              padding: '4px 12px',
-              borderRadius: 4,
-              border: '1px solid #ddd',
-              background: theme === key ? '#333' : '#fff',
-              color: theme === key ? '#fff' : '#333',
-              cursor: 'pointer',
-              fontSize: 13,
-            }}
+            active={theme === key}
           >
             {label}
-          </button>
+          </ExampleButton>
         ))}
-        <span style={{ width: 1, height: 20, background: '#ddd' }} />
+        <ExampleDivider />
         <label style={{ fontSize: 13, color: '#666', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
           <input type="checkbox" checked={customBg} onChange={(e) => setCustomBg(e.target.checked)} />
           Custom background (className override)
         </label>
-      </div>
-      <div style={{ flex: 1, minHeight: 0 }}>
-        <style>{`.custom-bg { --color-background: #f0e6ff; --color-sidebar: #e8dcf5; }`}</style>
-        <Finder
-          style={{ height: '100%' }}
-          theme={theme}
-          className={customBg ? 'custom-bg' : undefined}
-          tabs={[
-            { key: 'all', label: 'All Files', rootPath: '/' },
-            { key: 'projects', label: 'Projects', rootPath: '/projects' },
-          ]}
-          onFetchFiles={fetchFiles}
-          onOpenFile={openFile}
-        />
-      </div>
-    </div>
+        </>
+      }
+    >
+      <style>{`.custom-bg { --color-background: #f0e6ff; --color-sidebar: #e8dcf5; }`}</style>
+      <Finder
+        style={{ height: '100%' }}
+        theme={theme}
+        className={customBg ? 'custom-bg' : undefined}
+        tabs={[
+          { key: 'all', label: 'All Files', rootPath: '/' },
+          { key: 'projects', label: 'Projects', rootPath: '/projects' },
+        ]}
+        onFetchFiles={fetchFiles}
+        onOpenFile={openFile}
+      />
+    </ExampleFrame>
   )
 }

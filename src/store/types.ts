@@ -1,4 +1,12 @@
-import type { SidebarTab, TabKey, FileEntry, ContextMenuTargetType, PreviewMode, PreviewWindow } from '@/types'
+import type {
+  SidebarTab,
+  TabKey,
+  FileEntry,
+  ContextMenuTargetType,
+  PreviewMode,
+  PreviewWindow,
+  DeleteConfirmHandler,
+} from '@/types'
 import type { FinderLocale } from '@/locale'
 
 export interface ContextMenuState {
@@ -93,10 +101,10 @@ export interface ContextMenuSlice {
 export interface HandlersSlice {
   onOpen: (file: FileEntry) => void
   setOpenHandler: (handler: (file: FileEntry) => void) => void
-  onDownload: (file: FileEntry) => void
-  setDownloadHandler: (handler: (file: FileEntry) => void) => void
-  onBatchDownload: (files: FileEntry[]) => void
-  setBatchDownloadHandler: (handler: (files: FileEntry[]) => void) => void
+  onDownload: (file: FileEntry) => Promise<void> | void
+  setDownloadHandler: (handler: (file: FileEntry) => Promise<void> | void) => void
+  onBatchDownload: (files: FileEntry[]) => Promise<void> | void
+  setBatchDownloadHandler: (handler: (files: FileEntry[]) => Promise<void> | void) => void
   onUpload: (isFolder: boolean, targetPath?: string) => void
   setUploadHandler: (handler: (isFolder: boolean, targetPath?: string) => void) => void
   onRefresh: () => void
@@ -111,6 +119,8 @@ export interface HandlersSlice {
   setRenameHandler: (handler: (file: FileEntry, newName: string) => Promise<void> | void) => void
   onDelete: (files: FileEntry[]) => Promise<void> | void
   setDeleteHandler: (handler: (files: FileEntry[]) => Promise<void> | void) => void
+  onConfirmDelete: DeleteConfirmHandler
+  setConfirmDeleteHandler: (handler: DeleteConfirmHandler) => void
   onCreateFolder: (parentPath: string, name: string) => Promise<void> | void
   setCreateFolderHandler: (handler: (parentPath: string, name: string) => Promise<void> | void) => void
   hasRename: boolean

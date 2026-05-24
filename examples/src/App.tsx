@@ -1,146 +1,76 @@
-import { useState } from 'react'
-import { Finder, type SidebarTab, type FileEntry, type FinderLocale } from 'finder-ui'
-import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from 'finder-ui'
-import { enLocale } from 'finder-ui'
-import { zhCNLocale } from 'finder-ui'
+import { lazy, Suspense, useMemo, useState, type ComponentType } from 'react'
 
-// ── Icons ──────────────────────────────────────────────────────
+const BasicExample = lazy(() => import('./examples/basic/App'))
+const CustomThemeExample = lazy(() => import('./examples/custom-theme/App'))
+const FileOperationsExample = lazy(() => import('./examples/file-operations/App'))
+const I18nExample = lazy(() => import('./examples/i18n/App'))
+const KitchenSinkExample = lazy(() => import('./examples/kitchen-sink/App'))
+const MultipleInstancesExample = lazy(() => import('./examples/multiple-instances/App'))
+const WithPreviewExample = lazy(() => import('./examples/with-preview/App'))
 
-const ProjectsIcon = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-    <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-  </svg>
-)
-
-const NotesIcon = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-    <polyline points="14 2 14 8 20 8" />
-    <line x1="16" y1="13" x2="8" y2="13" />
-    <line x1="16" y1="17" x2="8" y2="17" />
-    <polyline points="10 9 9 9 8 9" />
-  </svg>
-)
-
-const ArchiveIcon = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-    <polyline points="21 8 21 21 3 21 3 8" />
-    <rect x="1" y="3" width="22" height="5" />
-    <line x1="10" y1="12" x2="14" y2="12" />
-  </svg>
-)
-
-// ── Tabs ───────────────────────────────────────────────────────
-
-const TABS: SidebarTab[] = [
-  { key: 'projects', label: 'Projects', rootPath: '/projects', icon: ProjectsIcon },
-  { key: 'notes', label: 'Notes', rootPath: '/notes', icon: NotesIcon },
-  { key: 'archives', label: 'Archives', rootPath: '/archives', icon: ArchiveIcon },
+const EXAMPLES = [
+  {
+    key: 'kitchen-sink',
+    name: 'Kitchen Sink',
+    description: 'Multi-tab browsing, preview, editing, i18n, themes, upload, save, and download.',
+    component: KitchenSinkExample,
+  },
+  {
+    key: 'basic',
+    name: 'Basic',
+    description: 'Minimal setup with one tab and file listing only.',
+    component: BasicExample,
+  },
+  {
+    key: 'with-preview',
+    name: 'With Preview',
+    description: 'Preview Markdown, code, CSV, images, audio, video, and PDF files.',
+    component: WithPreviewExample,
+  },
+  {
+    key: 'file-operations',
+    name: 'File Operations',
+    description: 'Upload, save, and download callbacks wired to the local API.',
+    component: FileOperationsExample,
+  },
+  {
+    key: 'i18n',
+    name: 'Internationalization',
+    description: 'Switch locale strings at runtime.',
+    component: I18nExample,
+  },
+  {
+    key: 'custom-theme',
+    name: 'Custom Theme',
+    description: 'Theme variants and CSS variable overrides.',
+    component: CustomThemeExample,
+  },
+  {
+    key: 'multiple-instances',
+    name: 'Multiple Instances',
+    description: 'Two independent Finder instances sharing the same API.',
+    component: MultipleInstancesExample,
+  },
 ]
 
-// ── Helpers ────────────────────────────────────────────────────
+type ExampleKey = (typeof EXAMPLES)[number]['key']
 
-function triggerDownload(content: string, filename: string) {
-  const blob = new Blob([content], { type: 'application/octet-stream' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+type ExampleMeta = {
+  key: ExampleKey
+  name: string
+  description: string
+  component: ComponentType
 }
 
-const THEMES = ['default', 'graphite', 'minimal'] as const
-type Theme = (typeof THEMES)[number]
-
-const LOCALES: Record<string, Partial<FinderLocale>> = {
-  en: enLocale,
-  'zh-CN': zhCNLocale,
-}
-
-// ── App ────────────────────────────────────────────────────────
+const EXAMPLE_ITEMS: readonly ExampleMeta[] = EXAMPLES
 
 function App() {
-  const [theme, setTheme] = useState<Theme>('default')
-  const [localeKey, setLocaleKey] = useState('en')
-
-  const handleFetchFiles = async (path: string): Promise<FileEntry[]> => {
-    const res = await fetch(`/api/files?path=${encodeURIComponent(path)}`)
-    const data = await res.json()
-    return data.files
-  }
-
-  const handleOpenFile = async (file: FileEntry): Promise<string | void> => {
-    if (file.type !== 'file') return
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
-    const url = `/api/files?fileName=${encodeURIComponent(file.path)}&t=${Date.now()}`
-
-    if (IMAGE_EXTENSIONS.has(ext) || VIDEO_EXTENSIONS.has(ext) || AUDIO_EXTENSIONS.has(ext) || ext === 'pdf') {
-      const res = await fetch(url)
-      const blob = await res.blob()
-      return URL.createObjectURL(blob)
-    }
-
-    const res = await fetch(url)
-    const data = await res.json()
-    return data.file.content
-  }
-
-  const handleSave = async (path: string, content: string) => {
-    const parentDir = path.substring(0, path.lastIndexOf('/'))
-    const fileName = path.substring(path.lastIndexOf('/') + 1)
-    const blob = new Blob([content], { type: 'text/plain' })
-    const form = new FormData()
-    form.append('path', parentDir)
-    form.append('files', blob, fileName)
-    await fetch('/api/files/upload', { method: 'POST', body: form })
-  }
-
-  const handleUpload = async (files: File[], targetPath = '/') => {
-    const dir = targetPath
-    const hasRelativePaths = files.some((f) => f.webkitRelativePath?.includes('/'))
-
-    if (!hasRelativePaths) {
-      const form = new FormData()
-      form.append('path', dir)
-      for (const f of files) form.append('files', f, f.name)
-      await fetch('/api/files/upload', { method: 'POST', body: form })
-      return
-    }
-
-    const groups = new Map<string, File[]>()
-    for (const file of files) {
-      const parts = (file.webkitRelativePath || file.name).split('/')
-      parts.pop()
-      const dirKey = parts.join('/')
-      if (!groups.has(dirKey)) groups.set(dirKey, [])
-      groups.get(dirKey)!.push(file)
-    }
-
-    await Promise.all(
-      Array.from(groups.entries()).map(([dirKey, groupFiles]) => {
-        const targetDir = dir === '/' ? `/${dirKey}` : `${dir}/${dirKey}`
-        const form = new FormData()
-        form.append('path', targetDir)
-        for (const f of groupFiles) form.append('files', f, f.name)
-        return fetch('/api/files/upload', { method: 'POST', body: form })
-      }),
-    )
-  }
-
-  const handleDownload = async (file: FileEntry) => {
-    const res = await fetch(
-      `/api/files?fileName=${encodeURIComponent(file.path)}&t=${Date.now()}`,
-    )
-    const data = await res.json()
-    triggerDownload(data.file.content, file.name)
-  }
-
-  const handleBatchDownload = (files: FileEntry[]) => {
-    for (const f of files) handleDownload(f)
-  }
+  const [activeKey, setActiveKey] = useState<ExampleKey>('kitchen-sink')
+  const activeExample = useMemo(
+    () => EXAMPLE_ITEMS.find((example) => example.key === activeKey) ?? EXAMPLE_ITEMS[0],
+    [activeKey],
+  )
+  const ActiveComponent = activeExample.component
 
   return (
     <div
@@ -150,72 +80,52 @@ function App() {
         WebkitFontSmoothing: 'antialiased',
       }}
     >
-      {/* ── Outer App Sidebar ── */}
-      <aside className="h-full w-64 flex-shrink-0 flex flex-col px-4">
-        <div className="flex-shrink-0 pt-4 pb-1">
-          <h2 className="text-xs font-semibold text-[#666666] uppercase tracking-wider mb-3">Demo Controls</h2>
-
-          <div className="space-y-3">
-            <div>
-              <label className="text-[10px] font-medium text-[#999] uppercase tracking-wider">Theme</label>
-              <div className="flex gap-1 mt-1">
-                {THEMES.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTheme(t)}
-                    className={`px-2 py-1 text-xs rounded-md border transition-colors ${
-                      theme === t
-                        ? 'bg-[#2E2929] text-white border-[#2E2929]'
-                        : 'bg-white text-[#2E2929] border-[#EAE9E6] hover:bg-[#F6F5F4]'
-                    }`}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-[10px] font-medium text-[#999] uppercase tracking-wider">Locale</label>
-              <div className="flex gap-1 mt-1">
-                {Object.keys(LOCALES).map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => setLocaleKey(key)}
-                    className={`px-2 py-1 text-xs rounded-md border transition-colors ${
-                      localeKey === key
-                        ? 'bg-[#2E2929] text-white border-[#2E2929]'
-                        : 'bg-white text-[#2E2929] border-[#EAE9E6] hover:bg-[#F6F5F4]'
-                    }`}
-                  >
-                    {key}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+      <aside className="h-full w-72 flex-shrink-0 flex flex-col px-4 py-4 border-r border-[#EAE9E6]">
+        <div className="mb-4">
+          <h1 className="text-sm font-semibold text-[#2E2929]">finder-ui examples</h1>
+          <p className="mt-1 text-xs leading-5 text-[#666666]">
+            API server: 8010 · Vite: 5273
+          </p>
         </div>
-        <div className="flex-1 min-h-0" />
-        <div className="pt-1 pb-4 flex-shrink-0" />
+
+        <nav className="space-y-1" aria-label="Examples">
+          {EXAMPLE_ITEMS.map((example) => {
+            const active = example.key === activeKey
+            return (
+              <button
+                key={example.key}
+                type="button"
+                onClick={() => setActiveKey(example.key)}
+                className={`w-full text-left px-3 py-2 rounded-md border transition-colors ${
+                  active
+                    ? 'bg-[#2E2929] text-white border-[#2E2929]'
+                    : 'bg-white text-[#2E2929] border-[#EAE9E6] hover:bg-[#F6F5F4]'
+                }`}
+                aria-current={active ? 'page' : undefined}
+              >
+                <span className="block text-xs font-semibold">{example.name}</span>
+                <span className={`block mt-1 text-[11px] leading-4 ${active ? 'text-white/75' : 'text-[#777]'}`}>
+                  {example.description}
+                </span>
+              </button>
+            )
+          })}
+        </nav>
       </aside>
 
-      {/* ── Content: Finder ── */}
-      <div className="flex-1 min-w-0 h-full pt-4 pr-4 pb-4">
-        <Finder
-          tabs={TABS}
-          defaultTab="projects"
-          style={{ height: '100%', width: '100%' }}
-          theme={theme}
-          locale={LOCALES[localeKey]}
-          onFetchFiles={handleFetchFiles}
-          onOpenFile={handleOpenFile}
-          onSave={handleSave}
-          onUpload={handleUpload}
-          onDownload={handleDownload}
-          onBatchDownload={handleBatchDownload}
-          editable
-        />
-      </div>
+      <main className="flex-1 min-w-0 h-full p-4">
+        <div className="h-full overflow-hidden rounded-lg border border-[#EAE9E6] bg-white">
+          <Suspense
+            fallback={
+              <div className="h-full flex items-center justify-center text-sm text-[#666666]">
+                Loading example...
+              </div>
+            }
+          >
+            <ActiveComponent />
+          </Suspense>
+        </div>
+      </main>
     </div>
   )
 }

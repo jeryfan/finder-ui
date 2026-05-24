@@ -35,8 +35,8 @@ export function buildFileContextMenuItems({
       id: 'download-file',
       label: locale.download,
       icon: 'download',
-      action: () => {
-        onDownload(targetFile)
+      action: async () => {
+        await onDownload(targetFile)
         closeMenu()
       },
     })
@@ -59,9 +59,9 @@ export function buildFileContextMenuItems({
       id: 'delete-file',
       label: locale.delete,
       icon: 'delete',
-      action: () => {
-        if (confirm(locale.deleteConfirm(targetFile.name))) {
-          onDelete([targetFile])
+      action: async () => {
+        if (await confirm([targetFile], locale.deleteConfirm(targetFile.name))) {
+          await onDelete([targetFile])
         }
         closeMenu()
       },

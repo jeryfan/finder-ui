@@ -7,6 +7,7 @@ import type {
   FileEntryContextHandler,
   FileEntryMouseHandler,
 } from "./file-list-row-types";
+import { getFileOptionId } from "./file-list-row-types";
 
 export type FileListRowProps = {
   virtualKey: React.Key;
@@ -48,6 +49,7 @@ export function FileListRow({
   return (
     <button
       key={virtualKey}
+      id={getFileOptionId(virtualIndex)}
       data-file-row="true"
       data-file-path={entry.path}
       data-file-index={virtualIndex}
@@ -87,8 +89,8 @@ export function FileListRow({
         {renamingPath === entry.path ? (
           <InlineInput
             defaultValue={entry.name}
-            onConfirm={(newName) => {
-              onRename(entry, newName);
+            onConfirm={async (newName) => {
+              await onRename(entry, newName);
               onSetRenamingPath(null);
             }}
             onCancel={() => onSetRenamingPath(null)}
