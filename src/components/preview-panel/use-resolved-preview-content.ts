@@ -14,6 +14,11 @@ function isResolvableContentUrl(content: string) {
   return content.startsWith("blob:") || content.startsWith("data:");
 }
 
+function normalizeResolvableContentUrl(content: string) {
+  const trimmed = content.trim();
+  return isResolvableContentUrl(trimmed) ? trimmed : content;
+}
+
 function shouldResolveContentUrl(contentKind: PreviewContentKind) {
   return TEXT_CONTENT_KINDS.has(contentKind.kind);
 }
@@ -22,7 +27,7 @@ export function useResolvedPreviewContent(
   preview: PreviewWindow,
   contentKind: PreviewContentKind,
 ) {
-  const source = preview.draftContent || preview.content;
+  const source = normalizeResolvableContentUrl(preview.draftContent || preview.content);
   const shouldResolve = shouldResolveContentUrl(contentKind);
   const [state, setState] = useState<{
     source: string;

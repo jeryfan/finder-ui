@@ -43,6 +43,64 @@ const waitFor = async (assertion: () => void) => {
 }
 
 describe('PreviewContent', () => {
+  it('does not expose a resolvable url before text content finishes loading', async () => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const root = createRoot(host)
+    const contentUrl = `data:text/markdown;charset=utf-8,${encodeURIComponent('# URL markdown')}`
+
+    await act(async () => {
+      root.render(
+        <PreviewContent
+          preview={createPreview('notes.md', {
+            content: contentUrl,
+            draftContent: contentUrl,
+            mimeType: 'text/markdown',
+          })}
+          locale={enLocale}
+          renderMarkdown={(content) => <div data-testid="markdown-content">{content}</div>}
+        />,
+      )
+    })
+
+    expect(host.textContent).not.toContain(contentUrl)
+
+    await act(async () => {
+      root.unmount()
+    })
+    host.remove()
+  })
+
+  it('resolves url content with surrounding whitespace for text based previews', async () => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const root = createRoot(host)
+    const contentUrl = `data:text/markdown;charset=utf-8,${encodeURIComponent('# Trimmed URL markdown')}`
+
+    await act(async () => {
+      root.render(
+        <PreviewContent
+          preview={createPreview('notes.md', {
+            content: `\n${contentUrl}\n`,
+            draftContent: `\n${contentUrl}\n`,
+            mimeType: 'text/markdown',
+          })}
+          locale={enLocale}
+          renderMarkdown={(content) => <div data-testid="markdown-content">{content}</div>}
+        />,
+      )
+    })
+
+    await waitFor(() => {
+      expect(host.textContent).toContain('# Trimmed URL markdown')
+    })
+
+    await act(async () => {
+      root.unmount()
+    })
+    host.remove()
+  })
+
   it('resolves url content for text based previews', async () => {
     const host = document.createElement('div')
     document.body.appendChild(host)
