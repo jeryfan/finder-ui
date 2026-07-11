@@ -16,23 +16,25 @@ import {
   PreviewLoadingState,
 } from "./preview-content";
 
-export type PreviewBodyProps = {
+export type PreviewContentProps = {
   preview: PreviewWindow;
-  updateEnabled: boolean;
+  updateEnabled?: boolean;
   locale: FinderLocale;
   renderMarkdown?: (content: string) => React.ReactNode;
-  onDraftChange: (path: string, content: string) => void;
-  onRefresh: (path: string) => void;
+  onDraftChange?: (path: string, content: string) => void;
+  onRefresh?: (path: string) => void;
 };
 
-export function PreviewBody({
+const noop = () => {};
+
+export function PreviewContent({
   preview,
-  updateEnabled,
+  updateEnabled = false,
   locale,
   renderMarkdown,
-  onDraftChange,
-  onRefresh,
-}: PreviewBodyProps) {
+  onDraftChange = noop,
+  onRefresh = noop,
+}: PreviewContentProps) {
   const contentKind = getPreviewContentKind(preview);
 
   if (preview.isLoading) {
@@ -88,3 +90,7 @@ export function PreviewBody({
       );
   }
 }
+
+export type PreviewBodyProps = PreviewContentProps;
+
+export const PreviewBody = PreviewContent;

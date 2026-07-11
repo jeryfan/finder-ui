@@ -1,6 +1,10 @@
 import { SplitMode } from './split-mode'
 import { GroupedMode } from './grouped-mode'
+import { PreviewContent, type PreviewContentProps } from './preview-body'
 import { usePreviewPanel } from './use-preview-panel'
+
+export { PreviewContent }
+export type { PreviewContentProps }
 
 export type PreviewPanelProps = {
   leftPaneWidth: number
