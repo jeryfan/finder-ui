@@ -26,7 +26,52 @@ const createPreview = (
   ...overrides,
 })
 
+const waitFor = async (assertion: () => void) => {
+  let lastError: unknown
+  for (let i = 0; i < 10; i += 1) {
+    try {
+      assertion()
+      return
+    } catch (error) {
+      lastError = error
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0))
+      })
+    }
+  }
+  throw lastError
+}
+
 describe('PreviewContent', () => {
+  it('resolves url content for text based previews', async () => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const root = createRoot(host)
+    const contentUrl = `data:text/markdown;charset=utf-8,${encodeURIComponent('# URL markdown')}`
+
+    await act(async () => {
+      root.render(
+        <PreviewContent
+          preview={createPreview('notes.md', {
+            content: contentUrl,
+            draftContent: contentUrl,
+            mimeType: 'text/markdown',
+          })}
+          locale={enLocale}
+          renderMarkdown={(content) => <div data-testid="markdown-content">{content}</div>}
+        />,
+      )
+    })
+
+    await waitFor(() => {
+      expect(host.textContent).toContain('# URL markdown')
+    })
+    await act(async () => {
+      root.unmount()
+    })
+    host.remove()
+  })
+
   it('is exported as a standalone preview renderer', async () => {
     const host = document.createElement('div')
     document.body.appendChild(host)

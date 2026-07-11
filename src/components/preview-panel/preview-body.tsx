@@ -6,6 +6,7 @@ import type { PreviewWindow } from "@/types";
 import type { FinderLocale } from "@/locale";
 import { defaultRenderMarkdown } from "./markdown-renderer";
 import { getPreviewContentKind } from "./preview-content-kind";
+import { useResolvedPreviewContent } from "./use-resolved-preview-content";
 import {
   CodePreviewEditor,
   HtmlPreviewFrame,
@@ -36,15 +37,16 @@ export function PreviewContent({
   onRefresh = noop,
 }: PreviewContentProps) {
   const contentKind = getPreviewContentKind(preview);
+  const resolvedPreview = useResolvedPreviewContent(preview, contentKind);
 
-  if (preview.isLoading) {
+  if (resolvedPreview.isLoading) {
     return <PreviewLoadingState />;
   }
 
-  if (preview.error) {
+  if (resolvedPreview.error) {
     return (
       <PreviewErrorState
-        preview={preview}
+        preview={resolvedPreview}
         locale={locale}
         onRefresh={onRefresh}
       />
@@ -53,28 +55,28 @@ export function PreviewContent({
 
   switch (contentKind.kind) {
     case "image":
-      return <ImagePreview src={preview.content} alt={preview.name} locale={locale} />;
+      return <ImagePreview src={resolvedPreview.content} alt={resolvedPreview.name} locale={locale} />;
     case "video":
-      return <VideoPreview src={preview.content} />;
+      return <VideoPreview src={resolvedPreview.content} />;
     case "audio":
-      return <AudioPreview src={preview.content} name={preview.name} locale={locale} />;
+      return <AudioPreview src={resolvedPreview.content} name={resolvedPreview.name} locale={locale} />;
     case "pdf":
-      return <PdfPreviewFrame preview={preview} />;
+      return <PdfPreviewFrame preview={resolvedPreview} />;
     case "csv":
-      return <TablePreview content={preview.draftContent} locale={locale} />;
+      return <TablePreview content={resolvedPreview.draftContent} locale={locale} />;
     case "markdown":
       return (
         <MarkdownPreviewContent
-          preview={preview}
+          preview={resolvedPreview}
           renderMarkdown={renderMarkdown ?? defaultRenderMarkdown}
         />
       );
     case "html":
-      return <HtmlPreviewFrame preview={preview} />;
+      return <HtmlPreviewFrame preview={resolvedPreview} />;
     case "code":
       return (
         <CodePreviewEditor
-          preview={preview}
+          preview={resolvedPreview}
           updateEnabled={updateEnabled}
           extension={contentKind.extension}
           onDraftChange={onDraftChange}
@@ -83,7 +85,7 @@ export function PreviewContent({
     case "text":
       return (
         <PlainTextPreviewEditor
-          preview={preview}
+          preview={resolvedPreview}
           updateEnabled={updateEnabled}
           onDraftChange={onDraftChange}
         />

@@ -33,6 +33,17 @@ describe('getPreviewContentKind', () => {
     expect(getPreviewContentKind(createPreview(name)).kind).toBe(kind)
   })
 
+  it('classifies files by mime type when the name has no extension', () => {
+    expect(getPreviewContentKind(createPreview('pasted-image', { mimeType: 'image/png' })).kind).toBe('image')
+    expect(getPreviewContentKind(createPreview('pasted-video', { mimeType: 'video/mp4' })).kind).toBe('video')
+    expect(getPreviewContentKind(createPreview('pasted-audio', { mimeType: 'audio/mpeg' })).kind).toBe('audio')
+    expect(getPreviewContentKind(createPreview('pasted-pdf', { mimeType: 'application/pdf' })).kind).toBe('pdf')
+    expect(getPreviewContentKind(createPreview('pasted-markdown', { mimeType: 'text/markdown' })).kind).toBe('markdown')
+    expect(getPreviewContentKind(createPreview('pasted-html', { mimeType: 'text/html' })).kind).toBe('html')
+    expect(getPreviewContentKind(createPreview('pasted-json', { mimeType: 'application/json' })).kind).toBe('code')
+    expect(getPreviewContentKind(createPreview('pasted-csv', { mimeType: 'text/csv' })).kind).toBe('csv')
+  })
+
   it('uses the code editor kind while markdown or html files are being edited', () => {
     expect(getPreviewContentKind(createPreview('notes.md', { isEditing: true }))).toEqual({
       kind: 'code',
