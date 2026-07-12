@@ -82,7 +82,7 @@ export function HtmlPreviewFrame({ preview }: HtmlPreviewFrameProps) {
         srcDoc={preview.draftContent}
         className="h-full w-full border-0 bg-white"
         title={preview.name}
-        sandbox="allow-same-origin"
+        sandbox="allow-same-origin allow-scripts"
       />
     </div>
   );

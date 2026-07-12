@@ -130,6 +130,32 @@ describe('PreviewContent', () => {
     host.remove()
   })
 
+  it('allows scripts in html previews by default', async () => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const root = createRoot(host)
+
+    await act(async () => {
+      root.render(
+        <PreviewContent
+          preview={createPreview('page.html', {
+            content: '<button onclick="window.clicked = true">Click</button>',
+            draftContent: '<button onclick="window.clicked = true">Click</button>',
+            mimeType: 'text/html',
+          })}
+          locale={enLocale}
+        />,
+      )
+    })
+
+    expect(host.querySelector('iframe')?.getAttribute('sandbox')).toBe('allow-same-origin allow-scripts')
+
+    await act(async () => {
+      root.unmount()
+    })
+    host.remove()
+  })
+
   it('is exported as a standalone preview renderer', async () => {
     const host = document.createElement('div')
     document.body.appendChild(host)
